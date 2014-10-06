@@ -1,0 +1,69 @@
+{
+  "id": "authnz-vagrant",
+  "authn": {
+    "search_head": {
+      "LDAP_strategies": [{
+        "bag": ":ldap",
+        "roleMap" : {
+          "opsinfra": "splunk_dev_opsinfra",
+          "admin": "DevOps_SuperAdmins"
+        }
+      }]
+    },
+    "server": "search_head",
+    "": {
+      "LDAP_strategies": [{
+        "bag": ":ldap",
+        "roleMap" : {
+          "admin": "DevOps_SuperAdmins"
+        }
+      }]
+    },
+    "forwarder":null
+  },
+  "ldap":{
+    "strategy_name":"ADDomain",
+    "host":"ad.example.com",
+    "SSLEnabled":1,
+    "port":636,
+    "bindDN":"bindacct@example.com",
+    "bindDNpassword":"passwords:bindacct",
+    "userBaseDN":["OU=Users,DC=example,DC=com"],
+    "userBaseFilter":"(objectClass=user)",
+    "userNameAttribute":"sAMAccountName",
+    "realNameAttribute":"displayName",
+    "groupBaseDN":["OU=Splunk Groups,DC=example,DC=com"],
+    "groupBaseFilter":"(objectClass=group)",
+    "groupNameAttribute":"cn",
+    "groupMemberAttribute":"member",
+    "nestedGroups":1,
+    "anonymous_referrals":0
+  },
+  "roles":{
+    "server":"search_head",
+    "search_head": {
+      "default":{
+        "app":"launcher",
+        "tz":"America/Chicago",
+        "showWhatsNew":0,
+        "capabilities":["!schedule_rtsearch"]
+      },
+      "nobody": {},
+      "user": {
+        "app":"search",
+        "capabilities":["!change_own_password","schedule_search"],
+        "srchIndexesAllowed":[],
+        "srchIndexesDefault":[]
+      },
+      "cloud-infra": {
+        "importRoles":["user"]
+      },
+      "opsinfra":{
+        "importRoles":["user"]
+      },
+      "admin": {
+        "capabilities":["change_own_password"]
+      }
+    }
+  }
+}

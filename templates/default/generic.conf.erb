@@ -1,0 +1,17 @@
+# Auto Generated and Managed with Chef!
+# EVERY TIME YOU MANUALLY EDIT THIS FILE,
+# APES GO BANANNAS MONKEYPATCHING UR RUBIES
+# SO DON'T DO IT CHIMP!!!!! BORK BORK BORK!!!!!
+
+<% @stanzas['default'].each do |key,value| -%>
+<%=key%> = <%=value%>
+<% end if @stanzas['default'] -%>
+
+<% @stanzas.each do |stanza,hash|
+     next if 'default' == stanza -%>
+[<%=stanza%>]
+<%   hash.each do |key,value| -%>
+<%=key%> = <%=value%>
+<%   end -%>
+
+<% end -%>

@@ -1,0 +1,1 @@
+default[:splunk][:groups] = ['vagrant']

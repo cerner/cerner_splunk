@@ -1,0 +1,31 @@
+{
+  "id": "indexes-vagrant",
+  "config": {
+    "default": {
+      "maxTotalDataSizeMB": 81920,
+      "frozenTimePeriodInSecs": 15778800
+    },
+    "_audit": { "maxTotalDataSizeMB": 500000 },
+    "_internal": {
+      "maxTotalDataSizeMB": 500000,
+      "frozenTimePeriodInSecs": 7776000
+    },
+    "history": { "disabled": true },
+    "main": {
+      "isReadOnly": true,
+      "maxDataSize": "auto",
+      "maxMemMB": 1
+    },
+    "opsinfra" : {},
+    "pop_health" : {},
+    "bobs_index_emporium": {},
+    "summary": { "maxTotalDataSizeMB": 500000 }
+  },
+  "flags": {
+    "_audit": { "noGeneratePaths": true },
+    "_internal": { "noGeneratePaths": true },
+    "main": { "noGeneratePaths": true, "noRepFactor": true },
+    "history": { "noGeneratePaths": true, "noRepFactor": true },
+    "summary": { "noGeneratePaths": true }
+  }
+}

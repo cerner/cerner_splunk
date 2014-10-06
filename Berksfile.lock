@@ -1,0 +1,9 @@
+DEPENDENCIES
+  cerner_splunk
+    path: .
+    metadata: true
+
+GRAPH
+  cerner_splunk (1.5.0)
+    ulimit (~> 0.3.2)
+  ulimit (0.3.2)

@@ -1,0 +1,27 @@
+LineLength:
+  Enabled: false
+
+TrivialAccessors:
+  ExactNameMatch: true
+
+CollectionMethods:
+  Enabled: false
+
+EachWithObject:
+  Enabled: false
+
+MethodLength:
+  Max: 40
+  Exclude:
+    - libraries/lwrp.rb
+    - libraries/databag.rb
+    - libraries/conf.rb
+
+SingleSpaceBeforeFirstArg:
+  Exclude:
+    - '**/metadata.rb'
+
+PerceivedComplexity:
+  Exclude:
+    - libraries/lwrp.rb
+    - libraries/databag.rb

@@ -1,0 +1,9 @@
+require 'socket'
+
+# rubocop:disable RescueModifier
+internal = !Socket.gethostbyname('repo.release.cerner.corp').nil? rescue false
+# rubocop:enable RescueModifier
+
+if internal
+  cookbook 'splunk_forwarder', git: 'http://github.cerner.com/aeon-operations/splunk-forwarder-chef.git', tag: '1.1.0', rel: 'cookbooks/splunk_forwarder'
+end

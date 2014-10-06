@@ -1,0 +1,13 @@
+{
+  "id": "cluster-standalone",
+  "receivers": [
+    "33.33.33.20"
+  ],
+  "license_uri": null,
+  "receiver_settings": {
+    "splunktcp": {
+      "port": 9997
+    }
+  },
+  "indexes" : "cerner_splunk/indexes-vagrant"
+}

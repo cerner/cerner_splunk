@@ -1,0 +1,7 @@
+<% time = Time.now - 3600
+
+(1..10).each do |x|
+  time = time + x
+-%>
+<%=[*1..254].sample(4).join('.')%> - webdev [<%=time.strftime("%d/%b/%Y:%T %z")%>] "GET / HTTP/1.0" 200 0442 "-" "check_http/1.10 (nagios-plugins 1.4)"
+<% end %>

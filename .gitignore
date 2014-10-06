@@ -1,0 +1,23 @@
+.vagrant
+*~
+*#
+.#*
+\#*#
+.*.sw[a-z]
+*.project
+.idea/
+*.bak
+*.DS_Store
+*.un~
+
+# Bundler
+Gemfile.lock
+bin/*
+.bundle/*
+
+# Roll-Out
+/target
+/site
+
+# Vagrant-Repo
+vagrant_repo/Berksfile.lock
