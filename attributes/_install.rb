@@ -4,8 +4,8 @@ default[:splunk][:node_type] = nil
 
 default[:splunk][:external_config_directory] = '/etc/splunk'
 
-default[:splunk][:package][:version] = '6.0.3'
-default[:splunk][:package][:build] = '204106'
+default[:splunk][:package][:version] = '6.0.6'
+default[:splunk][:package][:build] = '228831'
 
 default[:splunk][:package][:base_url] = 'http://download.splunk.com/releases'
 default[:splunk][:package][:platform] = node[:os]
