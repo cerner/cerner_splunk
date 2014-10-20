@@ -1,5 +1,5 @@
 if respond_to? :source
-  source 'https://api.berkshelf.com'
+  source 'https://supermarket.getchef.com'
 else
   site :opscode
 end
