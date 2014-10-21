@@ -2,11 +2,11 @@
 ===================
 Installs and Configures Splunk forwarders and servers, and other components related to the same.
 
-Based on the work done by [BBY Solutions](https://github.com/bestbuycom/splunk_cookbook) and the [aeon-operations](http://github.cerner.com/aeon-operations/splunk-chef) team.
+Based on the work done by [BBY Solutions](https://github.com/bestbuycom/splunk_cookbook) and a previous Cerner team.
 
 Requirements
 ------------
-* Red Hat Enterprise 5.5+ or Ubuntu LTS 12.04+
+* Red Hat Enterprise / CentOS 5.5+ or Ubuntu LTS 12.04+
 * Chef 10.24+ or 11+
 
 **_Important Note:_** The Cerner forked 0.10.8.x versions of Chef are NOT supported and will likely be [problematic](http://www.fireflyfans.net/bluesunimages/227243C5F193ACEE32D874D8BD22AFD1.jpg). We highly suggest moving to Omnibus packaged Chef 10.24+ as quickly as possible.
