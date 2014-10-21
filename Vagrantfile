@@ -16,8 +16,8 @@ end
 @boxes =
   if @internal
     {
-      newest: { box: 'rhel65-1.0.0', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel65/1.0.0/rhel65-1.0.0.box' },
-      previous: { box: 'rhel64-1.2.0', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel64/1.2.0/rhel64-1.2.0.box' },
+      newest: { box: 'rhel65-1.0.1', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel65/1.0.1/rhel65-1.0.1.box' },
+      previous: { box: 'rhel64-1.2.1', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel64/1.2.1/rhel64-1.2.1.box' },
       rhel55: { box: 'rhel55-1.0.0', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel55/1.0.0/rhel55-1.0.0.box' },
       ubuntu1204: { box: 'opscode_ubuntu-12.04_provisionerless', box_url: 'http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-12.04_chef-provisionerless.box' }
     }
