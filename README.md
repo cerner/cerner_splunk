@@ -44,10 +44,10 @@ Getting your logs into Splunk
     * As root on each node, run chef-client & profit.
 
 ### Example Time!!!!
-Let's say I'm on an Awesome Population Health team, and I am setting up an Apache server, and want to feed the access and error logs into Splunk.
+Let's say I'm on the Awesome Team, and I am setting up an Apache server, and want to feed the access and error logs into Splunk.
 
 1. I talk to my trusty Splunk administrator, who points me to the `cluster-corporate` item in the `cerner_splunk` databag.
-2. Because I'm part of Population Health, I've talked to my team and Splunk Administrator to learn I'm forwarding to the `pop_health` index.
+2. I've talked to my team and Splunk Administrator to also learn that Awesome Team's events should be forwarded to the `awesome_team` index.
 3. My Apache access log will be located on my nodes at /var/log/httpd/access_log, and the error log is at /var/log/httpd/error_log.
     * My application recipe creates and grants access to these logs to the 'apachelogs' group, and the directories leading to them are traversable by members of the same group.
     * I'm using standard logging, so my Access log is in NCSA Combined format (access_combined sourcetype), and my Error log is sourcetype apache_error.
@@ -56,21 +56,21 @@ Let's say I'm on an Awesome Population Health team, and I am setting up an Apach
      ```ruby
      # coding: UTF-8
 
-     name 'pop_health_awesomeness_corporate'
-     description 'Node Environment for the Awesome Pop Health Team Servers in Corporate'
+     name 'awesomeness_corporate'
+     description 'Node Environment for the Awesome Team Servers in Corporate'
      default_attributes(splunk: { config: { clusters: ['cerner_splunk/cluster-corporate']}})
      ```
     * I create a role:
      ```ruby
       # coding: UTF-8
 
-      name 'pop_health_awesome_ops'
-      description 'PHAwesome Operations Role'
+      name 'awesomeness_ops'
+      description 'Awesome Operations Role'
       run_list 'recipe[cerner_splunk]'
       default_attributes(
         splunk: {
           groups: ['apachelogs']
-          main_project_index: 'pop_health',
+          main_project_index: 'awesome_team',
           monitors: [{
             path: '/var/log/httpd/access_log',
             sourcetype: 'access_combined'
