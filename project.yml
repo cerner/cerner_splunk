@@ -1,7 +1,7 @@
 name: Splunk Cookbook
 group_id: com.cerner.opsinfra
 artifact_id: cerner_splunk
-version: 1.5.0
+version: 1.6.0.SNAPSHOT
 doc: tomdoc
 package:
   type: cookbook
@@ -13,6 +13,7 @@ jira:
   component: 12916
 github:
   project_url: https://github.com/cerner/cerner_splunk
+  previous_version: 1.5.0
 snapshot_repository:
   id: semantic-snapshot
   url: http://repo.snapshot.cerner.corp/nexus/content/repositories/semantic-snapshot/
