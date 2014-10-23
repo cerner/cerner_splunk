@@ -16,8 +16,8 @@ end
 @boxes =
   if @internal
     {
-      newest: { box: 'rhel65-1.0.0', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel65/1.0.0/rhel65-1.0.0.box' },
-      previous: { box: 'rhel64-1.2.0', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel64/1.2.0/rhel64-1.2.0.box' },
+      newest: { box: 'rhel65-1.0.1', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel65/1.0.1/rhel65-1.0.1.box' },
+      previous: { box: 'rhel64-1.2.1', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel64/1.2.1/rhel64-1.2.1.box' },
       rhel55: { box: 'rhel55-1.0.0', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel55/1.0.0/rhel55-1.0.0.box' },
       ubuntu1204: { box: 'opscode_ubuntu-12.04_provisionerless', box_url: 'http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-12.04_chef-provisionerless.box' }
     }
@@ -51,7 +51,12 @@ fail 'Non-unique hostnames' if @network.collect { |_, v| v[:hostname] }.uniq!
 
 fail 'Non-unique ports' if @network.collect { |_, v| v[:ports].keys }.flat_map { |v| v }.uniq!
 
+def default_omnibus(config)
+  config.omnibus.chef_version = :latest
+end
+
 def disk(config)
+  default_omnibus config
   config.vm.provision :shell, inline: 'lvextend -L 10G /dev/vg00/optlv00 && resize2fs /dev/vg00/optlv00 || echo "already resized"'
 end
 
@@ -90,7 +95,6 @@ end
 
 Vagrant.configure('2') do |config|
   set_box config, :newest
-  config.omnibus.chef_version = :latest
 
   if Vagrant.has_plugin? 'vagrant-berkshelf'
     config.berkshelf.enabled = false
@@ -105,9 +109,11 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :chef do |cfg|
+    config.omnibus.chef_version = nil
+
     cfg.vm.provision :shell, inline: <<-'SCRIPT'.gsub(/^\s+/, '')
       yum -y install git
-      rpm -q chefdk || rpm -Uvh https://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chefdk-0.2.0-2.el6.x86_64.rpm
+      rpm -q chefdk || rpm -Uvh https://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chefdk-0.3.0-1.x86_64.rpm
     SCRIPT
 
     if ENV['KNIFE_ONLY']
@@ -188,6 +194,7 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :f_default do |cfg|
+    default_omnibus config
     set_box cfg, :previous
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :f_default, 'splunk_standalone'
@@ -198,6 +205,7 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :f_debian do |cfg|
+    default_omnibus config
     set_box cfg, :ubuntu1204
     cfg.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', 256]

@@ -17,8 +17,8 @@ Configurable (with defaults)
   * `node[:splunk][:monitors][][:index]` - Index to send events from this monitor to (`node[:splunk][:main_project_index]`).
   * `node[:splunk][:monitors][][:type]` - Type of stanza (`monitor`). See [inputs.conf][] for stanzas.
   * `node[:splunk][:monitors][][???]` - Other attributes for an inputs.conf stanza. See [inputs.conf][]
-* `node[:splunk][:package][:version]` - Major version to install (`6.0.3`)
-* `node[:splunk][:package][:build]` - Corresponding build number (`204106`)
+* `node[:splunk][:package][:version]` - Major version to install (`6.0.6`)
+* `node[:splunk][:package][:build]` - Corresponding build number (`228831`)
 * `node[:splunk][:package][:base_url]` - Base download path (`http://download.splunk.com/releases`)
 * `node[:splunk][:package][:base_name]` - Name of the package to install (`splunkforwarder`/`splunk`)
 * `node[:splunk][:package][:name]` - Name of the package being installed (`"#{node[:splunk][:package][:base_name]}-#{node[:splunk][:package][:version]}-#{node[:splunk][:package][:build]}"`)

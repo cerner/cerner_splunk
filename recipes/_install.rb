@@ -56,7 +56,7 @@ end
 include_recipe 'cerner_splunk::_user_management'
 
 execute 'splunk-first-run' do
-  command "#{node[:splunk][:cmd]} help --accept-license --answer-yes --no-prompt"
+  command "#{node[:splunk][:cmd]} help commands --accept-license --answer-yes --no-prompt"
   user node[:splunk][:user]
   group node[:splunk][:group]
   action :nothing

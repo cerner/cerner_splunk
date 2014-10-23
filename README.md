@@ -2,11 +2,11 @@
 ===================
 Installs and Configures Splunk forwarders and servers, and other components related to the same.
 
-Based on the work done by [BBY Solutions](https://github.com/bestbuycom/splunk_cookbook) and the [aeon-operations](http://github.cerner.com/aeon-operations/splunk-chef) team.
+Based on the work done by [BBY Solutions](https://github.com/bestbuycom/splunk_cookbook) and a previous Cerner team.
 
 Requirements
 ------------
-* Red Hat Enterprise 5.5+ or Ubuntu LTS 12.04+
+* Red Hat Enterprise / CentOS 5.5+ or Ubuntu LTS 12.04+
 * Chef 10.24+ or 11+
 
 **_Important Note:_** The Cerner forked 0.10.8.x versions of Chef are NOT supported and will likely be [problematic](http://www.fireflyfans.net/bluesunimages/227243C5F193ACEE32D874D8BD22AFD1.jpg). We highly suggest moving to Omnibus packaged Chef 10.24+ as quickly as possible.
@@ -44,10 +44,10 @@ Getting your logs into Splunk
     * As root on each node, run chef-client & profit.
 
 ### Example Time!!!!
-Let's say I'm on an Awesome Population Health team, and I am setting up an Apache server, and want to feed the access and error logs into Splunk.
+Let's say I'm on the Awesome Team, and I am setting up an Apache server, and want to feed the access and error logs into Splunk.
 
 1. I talk to my trusty Splunk administrator, who points me to the `cluster-corporate` item in the `cerner_splunk` databag.
-2. Because I'm part of Population Health, I've talked to my team and Splunk Administrator to learn I'm forwarding to the `pop_health` index.
+2. I've talked to my team and Splunk Administrator to also learn that Awesome Team's events should be forwarded to the `awesome_team` index.
 3. My Apache access log will be located on my nodes at /var/log/httpd/access_log, and the error log is at /var/log/httpd/error_log.
     * My application recipe creates and grants access to these logs to the 'apachelogs' group, and the directories leading to them are traversable by members of the same group.
     * I'm using standard logging, so my Access log is in NCSA Combined format (access_combined sourcetype), and my Error log is sourcetype apache_error.
@@ -56,21 +56,21 @@ Let's say I'm on an Awesome Population Health team, and I am setting up an Apach
      ```ruby
      # coding: UTF-8
 
-     name 'pop_health_awesomeness_corporate'
-     description 'Node Environment for the Awesome Pop Health Team Servers in Corporate'
+     name 'awesomeness_corporate'
+     description 'Node Environment for the Awesome Team Servers in Corporate'
      default_attributes(splunk: { config: { clusters: ['cerner_splunk/cluster-corporate']}})
      ```
     * I create a role:
      ```ruby
       # coding: UTF-8
 
-      name 'pop_health_awesome_ops'
-      description 'PHAwesome Operations Role'
+      name 'awesomeness_ops'
+      description 'Awesome Operations Role'
       run_list 'recipe[cerner_splunk]'
       default_attributes(
         splunk: {
           groups: ['apachelogs']
-          main_project_index: 'pop_health',
+          main_project_index: 'awesome_team',
           monitors: [{
             path: '/var/log/httpd/access_log',
             sourcetype: 'access_combined'
