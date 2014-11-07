@@ -25,6 +25,7 @@ The Cluster Hash is part of a plaintext data bag item that defines a logical gro
 * `['receivers']` - Array of strings of hosts where this cluster's indexers are listening. (Required for forwarders)
 * `['receiver_settings']['splunktcp']['port']` - Port indexers are listening on, and forwarders are sending data (required for forwarders and receivers)
 * `['indexes']` - A String pointing to an indexes data bag hash. (Coordinate form as described above)
+* `['apps']` - A String pointing to an apps data bag hash. (Coordinate form as described above)
 
 License Hash
 ------------
@@ -85,6 +86,23 @@ An Alerts hash is a contextual (see above) Hash, part of a plaintext data bag it
 * `['email']['auth_password']` - Coordinate String (see above), pointing to a String within a Chef Vault encrypted data bag item.
 * `[stanza][key]` - Any other stanza/key combination from [alert-actions.conf][]
 
+Apps Hash
+-----------
+An apps hash is a contextual (see above) Hash, part of a plaintext data bag item or specified directly as attributes that configures apps. A special key of 'master-apps' is looked for managing apps that should be installed and pushed by the cluster master, instead of locally.
+
+* `['bag']` - A string that points to an externalized Apps Hash in which all keys (except this one) are valid. 
+* `[app]` - The name of an app to manage (disk name)
+* `[app]['remove']` - If true, remove this app instead of creating / managing  (default - false)
+* `[app]['local']` - If true, manage files in the local directories instead of the "default" (default-false)
+* `[app]['files']` - Hash of files to manage under the "default" or "local" directory.
+* `[app]['files'][filename]` - Contents of a particular file to manage. It can take 3 values, a hash of stanzas -> key-value pairs (then written with the splunk template), a string (written as is), or nil / false (deleted). If the hash or string is empty, the file is also deleted.
+* `[app]['permissions']` - Hash of permissions to manage for the app. 
+* `[app]['permissions'][object]` - Permissions to manage for a particular knowledge object or class of knowledge objects
+* `[app]['permissions'][object]['access']['read']` - array of roles or String '*' allowed to read the object
+* `[app]['permissions'][object]['access']['write']` - array of roles or String '*' allowed to write the object
+* `[app]['permissions'][object][???]` - Any otther stanza from [default.meta][]
+
+
 Docs Navigation
 ===============
 * [Docs Readme](README.md)
@@ -96,3 +114,4 @@ Docs Navigation
 [authorize.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Authorizeconf
 [authentication.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Authenticationconf
 [alert-actions.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Alert-actionsconf
+[default.meta]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Defaultmetaconf
