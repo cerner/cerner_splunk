@@ -25,3 +25,7 @@ PerceivedComplexity:
   Exclude:
     - libraries/lwrp.rb
     - libraries/databag.rb
+
+Metrics/AbcSize:
+  Enabled: false
+
