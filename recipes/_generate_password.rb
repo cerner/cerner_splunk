@@ -19,10 +19,18 @@ execute 'change-admin-password' do
   command "#{node[:splunk][:cmd]} edit user admin -password #{new_password} -roles admin -auth admin:#{old_password}"
 end
 
+if platform_family?('windows')
+  system_user = 'SYSTEM'
+  system_group = 'SYSTEM'
+else
+  system_user = 'root'
+  system_group = 'root'
+end
+
 file password_file do
   backup false
-  owner 'root'
-  group 'root'
+  owner system_user
+  group system_group
   mode '0600'
   content new_password
 end

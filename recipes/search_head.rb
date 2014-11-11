@@ -5,6 +5,8 @@
 #
 # Configures a Search Head
 
+fail 'Search Head installation not currently supported on windows' if platform_family?('windows')
+
 ## Attributes
 instance_exec :search_head, &CernerSplunk::NODE_TYPE
 

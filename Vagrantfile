@@ -19,6 +19,7 @@ end
       newest: { box: 'rhel65-1.0.1', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel65/1.0.1/rhel65-1.0.1.box' },
       previous: { box: 'rhel64-1.2.1', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel64/1.2.1/rhel64-1.2.1.box' },
       rhel55: { box: 'rhel55-1.0.0', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel55/1.0.0/rhel55-1.0.0.box' },
+      win2012r2: { box: 'win2012r2-standard-nocm-1.0.0', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/win2012r2-standard-nocm/1.0.0/win2012r2-standard-nocm-1.0.0.box' },
       ubuntu1204: { box: 'opscode_ubuntu-12.04_provisionerless', box_url: 'http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-12.04_chef-provisionerless.box' }
     }
   else
@@ -39,7 +40,8 @@ end
   s_standalone: { ip: '33.33.33.20', hostname: 'splunk2', ports: { 8006 => 8000, 8096 => 8089 } },
   f_default:    { ip: '33.33.33.50', hostname: 'default.forward', ports: { 9090 => 8089 } },
   f_debian:     { ip: '33.33.33.51', hostname: 'debian.forward', ports: { 9091 => 8089 } },
-  f_old:        { ip: '33.33.33.52', hostname: 'splunk4.forward', ports: { 9092 => 8089 } }
+  f_old:        { ip: '33.33.33.52', hostname: 'splunk4.forward', ports: { 9092 => 8089 } },
+  f_win2012r2:  { ip: '33.33.33.53', hostname: 'windowsforward', ports: { 9093 => 8089 } }
 }
 
 @chefip = @network[:chef][:ip]
@@ -64,7 +66,7 @@ def network(config, name, splunk_password = true)
   net = @network.delete(name)
   throw "Unknown or duplicate config #{name}" unless net
 
-  config.vm.hostname = "#{net[:hostname]}.cerner.local"
+  config.vm.hostname = "#{net[:hostname]}"
   config.vm.network :private_network, ip: net[:ip]
   net[:ports].each do |hostport, guestport|
     config.vm.network :forwarded_port, guest: guestport, host: hostport, auto_correct: true
@@ -230,5 +232,19 @@ Vagrant.configure('2') do |config|
       chef.add_recipe 'cerner_splunk_test'
     end
     network cfg, :f_old
+  end if @internal
+
+  config.vm.define :f_win2012r2 do |cfg|
+    set_box cfg, :win2012r2
+    default_omnibus config
+    cfg.vm.provider :virtualbox do |vb|
+      vb.customize ['modifyvm', :id, '--memory', 1024]
+    end
+    cfg.vm.provision :chef_client do |chef|
+      chef_defaults chef, :f_win2012r2, 'splunk_standalone'
+      chef.add_role 'splunk_monitors_windows'
+      chef.add_recipe 'cerner_splunk'
+    end
+    network cfg, :f_win2012r2, false
   end if @internal
 end

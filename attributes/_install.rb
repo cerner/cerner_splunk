@@ -2,7 +2,11 @@
 
 default[:splunk][:node_type] = nil
 
-default[:splunk][:external_config_directory] = '/etc/splunk'
+if platform_family?('windows')
+  default[:splunk][:external_config_directory] = "#{ENV['PROGRAMDATA']}/splunk"
+else
+  default[:splunk][:external_config_directory] = '/etc/splunk'
+end
 
 default[:splunk][:package][:version] = '6.0.6'
 default[:splunk][:package][:build] = '228831'
@@ -23,6 +27,12 @@ default[:splunk][:package][:file_suffix] =
     else
       '-linux-2.6-intel.deb'
     end
+  when 'windows'
+    if node[:kernel][:machine] == 'x86_64'
+      '-x64-release.msi'
+    else
+      '-x86-release.msi'
+    end
   end
 
 default[:splunk][:package][:provider] =
@@ -31,4 +41,6 @@ default[:splunk][:package][:provider] =
     Chef::Provider::Package::Rpm
   when 'debian'
     Chef::Provider::Package::Dpkg
+  when 'windows'
+    Chef::Provider::Package::Windows
   end
