@@ -5,6 +5,9 @@
 #
 # Manages the attributes of the splunk user. Called after package installation.
 
+# User management currently not supported on windows
+return if platform_family?('windows')
+
 # user should be created by the package install
 user node[:splunk][:user] do
   supports manage_home: true

@@ -5,6 +5,8 @@
 #
 # Removes the side-effects from the Aeon Forwarder
 
+return if platform_family?('windows')
+
 ruby_block 'clean-bashrc' do
   block do
     begin

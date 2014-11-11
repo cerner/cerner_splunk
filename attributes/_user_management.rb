@@ -1,8 +1,13 @@
 # coding: UTF-8
 
 # Do not override these
-default[:splunk][:user] = 'splunk'
-default[:splunk][:group] = 'splunk'
+if platform_family?('windows')
+  default[:splunk][:user] = 'SYSTEM'
+  default[:splunk][:group] = 'SYSTEM'
+else
+  default[:splunk][:user] = 'splunk'
+  default[:splunk][:group] = 'splunk'
+end
 
 # This attribute you can add splunk to additional groups
 default[:splunk][:groups] = []

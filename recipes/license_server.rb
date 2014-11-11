@@ -5,6 +5,8 @@
 #
 # Configures a License Server
 
+fail 'License Server installation not currently supported on windows' if platform_family?('windows')
+
 chef_gem 'nokogiri'
 require 'nokogiri'
 

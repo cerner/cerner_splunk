@@ -10,6 +10,7 @@ depends          'ulimit', '~> 0.3.2'
 
 supports         'redhat', '>= 5.5'
 supports         'ubuntu', '>= 12.04'
+supports         'windows', '>= 6.1'
 
 # Chef's cookbook: https://github.com/opscode-cookbooks/chef-splunk
 conflicts        'chef-splunk'

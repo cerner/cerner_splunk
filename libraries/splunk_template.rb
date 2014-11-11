@@ -29,6 +29,11 @@ class Chef
         user node[:splunk][:user]
         group node[:splunk][:group]
         mode '0600'
+        # atomic_update in this instance causes issues on windows similar to
+        # https://tickets.opscode.com/browse/CHEF-4625
+        # However, atomic_update from a chef provided template resource
+        # works on the same node that this fails.
+        atomic_update false if platform_family?('windows')
 
         # If resource name is unambiguous, default values
         case name
