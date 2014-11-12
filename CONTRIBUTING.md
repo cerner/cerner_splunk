@@ -2,7 +2,7 @@
 1. Cookbook related Issues should be logged on Github's issue tracker, and are considered to be the source of truth. 
     1.  Issues should be triaged and marked with an appropriate label of bug, enhancement, question
     2. A corresponding internal JIRA could be logged if there needs to be internal discussion or if an internal code review is desired
-2.  The issue should be worked in a branch (Outside of the cerner/cerner_splunk repo)
+2.  The issue should be worked on in a fork of this repo (Outside of the cerner/cerner_splunk repo)
     1. Working internally on OpsInfra/cerner_splunk and using Crucible reviews is OK.
 3. The feature is pull requested to 'stable' 
     1. The feature branch should use as few logical commits as possible with descriptive commit messages
@@ -10,6 +10,7 @@
 4. The pull request is reviewed and gets two +1s, or is sent back for revision
 5. The issue is marked for the next milestone. 
 6. A merge commit is made to merge the pull request to stable and close the issue
+
 # Release Process:
 1. An issue is created in the milestone with the label of release
     1. The issue will summarize what was changed in the release, and propose a tag text
