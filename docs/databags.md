@@ -96,11 +96,11 @@ An apps hash is a contextual (see above) Hash, part of a plaintext data bag item
 * `[app]['local']` - If true, manage files in the local directories instead of the "default" (default-false)
 * `[app]['files']` - Hash of files to manage under the "default" or "local" directory.
 * `[app]['files'][filename]` - Contents of a particular file to manage. It can take 3 values, a hash of stanzas -> key-value pairs (then written with the splunk template), a string (written as is), or nil / false (deleted). If the hash or string is empty, the file is also deleted.
-* `[app]['permissions']` - Hash of permissions to manage for the app. 
+* `[app]['permissions']` - Hash of permissions to manage for the app.
 * `[app]['permissions'][object]` - Permissions to manage for a particular knowledge object or class of knowledge objects
 * `[app]['permissions'][object]['access']['read']` - array of roles or String '*' allowed to read the object
 * `[app]['permissions'][object]['access']['write']` - array of roles or String '*' allowed to write the object
-* `[app]['permissions'][object][???]` - Any otther stanza from [default.meta][]
+* `[app]['permissions'][object][???]` - Any other stanza from [default.meta][]
 
 
 Docs Navigation

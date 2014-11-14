@@ -6,6 +6,9 @@ description 'Environment for the Splunk 6 Standalone server'
 
 default_attributes(
   splunk: {
+    apps: {
+      bag: 'cerner_splunk/apps-vagrant:apps'
+    },
     config: {
       clusters: [
         'cerner_splunk/cluster-standalone',
