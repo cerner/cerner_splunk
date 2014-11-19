@@ -19,5 +19,6 @@
       "port": 9997
     }
   },
-  "indexes" : "cerner_splunk/indexes-vagrant"
+  "indexes" : "cerner_splunk/indexes-vagrant",
+  "apps": "cerner_splunk/master-apps-vagrant"
 }

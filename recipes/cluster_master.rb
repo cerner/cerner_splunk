@@ -20,7 +20,7 @@ execute 'apply-cluster-bundle' do
   action :nothing
 end
 
-cluster_bag = CernerSplunk::DataBag.load(CernerSplunk.my_cluster_data(node)['apps'], pick_context['master-apps']) || {}
+cluster_bag = CernerSplunk::DataBag.load(CernerSplunk.my_cluster_data(node)['apps'], pick_context: ['master-apps']) || {}
 
 bag_bag = CernerSplunk::DataBag.load(cluster_bag['bag']) || {}
 
@@ -33,7 +33,7 @@ apps.each do |app_name, app_data|
     local app_data['local']
     files app_data['files']
     permissions app_data['permissions']
-    notifies :execute, 'execute[apply-cluster-bundle]'
+    notifies :run, 'execute[apply-cluster-bundle]'
   end
 end
 
