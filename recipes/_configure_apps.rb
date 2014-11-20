@@ -9,7 +9,8 @@ attributes = node[:splunk][:apps]
 
 attributes_bag = CernerSplunk::DataBag.load(attributes['bag']) || {}
 
-cluster_bag = CernerSplunk::DataBag.load(CernerSplunk.my_cluster_data(node)['apps'], pick_context: CernerSplunk.keys(node)) || {}
+# warn if the cluster's apps bag is not available on forwarders, but fail for any servers.
+cluster_bag = CernerSplunk::DataBag.load(CernerSplunk.my_cluster_data(node)['apps'], pick_context: CernerSplunk.keys(node), handle_load_failure: node[:splunk][:node_type] == :forwarder) || {}
 
 bag_bag = CernerSplunk::DataBag.load(cluster_bag['bag']) || {}
 

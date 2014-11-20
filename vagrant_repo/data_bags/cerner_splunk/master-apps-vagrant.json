@@ -17,7 +17,7 @@
             "FIELDALIAS-msgid": "mid AS msgid",
             "EXTRACT-qid": "sendmail[^\\]]*\\]:\\s+(?<qid>[^:]*):"
           }
-        },
+        }
       },
       "permissions": {
         "": {
