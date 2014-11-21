@@ -17,6 +17,7 @@ default[:splunk][:free_license] = false
 # Legacy attributes from the aeon-operations cookbook
 default[:splunk][:main_project_index] = nil
 default[:splunk][:monitors] = []
+default[:splunk][:apps] = {}
 
 # Flag attributes for warnings
 default[:splunk][:flags][:index_checks_fail] = true

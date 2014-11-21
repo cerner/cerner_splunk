@@ -1,0 +1,38 @@
+{
+  "id": "master-apps-vagrant",
+  "master-apps": {
+    "awesome_splunk_master_app": {
+      "files": {
+        "app.conf": {
+          "install": {
+            "is_configured": "0"
+          },
+          "ui": {
+            "is_visible": "false",
+            "label": "Awesome Splunk Master App"
+          }
+        },
+        "props.conf": {
+          "sendmail": {
+            "FIELDALIAS-msgid": "mid AS msgid",
+            "EXTRACT-qid": "sendmail[^\\]]*\\]:\\s+(?<qid>[^:]*):"
+          }
+        }
+      },
+      "permissions": {
+        "": {
+          "access": {
+            "read": "*",
+            "write": [
+              "admin",
+              "power"
+            ]
+          }
+        },
+        "tags": {
+          "export": "system"
+        }
+      }
+    }
+  }
+}
