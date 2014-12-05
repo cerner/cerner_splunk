@@ -7,7 +7,7 @@
 
 output_stanzas = {}
 
-if [:search_head, :forwarder, :cluster_master].include? node[:splunk][:node_type]
+if [:search_head, :forwarder, :cluster_master].include? node['splunk']['node_type']
   output_stanzas['tcpout'] = {
     'forwardedindex.0.whitelist' => '.*',
     'forwardedindex.1.blacklist' => '_.*',
@@ -15,7 +15,7 @@ if [:search_head, :forwarder, :cluster_master].include? node[:splunk][:node_type
   }
 
   # If we're part of a cluster, we only want to send events to our cluster.
-  if node[:splunk][:node_type] == :forwarder
+  if node['splunk']['node_type'] == :forwarder
     CernerSplunk.all_clusters(node)
   else
     [CernerSplunk.my_cluster(node)]

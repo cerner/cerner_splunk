@@ -5,7 +5,7 @@
 #
 # Configures the alert settings for the system
 
-hash = CernerSplunk::DataBag.load node[:splunk][:config][:alerts], pick_context: CernerSplunk.keys(node)
+hash = CernerSplunk::DataBag.load node['splunk']['config']['alerts'], pick_context: CernerSplunk.keys(node)
 
 unless hash
   Chef::Log.info 'Splunk Alerts not configured for this node.'
@@ -13,7 +13,7 @@ unless hash
 end
 
 hash = hash.clone
-default_coords = CernerSplunk::DataBag.to_a node[:splunk][:config][:alerts]
+default_coords = CernerSplunk::DataBag.to_a node['splunk']['config']['alerts']
 bag = CernerSplunk::DataBag.load hash.delete('bag'), default: default_coords
 
 alert_stanzas =

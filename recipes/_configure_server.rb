@@ -7,7 +7,7 @@
 
 server_stanzas = {
   'general' => {
-    'serverName' => node[:splunk][:config][:host]
+    'serverName' => node['splunk']['config']['host']
   },
   'sslConfig' => {}
 }
@@ -33,7 +33,7 @@ MASTER_ONLY_CONFIGS = %w(
   commit_retry_time
 )
 
-case node[:splunk][:node_type]
+case node['splunk']['node_type']
 when :search_head, :server
   clusters = CernerSplunk.all_clusters(node).collect do |(cluster, bag)|
     stanza = "clustermaster:#{cluster}"
@@ -90,11 +90,11 @@ end
 
 # License Configuration
 license_uri =
-  case node[:splunk][:node_type]
+  case node['splunk']['node_type']
   when :forwarder, :license_server
     'self'
   when :cluster_master, :cluster_slave, :search_head, :server
-    if node[:splunk][:free_license]
+    if node['splunk']['free_license']
       'self'
     else
       CernerSplunk.my_cluster_data(node)['license_uri'] || 'self'
@@ -102,7 +102,7 @@ license_uri =
   end
 
 license_group =
-  case node[:splunk][:node_type]
+  case node['splunk']['node_type']
   when :license_server, :cluster_master, :cluster_slave
     'Enterprise'
   when :forwarder
@@ -114,7 +114,7 @@ license_group =
       'Forwarder'
     end
   when :server
-    if node[:splunk][:free_license]
+    if node['splunk']['free_license']
       'Free'
     else
       'Enterprise'
@@ -137,7 +137,7 @@ server_stanzas['license'] = {
 
 splunk_template 'system/server.conf' do
   stanzas do
-    old_stanzas = CernerSplunk::Conf::Reader.new("#{node[:splunk][:home]}/etc/system/local/server.conf").read
+    old_stanzas = CernerSplunk::Conf::Reader.new("#{node['splunk']['home']}/etc/system/local/server.conf").read
 
     old_stanzas.each do |key, value|
       case key

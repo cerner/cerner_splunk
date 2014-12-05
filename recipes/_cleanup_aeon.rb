@@ -20,7 +20,7 @@ ruby_block 'clean-bashrc' do
 end
 
 forwarder_splunk = '/opt/splunkforwarder/bin/splunk'
-uninstall_tar_forwarder = !File.exist?(node[:splunk][:external_config_directory]) && File.exist?(forwarder_splunk)
+uninstall_tar_forwarder = !File.exist?(node['splunk']['external_config_directory']) && File.exist?(forwarder_splunk)
 
 ruby_block 'uninstall-tar-forwarder' do
   block do

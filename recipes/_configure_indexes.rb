@@ -16,7 +16,7 @@ end
 config = bag['config'] || {}
 flags = bag['flags'] || {}
 
-is_master = node[:splunk][:node_type] == :cluster_master
+is_master = node['splunk']['node_type'] == :cluster_master
 
 index_stanzas = config.inject({}) do |result, (stanza, index_config)|
   index_flags = flags[stanza] || {}

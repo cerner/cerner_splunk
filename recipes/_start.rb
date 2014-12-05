@@ -11,14 +11,14 @@ if platform_family?('windows')
     notifies :start, 'service[splunk]', :immediately
   end
 else
-  execute "#{node[:splunk][:cmd]} enable boot-start -user #{node[:splunk][:user]}" do
+  execute "#{node['splunk']['cmd']} enable boot-start -user #{node['splunk']['user']}" do
     notifies :start, 'service[splunk]', :immediately
   end
 end
 
-directory node[:splunk][:external_config_directory] do
-  owner node[:splunk][:user]
-  group node[:splunk][:group]
+directory node['splunk']['external_config_directory'] do
+  owner node['splunk']['user']
+  group node['splunk']['group']
   mode '0700'
 end
 

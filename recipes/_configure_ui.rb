@@ -6,6 +6,6 @@
 # Configures the ui settings for the system
 
 splunk_template 'system/ui-prefs.conf' do
-  stanzas node[:splunk][:config][:ui_prefs]
+  stanzas node['splunk']['config']['ui_prefs']
   notifies :restart, 'service[splunk]'
 end

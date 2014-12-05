@@ -76,7 +76,7 @@ module CernerSplunk
       index_error = []
       input_regex = /^(?:monitor|tcp|batch|udp|fifo|script|fschange)/
 
-      indexes = monitors.select { |key, _| (input_regex).match(key) }.collect { |_, v| v['index'] || node[:splunk][:config][:assumed_index] }.uniq
+      indexes = monitors.select { |key, _| (input_regex).match(key) }.collect { |_, v| v['index'] || node['splunk']['config']['assumed_index'] }.uniq
 
       CernerSplunk.all_clusters(node).each do |(cluster, data_bag)|
         bag = CernerSplunk::DataBag.load(data_bag['indexes'], handle_load_failure: true)
@@ -107,7 +107,7 @@ module CernerSplunk
 
       unless index_error.empty?
         index_error_msg = "Data cannot be forwarded to respective index(es) due to the following reason(s):\n#{index_error.join("\n")}"
-        if node[:splunk][:flags][:index_checks_fail]
+        if node['splunk']['flags']['index_checks_fail']
           fail index_error_msg
         else
           Chef::Log.warn index_error_msg
