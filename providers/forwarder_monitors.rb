@@ -12,6 +12,10 @@ end
 action :install do
   input_stanzas = CernerSplunk::LWRP.convert_monitors(node, new_resource.monitors, new_resource.index)
 
+  splunk_service 'splunk' do
+    action :nothing
+  end
+  
   directory app_dir do
     owner node[:splunk][:user]
     group node[:splunk][:group]
