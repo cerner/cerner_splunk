@@ -29,20 +29,16 @@ if platform_family?('windows')
   # The regex is intended to switch the direction of slashes to be windows friendly,
   # the second replacement surrounds any file names with spaces in quotes
   node.default[:splunk][:cmd] = "#{node[:splunk][:home]}/bin/splunk".gsub('/', '\\').gsub(/\w+\s\w+/) { |directory| %("#{directory}") }
-  service = 'SplunkForwarder'
 else
   node.default[:splunk][:home] = "/opt/#{nsp[:base_name]}"
   node.default[:splunk][:cmd] = "#{node[:splunk][:home]}/bin/splunk"
-  service = 'splunk'
 end
 
 manifest_missing = proc { ::Dir.glob("#{node[:splunk][:home]}/#{node[:splunk][:package][:name]}-*").empty? }
 
 # Actions
-service 'splunk' do
-  service_name service
+splunk_service 'splunk' do
   action :nothing
-  supports status: true, start: true, stop: true, restart: true
 end
 
 splunk_file = "#{Chef::Config[:file_cache_path]}/#{node[:splunk][:package][:file_name]}"
