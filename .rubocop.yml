@@ -29,3 +29,5 @@ PerceivedComplexity:
 Metrics/AbcSize:
   Enabled: false
 
+Style/BracesAroundHashParameters:
+  EnforcedStyle: context_dependent
