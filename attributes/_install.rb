@@ -2,7 +2,7 @@
 
 default[:splunk][:node_type] = nil
 
-if platform_family?('windows')
+if node['platform_family'] == 'windows'
   default[:splunk][:external_config_directory] = "#{ENV['PROGRAMDATA']}/splunk"
 else
   default[:splunk][:external_config_directory] = '/etc/splunk'
