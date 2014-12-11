@@ -5,6 +5,7 @@
 # HWR for configuring Splunk.
 
 require 'chef/resource/template'
+require 'chef/provider/template'
 require 'chef/mixin/securable'
 require_relative 'lwrp'
 
@@ -15,7 +16,9 @@ class Chef
       include Chef::Mixin::Securable
       extend CernerSplunk::LWRP::DelayableAttribute unless defined? delayable_attribute
 
-      provides :splunk_template, on_platforms: :all
+      use_provider_resolver = defined?(Chef::ProviderResolver) == 'constant' && Chef::ProviderResolver.class == Class
+
+      provides :splunk_template, (use_provider_resolver ? {} : { on_platforms: :all })
 
       # rubocop:disable MethodLength
       def initialize(name, run_context = nil)
@@ -29,6 +32,7 @@ class Chef
         user node[:splunk][:user]
         group node[:splunk][:group]
         mode '0600'
+        provider Chef::Provider::Template
         # atomic_update in this instance causes issues on windows similar to
         # https://tickets.opscode.com/browse/CHEF-4625
         # However, atomic_update from a chef provided template resource

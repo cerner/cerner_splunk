@@ -115,7 +115,7 @@ Vagrant.configure('2') do |config|
 
     cfg.vm.provision :shell, inline: <<-'SCRIPT'.gsub(/^\s+/, '')
       yum -y install git
-      rpm -q chefdk || rpm -Uvh https://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chefdk-0.3.0-1.x86_64.rpm
+      rpm -q chefdk || rpm -Uvh https://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chefdk-0.3.5-1.x86_64.rpm
     SCRIPT
 
     if ENV['KNIFE_ONLY']
