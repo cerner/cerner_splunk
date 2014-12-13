@@ -1,7 +1,7 @@
 # coding: UTF-8
 
 # Do not override these
-if platform_family?('windows')
+if node['platform_family'] == 'windows'
   default[:splunk][:user] = 'SYSTEM'
   default[:splunk][:group] = 'SYSTEM'
 else
