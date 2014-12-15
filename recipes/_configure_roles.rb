@@ -5,7 +5,7 @@
 #
 # Configures the roles available on the system
 
-hash = CernerSplunk::DataBag.load node[:splunk][:config][:roles],
+hash = CernerSplunk::DataBag.load node['splunk']['config']['roles'],
                                   pick_context: CernerSplunk.keys(node)
 
 unless hash
@@ -65,9 +65,9 @@ splunk_template 'system/authorize.conf' do
   notifies :restart, 'service[splunk]'
 end
 
-directory "#{node[:splunk][:home]}/etc/apps/user-prefs/local" do
-  user node[:splunk][:user]
-  group node[:splunk][:group]
+directory "#{node['splunk']['home']}/etc/apps/user-prefs/local" do
+  user node['splunk']['user']
+  group node['splunk']['group']
   mode '0700'
 end
 

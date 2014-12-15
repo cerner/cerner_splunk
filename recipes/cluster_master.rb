@@ -13,10 +13,10 @@ instance_exec :cluster_master, &CernerSplunk::NODE_TYPE
 ## Recipes
 include_recipe 'cerner_splunk::_install_server'
 
-password_file = File.join node[:splunk][:external_config_directory], 'password'
+password_file = File.join node['splunk']['external_config_directory'], 'password'
 
 execute 'apply-cluster-bundle' do
-  command "cat #{password_file} | xargs #{node[:splunk][:cmd]} apply cluster-bundle --answer-yes -auth admin:"
+  command "cat #{password_file} | xargs #{node['splunk']['cmd']} apply cluster-bundle --answer-yes -auth admin:"
   action :nothing
 end
 
@@ -28,7 +28,7 @@ apps = CernerSplunk::SplunkApp.merge_hashes(bag_bag, cluster_bag)
 
 apps.each do |app_name, app_data|
   splunk_app app_name do
-    apps_dir "#{node[:splunk][:home]}/etc/master-apps"
+    apps_dir "#{node['splunk']['home']}/etc/master-apps"
     action app_data['remove'] ? :remove : :create
     local app_data['local']
     files app_data['files']

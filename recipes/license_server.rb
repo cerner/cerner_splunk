@@ -16,10 +16,10 @@ instance_exec :license_server, &CernerSplunk::NODE_TYPE
 ## Recipes
 include_recipe 'cerner_splunk::_install_server'
 
-bag = CernerSplunk::DataBag.load node[:splunk][:config][:licenses], type: :vault
+bag = CernerSplunk::DataBag.load node['splunk']['config']['licenses'], type: :vault
 
 unless bag
-  throw 'Unknown databag configured for node[:splunk][:config][:licenses]'
+  throw "Unknown databag configured for node['splunk']['config']['licenses']"
 end
 
 data_bag_item = bag.to_hash
@@ -35,18 +35,18 @@ license_groups = data_bag_item.inject('enterprise' => {}) do |hash, (key, value)
 end
 
 license_groups.each do |type, keys|
-  prefix = "#{node[:splunk][:home]}/etc/licenses/#{type}"
+  prefix = "#{node['splunk']['home']}/etc/licenses/#{type}"
   directory prefix do
-    owner node[:splunk][:user]
-    group node[:splunk][:group]
+    owner node['splunk']['user']
+    group node['splunk']['group']
     mode '0700'
   end
 
   keys.each do |name, value|
     file "#{prefix}/#{name}.lic" do
       content value
-      owner node[:splunk][:user]
-      group node[:splunk][:group]
+      owner node['splunk']['user']
+      group node['splunk']['group']
       mode '0600'
       notifies :restart, 'service[splunk]'
     end
@@ -56,7 +56,7 @@ end
 b = ruby_block 'license cleanup' do
   block do
     license_groups.each do |type, licenses|
-      existing_files = Dir.glob("#{node[:splunk][:home]}/etc/licenses/#{type}/*.lic")
+      existing_files = Dir.glob("#{node['splunk']['home']}/etc/licenses/#{type}/*.lic")
       expected_files = licenses.keys.collect { |name| "#{name}.lic" }
       to_delete = existing_files.delete_if { |x| expected_files.include?(File.basename(x)) }
       to_delete.each do |file|

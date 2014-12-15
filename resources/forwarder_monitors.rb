@@ -14,11 +14,11 @@ attribute :monitors, kind_of: Array, default: []
 def initialize(name, run_context = nil)
   super
   @resource_name = :splunk_forwarder_monitors
-  @index = node[:splunk][:main_project_index]
+  @index = node['splunk']['main_project_index']
   @action = :install
 end
 
 def after_created
   super
-  Chef::Application.fatal!('node[:splunk][:home] is not defined, ensure your run list is configured to run the cerner_splunk recipe before this point!') unless node[:splunk][:home]
+  Chef::Application.fatal!("node['splunk']['home'] is not defined, ensure your run list is configured to run the cerner_splunk recipe before this point!") unless node['splunk']['home']
 end

@@ -29,8 +29,8 @@ class Chef
         backup false
         cookbook 'cerner_splunk'
         source 'generic.conf.erb'
-        user node[:splunk][:user]
-        group node[:splunk][:group]
+        user node['splunk']['user']
+        group node['splunk']['group']
         mode '0600'
         provider Chef::Provider::Template
         # atomic_update in this instance causes issues on windows similar to
@@ -65,7 +65,7 @@ class Chef
       end
 
       def after_created
-        @path = "#{node[:splunk][:home]}/#{@path}"
+        @path = "#{node['splunk']['home']}/#{@path}"
 
         config_file = ::File.basename(@path)
         return if KNOWN_CONFIG_FILES.include? config_file

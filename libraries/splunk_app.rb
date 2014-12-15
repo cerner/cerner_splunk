@@ -91,7 +91,7 @@ class Chef
       def action_create
         @root_dir = "#{@current_resource.apps_dir}/#{@current_resource.app}"
         create_app_directories
-        manage_metaconf
+        manage_metaconf unless @current_resource.permissions.empty?
         @current_resource.files.each do |file_name, contents|
           *directories, file_name = file_name.split('/')
           file_path = @current_resource.local ? "#{@root_dir}/local" : "#{@root_dir}/default"
@@ -124,8 +124,8 @@ class Chef
         dir = Chef::Resource::Directory.new(path, run_context)
         dir.path(path)
         dir.recursive(false)
-        dir.owner(node[:splunk][:user])
-        dir.group(node[:splunk][:group])
+        dir.owner(node['splunk']['user'])
+        dir.group(node['splunk']['group'])
         dir.mode('0755')
         dir.run_action(:create)
         new_resource.updated_by_last_action(dir.updated_by_last_action?)
@@ -159,8 +159,8 @@ class Chef
           file.content(contents)
         end
         file.path("#{path}/#{file_name}")
-        file.owner(node[:splunk][:user])
-        file.group(node[:splunk][:group])
+        file.owner(node['splunk']['user'])
+        file.group(node['splunk']['group'])
         file.mode('0600')
         if contents.empty?
           file.run_action(:delete)
