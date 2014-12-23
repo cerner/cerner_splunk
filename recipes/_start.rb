@@ -16,10 +16,4 @@ else
   end
 end
 
-directory node['splunk']['external_config_directory'] do
-  owner node['splunk']['user']
-  group node['splunk']['group']
-  mode '0700'
-end
-
 include_recipe 'cerner_splunk::_generate_password'

@@ -5,7 +5,7 @@
 #
 # Removes the side-effects from the Aeon Forwarder
 
-return if platform_family?('windows')
+return if platform_family?('windows') || !node['splunk']['cleanup']
 
 ruby_block 'clean-bashrc' do
   block do

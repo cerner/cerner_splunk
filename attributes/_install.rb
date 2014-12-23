@@ -1,6 +1,7 @@
 # coding: UTF-8
 
 default['splunk']['node_type'] = nil
+default['splunk']['cleanup'] = true
 
 if node['platform_family'] == 'windows'
   default['splunk']['external_config_directory'] = "#{ENV['PROGRAMDATA']}/splunk"
