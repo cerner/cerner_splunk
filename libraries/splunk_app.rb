@@ -13,15 +13,13 @@ module CernerSplunk
   class SplunkApp
     def self.merge_hashes(*hashes)
       hashes.collect(&:keys).flatten.uniq.each_with_object({}) do |app_name, result|
-        next if app_name == 'bag'
-
         app_hash = {}
 
         merger = proc { |_key, v1, v2| v1.is_a?(Hash) && v2.is_a?(Hash) ? v1.merge(v2, &merger) : v2 }
 
         hashes.each do |hash|
           to_merge = hash[app_name]
-          next unless to_merge
+          next unless to_merge.is_a? Hash
           app_hash.merge!(to_merge, &merger)
         end
 
