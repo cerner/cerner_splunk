@@ -29,6 +29,7 @@ groups_to_add.uniq.each do |grp|
     group_name grp
     members [node['splunk']['user']]
     action :manage
+    notifies :restart, 'service[splunk]'
   end
 end
 
@@ -41,6 +42,7 @@ if Chef::Resource::Group.instance_methods.include?(:excluded_members)
       group_name grp
       excluded_members [node['splunk']['user']]
       action :manage
+      notifies :restart, 'service[splunk]'
     end
   end
 else
