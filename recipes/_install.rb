@@ -53,8 +53,9 @@ remote_file splunk_file do
   only_if(&manifest_missing)
 end
 
-package node['splunk']['package']['name'] do
+package node['splunk']['package']['base_name'] do
   source splunk_file
+  version "#{node['splunk']['package']['version']}-#{node['splunk']['package']['build']}"
   provider node['splunk']['package']['provider']
   only_if(&manifest_missing)
   if platform_family?('windows')
