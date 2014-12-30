@@ -39,6 +39,12 @@ end
 manifest_missing = proc { ::Dir.glob("#{node['splunk']['home']}/#{node['splunk']['package']['name']}-*").empty? }
 
 # Actions
+directory node['splunk']['external_config_directory'] do
+  owner node['splunk']['user']
+  group node['splunk']['group']
+  mode '0700'
+end
+
 service 'splunk' do
   service_name service
   action :nothing
