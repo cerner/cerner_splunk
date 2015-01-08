@@ -2,13 +2,13 @@
   "id": "authnz-vagrant",
   "authn": {
     "search_head": {
-      "LDAP_strategies": [{
+      "LDAP_strategies": {
         "bag": ":ldap",
         "roleMap" : {
           "opsinfra": "splunk_dev_opsinfra",
           "admin": "DevOps_SuperAdmins"
         }
-      }]
+      }
     },
     "server": "search_head",
     "": {

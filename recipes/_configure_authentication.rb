@@ -71,7 +71,7 @@ when 'Scripted'
 when 'LDAP'
   strategies = hash.delete('LDAP_strategies')
   fail 'LDAP_strategies required for LDAP authentication' unless strategies
-  strategies = [*strategies]
+  strategies = [strategies] unless strategies.is_a? Array
   strategies = strategies.collect do |strategy|
     hash =
       case strategy
