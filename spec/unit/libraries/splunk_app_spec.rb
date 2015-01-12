@@ -12,11 +12,11 @@ describe 'CernerSplunk::SplunkApp.merge_hashes' do
   end
 
   context 'when given different keys' do
-    let(:one) { { foo: {} } }
-    let(:two) { { bar: {} } }
+    let(:one) { { foo: { a: 'foo' } } }
+    let(:two) { { bar: { a: 'foo' } } }
     let(:three) { { baz: {} } }
 
-    it { is_expected.to eq(foo: {}, bar: {}, baz: {}) }
+    it { is_expected.to eq(foo: { a: 'foo' }, bar: { a: 'foo' }) }
   end
 
   context 'when given same keys' do
@@ -27,8 +27,15 @@ describe 'CernerSplunk::SplunkApp.merge_hashes' do
     it { is_expected.to eq(foo: { a: 'baz' }) }
   end
 
+  context 'when given different subkeys' do
+    let(:one) { { foo: { a: 'foo' } } }
+    let(:two) { { foo: { b: { a: 'foo' } } } }
+    let(:three) { { foo: { b: { b: 'bar' }, c: 'baz' } } }
+
+    it { is_expected.to eq(foo: { a: 'foo', b: { a: 'foo', b: 'bar' }, c: 'baz' }) }
+  end
+
   context 'when given a key with a non-hash value' do
-    before { pending 'when issue #36 is fixed' }
     let(:one) { { foo: 'bar' } }
 
     it { is_expected.to eq({}) }
