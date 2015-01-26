@@ -15,9 +15,5 @@ Gemfile.lock
 bin/*
 .bundle/*
 
-# Roll-Out
-/target
-/site
-
 # Vagrant-Repo
 vagrant_repo/Berksfile.lock
