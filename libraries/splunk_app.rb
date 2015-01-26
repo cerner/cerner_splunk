@@ -23,7 +23,7 @@ module CernerSplunk
           app_hash.merge!(to_merge, &merger)
         end
 
-        result[app_name] = app_hash
+        result[app_name] = app_hash unless app_hash.empty?
       end
     end
   end

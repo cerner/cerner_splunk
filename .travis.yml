@@ -9,3 +9,4 @@ rvm:
 script:
 - bundle exec rubocop
 - bundle exec foodcritic -f any .
+- bundle exec rspec
