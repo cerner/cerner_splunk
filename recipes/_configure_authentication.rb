@@ -138,6 +138,7 @@ else
 end
 
 splunk_template 'system/authentication.conf' do
+  sensitive auth_stanzas.any? { |_, v| v.key? 'bindDNpassword' }
   stanzas auth_stanzas
   notifies :restart, 'service[splunk]'
 end

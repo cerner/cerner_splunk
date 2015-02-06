@@ -17,6 +17,7 @@ new_password = SecureRandom.hex(36)
 
 execute 'change-admin-password' do
   command "#{node['splunk']['cmd']} edit user admin -password #{new_password} -roles admin -auth admin:#{old_password}"
+  sensitive true
 end
 
 if platform_family?('windows')
@@ -32,5 +33,6 @@ file password_file do
   owner system_user
   group system_group
   mode '0600'
+  sensitive true
   content new_password
 end
