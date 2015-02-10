@@ -16,7 +16,7 @@ end
 user_prefs = {}
 authorize = {}
 
-hash.each do | stanza, values |
+hash.each do |stanza, values|
   pref_entries, auth_entries = values.inject([{}, {}]) do |result, (key, value)|
     prefs = result[0]
     auth = result[1]
