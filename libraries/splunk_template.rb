@@ -8,6 +8,7 @@ require 'chef/resource/template'
 require 'chef/provider/template'
 require 'chef/mixin/securable'
 require_relative 'lwrp'
+require_relative 'passive_sensitive'
 
 class Chef
   class Resource
