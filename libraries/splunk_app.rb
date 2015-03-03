@@ -49,7 +49,8 @@ class Chef
       end
 
       def local(arg = nil)
-        set_or_return(:local, arg, kind_of: [TrueClass, FalseClass])
+        val = set_or_return(:local, arg, kind_of: [TrueClass, FalseClass])
+        (url.nil? || url.empty?) ? val : true
       end
 
       def files(arg = nil)
@@ -62,6 +63,28 @@ class Chef
 
       def app(arg = nil)
         set_or_return(:app, arg, kind_of: String)
+      end
+
+      # Calculated attributes
+      def required_directories
+        %w(local default metadata lookups).collect { |d| "#{root_dir}/#{d}" }.unshift(root_dir)
+      end
+
+      def root_dir
+        "#{apps_dir}/#{app}"
+      end
+
+      def default_dir
+        "#{root_dir}/default"
+      end
+
+      def files_dir
+        local ? "#{root_dir}/local" : default_dir
+      end
+
+      def perms_file
+        file_name = local ? 'local.meta' : 'default.meta'
+        "#{root_dir}/metadata/#{file_name}"
       end
     end
   end
@@ -79,41 +102,39 @@ class Chef
         @current_resource ||= Chef::Resource::SplunkApp.new(new_resource.name)
         @current_resource.apps_dir(new_resource.apps_dir)
         @current_resource.local(new_resource.local)
-        @current_resource.files(new_resource.files)
-        @current_resource.permissions(new_resource.permissions)
         @current_resource.app(new_resource.app)
-        @current_resource.action(new_resource.action)
-        @current_resource
+        @current_resource.permissions(CernerSplunk::Conf::Reader.new(new_resource.perms_file).read)
+
+        app_conf = CernerSplunk::Conf::Reader.new("#{new_resource.default_dir}/app.conf").read
+        @current_resource.version((app_conf['launcher'] || {})['version'])
       end
 
       def action_create
-        @root_dir = "#{@current_resource.apps_dir}/#{@current_resource.app}"
         create_app_directories
-        manage_metaconf unless @current_resource.permissions.empty?
-        @current_resource.files.each do |file_name, contents|
+        manage_metaconf unless new_resource.permissions.empty?
+        new_resource.files.each do |file_name, contents|
           *directories, file_name = file_name.split('/')
-          file_path = @current_resource.local ? "#{@root_dir}/local" : "#{@root_dir}/default"
+          file_path = new_resource.files_dir
           directories.each do |subdir|
             file_path = "#{file_path}/#{subdir}"
             create_splunk_directory(file_path)
           end
-          manage_file(file_name, contents, file_path)
+          manage_file("#{file_path}/#{file_name}", contents)
         end
       end
 
       # uninstall the app by removing the apps directory
       def action_remove
-        app_dir = Chef::Resource::Directory.new("#{@current_resource.apps_dir}/#{@current_resource.app}", run_context)
-        app_dir.path("#{@current_resource.apps_dir}/#{@current_resource.app}")
+        app_dir = Chef::Resource::Directory.new(new_resource.root_dir, run_context)
+        app_dir.path(new_resource.root_dir)
         app_dir.recursive(true)
         app_dir.run_action(:delete)
         new_resource.updated_by_last_action(app_dir.updated_by_last_action?)
       end
 
       def create_app_directories
-        create_splunk_directory(@root_dir)
-        %w(local default metadata).each do |directory|
-          create_splunk_directory("#{@root_dir}/#{directory}")
+        new_resource.required_directories.each do |directory|
+          create_splunk_directory(directory)
         end
       end
 
@@ -126,13 +147,11 @@ class Chef
         dir.group(node['splunk']['group'])
         dir.mode('0755')
         dir.run_action(:create)
-        new_resource.updated_by_last_action(dir.updated_by_last_action?)
+        new_resource.updated_by_last_action(true) if dir.updated_by_last_action?
       end
 
       def manage_metaconf
-        file_name = @current_resource.local ? 'local.meta' : 'default.meta'
-        file_path = "#{@current_resource.apps_dir}/#{@current_resource.app}/metadata/"
-        permissions = @current_resource.permissions
+        permissions = new_resource.permissions
         permissions.each do |stanza, hash|
           hash.each do |key, values|
             if values.is_a?(Hash)
@@ -140,23 +159,23 @@ class Chef
             end
           end
         end
-        manage_file(file_name, permissions, file_path)
+        manage_file(new_resource.perms_file, permissions)
       end
 
       # function for dropping either a splunk template generated from a hash
       # or a simple file if the contents are a string. If the content of the file
       # is empty, then the file will be removed
-      def manage_file(file_name, contents, path)
+      def manage_file(path, contents)
         if contents.class == Hash && contents.empty? == false
-          file = Chef::Resource::Template.new("#{path}/#{file_name}", run_context)
+          file = Chef::Resource::Template.new(path, run_context)
           file.cookbook('cerner_splunk')
           file.source('generic.conf.erb')
           file.variables(stanzas: contents)
         else
-          file = Chef::Resource::File.new("#{path}/#{file_name}", run_context)
+          file = Chef::Resource::File.new(path, run_context)
           file.content(contents)
         end
-        file.path("#{path}/#{file_name}")
+        file.path(path)
         file.owner(node['splunk']['user'])
         file.group(node['splunk']['group'])
         file.mode('0600')
@@ -165,7 +184,7 @@ class Chef
         else
           file.run_action(:create)
         end
-        new_resource.updated_by_last_action(file.updated_by_last_action?)
+        new_resource.updated_by_last_action(true) if file.updated_by_last_action?
       end
     end
   end
