@@ -27,6 +27,22 @@ module CernerSplunk
       end
     end
   end
+
+  # Utility Class to parse app version strings
+  class AppVersion
+    def initialize(version)
+      @version = version.chomp.empty? ? nil : version.chomp unless version.nil?
+      @base, @prerelease = @version.split(' ', 2) unless @version.nil?
+      @type = @prerelease.nil? ? :base : :prerelease unless @version.nil?
+    end
+
+    attr_reader :version, :base, :prerelease, :type
+    alias_method :to_s, :version
+
+    def ==(other)
+      version == other.version
+    end
+  end
 end
 
 class Chef
