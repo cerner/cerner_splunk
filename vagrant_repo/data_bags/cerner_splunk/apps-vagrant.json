@@ -1,6 +1,12 @@
 {
   "id": "apps-vagrant",
   "apps": {
+    "my_app": {
+      "download": {
+        "url" : "http://33.33.33.33:5000/my_app.tgz",
+        "version" : "1.0"
+      }
+    },
     "awesome_splunk_app": {
       "files": {
         "app.conf": {
