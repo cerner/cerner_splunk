@@ -10,13 +10,21 @@ require 'zlib'
 require 'fileutils'
 
 module CernerSplunk
-  # Utility class to encapsulate operations on tar.gz files
+  # Utility class to encapulsate operations done on a tarball (tar.gz / tgz / spl) file, and not have a native dependency.
+  # The core to this method is the iterate method, which invokes a provided callback for each encoutered entry, based on the kind of entry
   # Mad Props to http://stackoverflow.com/a/19139114/504685
   class TarBall
+    # Standard initialization method to read the given tarball.
+    # Options that could be set:
+    # :prefix -> If set, any entry that does not start with this directory, is skipped when iteratating over entries.
+    # :user -> user who should own extracted files / created directories (nil if no-change)
+    # :group -> group who should own extracted files / created directories (nil if no-change)
     def initialize(file_name, options = {})
+      # These first three lines are black magic with the below class to ensure that the reader gets closed.
       @data = []
       @clean_proc = Remover.new(@data)
       ObjectSpace.define_finalizer(self, @clean_proc)
+      # Setup the reader, and read the prefix option if present.
       @file_name = @data[0] = file_name
       @reader = @data[1] =  Gem::Package::TarReader.new(Zlib::GzipReader.open @file_name)
       @prefix = options[:prefix]
@@ -25,6 +33,8 @@ module CernerSplunk
 
     attr_reader :prefix
 
+    # Get the contents of a normal file with the given name.
+    # If a prefix is set, the name argument is only the portion after the prefix.
     def get_file(name)
       data = []
       target_path = @prefix.nil? ? name : "#{@prefix}/#{name}"
@@ -33,6 +43,8 @@ module CernerSplunk
       data.first
     end
 
+    # Extracts the tar to the target directory
+    # If prefix is set, only extracts those matching the prefix, otherwise extracts all files.
     def extract(extract_dir)
       file_handler = proc do |path, entry|
         target = "#{extract_dir}/#{path}"
@@ -64,14 +76,16 @@ module CernerSplunk
     # of the corresponding callback applied to each entry in the tarfile is truthy.
     # With no arguments, counts the number of qualified entries
     # If called with a block (only), the block is the callback to for every entry.
-    # If called with a map, invoke the appropriate callback for each corresponding entry.
-    # See iterate for details on how callbacks are invoked.
+    # If called with a map, invoke the appropriate callback for each entry.
+    # This can be used to tell things such as how many files are contained in the tarball with our prefix
     def count(callbacks = {}, &other)
       callbacks = { other: other } if other && callbacks.empty?
       i = 0
       # Wrap each callback such that if it's truthy, we increment our counter.
       hsh = callbacks.each_with_object({}) { |(k, v), h| h[k] = proc { |*args| i += 1 if v.call(args) } }
+      # Default, count all entries (matching prefix if applicable)
       hsh[:other] = proc { i += 1 } if hsh.empty?
+      # For Counting, ensure that we do not blow up for any unspecified types of entries
       hsh[:other] = proc {} unless hsh[:other]
       iterate hsh
       i
@@ -81,6 +95,8 @@ module CernerSplunk
       count file: proc { true }
     end
 
+    # As entries in the tarball may skip directories, or may have directory entries after their contents
+    # as we extract files, we use this to create intermediate directories
     def make_dirs(extract_dir, path, all = false)
       segments = path.split('/')
       segments = segments[0...-1] unless all
@@ -141,6 +157,7 @@ module CernerSplunk
 
     # :stopdoc:
     # This pattern came from the Tempfile class in Ruby.
+    # This is simply a guard object to ensure that we close the reader object.
     class Remover
       def initialize(data)
         @pid = $PID
