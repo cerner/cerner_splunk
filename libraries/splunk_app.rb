@@ -27,6 +27,22 @@ module CernerSplunk
       end
     end
   end
+
+  # Utility Class to parse app version strings
+  class AppVersion
+    def initialize(version)
+      @version = version.chomp.empty? ? nil : version.chomp unless version.nil?
+      @base, @prerelease = @version.split(' ', 2) unless @version.nil?
+      @type = @prerelease.nil? ? :base : :prerelease unless @version.nil?
+    end
+
+    attr_reader :version, :base, :prerelease, :type
+    alias_method :to_s, :version
+
+    def ==(other)
+      version == other.version
+    end
+  end
 end
 
 class Chef
@@ -49,7 +65,8 @@ class Chef
       end
 
       def local(arg = nil)
-        set_or_return(:local, arg, kind_of: [TrueClass, FalseClass])
+        val = set_or_return(:local, arg, kind_of: [TrueClass, FalseClass])
+        (url.nil? || url.empty?) ? val : true
       end
 
       def files(arg = nil)
@@ -63,14 +80,46 @@ class Chef
       def app(arg = nil)
         set_or_return(:app, arg, kind_of: String)
       end
+
+      def url(arg = nil)
+        set_or_return(:url, arg, kind_of: String)
+      end
+
+      def version(arg = nil)
+        set_or_return(:version, arg, kind_of: String)
+      end
+
+      # Calculated attributes
+      def required_directories
+        %w(local default metadata lookups).collect { |d| "#{root_dir}/#{d}" }.unshift(root_dir)
+      end
+
+      def root_dir
+        "#{apps_dir}/#{app}"
+      end
+
+      def default_dir
+        "#{root_dir}/default"
+      end
+
+      def files_dir
+        local ? "#{root_dir}/local" : default_dir
+      end
+
+      def perms_file
+        file_name = local ? 'local.meta' : 'default.meta'
+        "#{root_dir}/metadata/#{file_name}"
+      end
     end
   end
 end
 
+require_relative 'conf'
+
 class Chef
   class Provider
     # Chef Provider for managing Splunk apps
-    class SplunkApp < Chef::Provider
+    class SplunkApp < Chef::Provider # rubocop:disable ClassLength
       def whyrun_supported?
         true
       end
@@ -79,41 +128,40 @@ class Chef
         @current_resource ||= Chef::Resource::SplunkApp.new(new_resource.name)
         @current_resource.apps_dir(new_resource.apps_dir)
         @current_resource.local(new_resource.local)
-        @current_resource.files(new_resource.files)
-        @current_resource.permissions(new_resource.permissions)
         @current_resource.app(new_resource.app)
-        @current_resource.action(new_resource.action)
-        @current_resource
+        @current_resource.permissions(CernerSplunk::Conf::Reader.new(new_resource.perms_file).read)
+
+        app_conf = CernerSplunk::Conf::Reader.new("#{new_resource.default_dir}/app.conf").read
+        @current_resource.version((app_conf['launcher'] || {})['version'])
       end
 
       def action_create
-        @root_dir = "#{@current_resource.apps_dir}/#{@current_resource.app}"
-        create_app_directories
-        manage_metaconf unless @current_resource.permissions.empty?
-        @current_resource.files.each do |file_name, contents|
+        download_and_install
+        create_app_directories unless new_resource.updated_by_last_action?
+        manage_metaconf unless new_resource.permissions.empty?
+        new_resource.files.each do |file_name, contents|
           *directories, file_name = file_name.split('/')
-          file_path = @current_resource.local ? "#{@root_dir}/local" : "#{@root_dir}/default"
+          file_path = new_resource.files_dir
           directories.each do |subdir|
             file_path = "#{file_path}/#{subdir}"
             create_splunk_directory(file_path)
           end
-          manage_file(file_name, contents, file_path)
+          manage_file("#{file_path}/#{file_name}", contents)
         end
       end
 
       # uninstall the app by removing the apps directory
       def action_remove
-        app_dir = Chef::Resource::Directory.new("#{@current_resource.apps_dir}/#{@current_resource.app}", run_context)
-        app_dir.path("#{@current_resource.apps_dir}/#{@current_resource.app}")
+        app_dir = Chef::Resource::Directory.new(new_resource.root_dir, run_context)
+        app_dir.path(new_resource.root_dir)
         app_dir.recursive(true)
         app_dir.run_action(:delete)
         new_resource.updated_by_last_action(app_dir.updated_by_last_action?)
       end
 
       def create_app_directories
-        create_splunk_directory(@root_dir)
-        %w(local default metadata).each do |directory|
-          create_splunk_directory("#{@root_dir}/#{directory}")
+        new_resource.required_directories.each do |directory|
+          create_splunk_directory(directory)
         end
       end
 
@@ -126,13 +174,96 @@ class Chef
         dir.group(node['splunk']['group'])
         dir.mode('0755')
         dir.run_action(:create)
-        new_resource.updated_by_last_action(dir.updated_by_last_action?)
+        new_resource.updated_by_last_action(true) if dir.updated_by_last_action?
+      end
+
+      def should_download?(expected_version, installed_version)
+        # No need to download if we already have the exact version installed
+        return false if expected_version.version && expected_version == installed_version
+        # We must not install a prerelease on top of the same released version
+        fail "Expecting to install prerelease on top of same released version for #{new_resource.app}" if installed_version.type == :base && expected_version.base == installed_version.base
+        # Warn (but not fail) if the expected version is not specified. (Optimization for us)
+        Chef::Log.warn "Expected version not specified for #{new_resource.app}." unless expected_version.version
+        # When in whyrun mode, we want to stop here as the rest requires the tarball to be downloaded (thus changing the node).
+        !whyrun_mode?
+      end
+
+      def download_and_install
+        return if new_resource.url.nil? || new_resource.url.empty?
+
+        expected_version = CernerSplunk::AppVersion.new new_resource.version
+        installed_version = CernerSplunk::AppVersion.new @current_resource.version
+
+        return unless should_download? expected_version, installed_version
+
+        filename = "#{Chef::Config[:file_cache_path]}/#{new_resource.app}.tgz"
+
+        download = Chef::Resource::RemoteFile.new(filename, run_context)
+        download.source(new_resource.url)
+        download.run_action(:create)
+        download.backup(false)
+
+        install_from_tar filename, expected_version, installed_version
+      ensure
+        download.run_action(:delete) if download
+      end
+
+      def validate_downloaded(tarfile)
+        fail "Downloaded tarball from '#{new_resource.url}' does not contain an app named '#{new_resource.app}'" if tarfile.num_files == 0
+        fail "Downloaded tarball for '#{new_resource.app}' has local entries" unless tarfile.count { |p, _| p.match %r{^[^/]+/local/.+} } == 0
+      end
+
+      def should_install?(expected_version, installed_version, tar_version) # rubocop:disable PerceivedComplexity, CyclomaticComplexity
+        fail "Downloaded tarball for #{new_resource.app} does not contain a version in app.conf!" unless tar_version.version
+        # If we specify an expected version (see warning in should download), the tar version must match exactly OR the expected version is the base version of the (prerelease) tar version
+        if expected_version.version && tar_version != expected_version
+          fail "Expected version #{expected_version} does not match tar version #{tar_version} for #{new_resource.app}" unless expected_version.type == :base && tar_version.base == expected_version.base
+        end
+        # If the exact version is already installed, NOOP
+        return false if tar_version == installed_version
+        # We must not install a prerelease on top of the same released version
+        fail "Attempting to install prerelease on top of same released version for #{new_resource.app}" if installed_version.type == :base && installed_version.base == tar_version.base
+        true
+      end
+
+      def install_from_tar(filename, expected_version, installed_version)
+        tarfile = CernerSplunk::TarBall.new(filename, prefix: new_resource.app, user: node['splunk']['user'], group: node['splunk']['group'])
+
+        validate_downloaded tarfile
+
+        app_conf = CernerSplunk::Conf.parse_string tarfile.get_file('default/app.conf')
+        tar_version = CernerSplunk::AppVersion.new((app_conf['launcher'] || {})['version'])
+
+        return unless should_install? expected_version, installed_version, tar_version
+
+        old_dir_path = "#{new_resource.root_dir}.old"
+
+        old_dir = Chef::Resource::Directory.new(old_dir_path, run_context)
+        old_dir.recursive true
+        old_dir.run_action :delete
+
+        # Move existing app out of the way
+        ::File.rename new_resource.root_dir, old_dir_path if ::File.exist? new_resource.root_dir
+        # Extract tarball to app directory
+        tarfile.extract new_resource.apps_dir
+
+        # Restore all potential user defined content
+        create_app_directories
+        ::Dir.chdir old_dir_path do
+          ::Dir['local/*', 'lookups/*', 'metadata/local.meta'].each do |f|
+            ::File.rename "#{old_dir_path}/#{f}", "#{new_resource.root_dir}/#{f}"
+          end
+        end if ::File.exist? old_dir_path
+        # Remove old app
+        old_dir.run_action :delete
+
+        new_resource.updated_by_last_action true
+      ensure
+        tarfile.close if tarfile
       end
 
       def manage_metaconf
-        file_name = @current_resource.local ? 'local.meta' : 'default.meta'
-        file_path = "#{@current_resource.apps_dir}/#{@current_resource.app}/metadata/"
-        permissions = @current_resource.permissions
+        permissions = new_resource.permissions
         permissions.each do |stanza, hash|
           hash.each do |key, values|
             if values.is_a?(Hash)
@@ -140,23 +271,23 @@ class Chef
             end
           end
         end
-        manage_file(file_name, permissions, file_path)
+        manage_file(new_resource.perms_file, permissions)
       end
 
       # function for dropping either a splunk template generated from a hash
       # or a simple file if the contents are a string. If the content of the file
       # is empty, then the file will be removed
-      def manage_file(file_name, contents, path)
+      def manage_file(path, contents)
         if contents.class == Hash && contents.empty? == false
-          file = Chef::Resource::Template.new("#{path}/#{file_name}", run_context)
+          file = Chef::Resource::Template.new(path, run_context)
           file.cookbook('cerner_splunk')
           file.source('generic.conf.erb')
           file.variables(stanzas: contents)
         else
-          file = Chef::Resource::File.new("#{path}/#{file_name}", run_context)
+          file = Chef::Resource::File.new(path, run_context)
           file.content(contents)
         end
-        file.path("#{path}/#{file_name}")
+        file.path(path)
         file.owner(node['splunk']['user'])
         file.group(node['splunk']['group'])
         file.mode('0600')
@@ -165,7 +296,7 @@ class Chef
         else
           file.run_action(:create)
         end
-        new_resource.updated_by_last_action(file.updated_by_last_action?)
+        new_resource.updated_by_last_action(true) if file.updated_by_last_action?
       end
     end
   end

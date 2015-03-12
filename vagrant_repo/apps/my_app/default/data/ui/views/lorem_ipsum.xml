@@ -1,0 +1,10 @@
+<dashboard>
+  <label>Lorem Ipsum</label>
+  <description>Hurray!</description>
+  <row>
+    <html>
+      <img src="http://33.media.tumblr.com/tumblr_lzkpw7DAl21qhy6c9o4_250.gif"/>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam blandit fringilla ex, nec vehicula nunc ornare efficitur. Maecenas auctor lacus justo, imperdiet dapibus eros pharetra sed. Proin eget erat varius, elementum lorem non, aliquet ante. Fusce dapibus ligula sit amet velit blandit, facilisis fringilla erat ornare. Sed id neque in augue maximus mattis a quis orci. Quisque consequat nibh nulla, a sagittis eros imperdiet sed. Sed at risus a nisi placerat egestas. Vivamus aliquet venenatis lacus, molestie tempor odio gravida posuere. Donec eros lectus, gravida id placerat eu, rhoncus eu metus. Donec eget nisl lobortis, fringilla massa non, accumsan purus. Integer eget orci consequat, efficitur sapien eget, ornare odio. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean pretium fringilla mauris vitae vulputate. Duis aliquam tellus vel ex imperdiet gravida. Donec tempus consequat volutpat.</p>
+    </html>
+  </row>
+</dashboard>

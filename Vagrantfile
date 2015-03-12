@@ -137,12 +137,33 @@ Vagrant.configure('2') do |config|
       berks upload -b ../Berksfile --no-freeze
       find . -name 'Berksfile*' -not -name '*.lock' -exec berks install -b {} \;
       find . -name 'Berksfile*' -not -name '*.lock' -exec berks upload -b {} --no-freeze \;
+      knife cookbook upload cerner_splunk_test
     SCRIPT
-    cfg.vm.provision :shell, inline: 'cd /vagrant/vagrant_repo; knife cookbook upload cerner_splunk_test'
 
     if ENV['KNIFE_ONLY']
       cfg.vm.provision :shell, inline: 'cd /vagrant/vagrant_repo; mv .nodes.bak nodes', privileged: false
     end
+
+    cfg.vm.provision :shell, inline: <<-'SCRIPT'.gsub(/^\s+/, ''), privileged: false
+      mkdir -p "$HOME/app_service"
+      rm -rf "$HOME/app_service/*"
+      cd /vagrant/vagrant_repo/apps
+      timestamp=`date -u +%Y%m%d%H%M%S`
+      for D in *; do
+        if [ -d "${D}" ]; then
+          if [ -f "${D}/default/app.conf" ]; then
+            cp "${D}/default/app.conf" "app.conf.bak"
+            sed -i "s/^\(version \?= \?.\+ SNAPSHOT\)$/\1_`echo $timestamp`/" "${D}/default/app.conf"
+          fi
+          tar czf "$HOME/app_service/$D.tgz" "$D"
+          [ -f "app.conf.bak" ] && mv "app.conf.bak" "${D}/default/app.conf"
+        fi
+      done
+      cd "$HOME"
+      nohup /opt/chefdk/embedded/bin/ruby -run -e httpd "$HOME/app_service" -p5000 2>&1 > /dev/null &
+      sleep 10
+    SCRIPT
+
     network cfg, :chef, false
   end
 

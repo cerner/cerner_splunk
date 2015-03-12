@@ -93,7 +93,10 @@ An apps hash is a contextual (see above) Hash, part of a plaintext data bag item
 * `['bag']` - A string that points to an externalized Apps Hash in which all keys (except this one) are valid. 
 * `[app]` - The name of an app to manage (disk name)
 * `[app]['remove']` - If true, remove this app instead of creating / managing  (default - false)
-* `[app]['local']` - If true, manage files in the local directories instead of the "default" (default-false)
+* `[app]['local']` - If true, manage `[app]['files']` defined files and `[app]['permissions']` defined metadata in the "local" directory and "local.meta" instead of the "default" directory and "default.meta" (default - false, but forced true if download-url is specified)
+* `[app]['download']` - Information for downloading an app
+* `[app]['download']['url']` - URL of where to download the app .tar.gz or .spl file. Archive is expected to contain a top-level directory with name matching 'app' attribute above.
+* `[app]['download']['version']` - Expected [version number][app.conf] (if any) used to determine if a new app should be downloaded.
 * `[app]['files']` - Hash of files to manage under the "default" or "local" directory.
 * `[app]['files'][filename]` - Contents of a particular file to manage. It can take 3 values, a hash of stanzas -> key-value pairs (then written with the splunk template), a string (written as is), or nil / false (deleted). If the hash or string is empty, the file is also deleted.
 * `[app]['permissions']` - Hash of permissions to manage for the app.
@@ -115,3 +118,4 @@ Docs Navigation
 [authentication.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Authenticationconf
 [alert-actions.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Alert-actionsconf
 [default.meta]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Defaultmetaconf
+[app.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/appconf
