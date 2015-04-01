@@ -6,6 +6,7 @@ description      'Installs/Configures Splunk Servers'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version          '1.9.1'
 
+depends          'chef-vault', '~> 1.2'
 depends          'ulimit', '~> 0.3.2'
 depends          'xml', '~> 1.2'
 
