@@ -130,14 +130,13 @@ Vagrant.configure('2') do |config|
       export PATH=$PATH:/opt/chefdk/bin:/opt/chefdk/embedded/bin
       nohup chef-zero -H 0.0.0.0 -p 4000 2>&1 > /dev/null &
       cd /vagrant/vagrant_repo
-      knife upload data_bags clients nodes
+      knife upload .
       find roles/ -iname *.rb -exec knife role from file {} \;
       find environments/ -iname *.rb -exec knife environment from file {} \;
       berks install -b ../Berksfile
       berks upload -b ../Berksfile --no-freeze
       find . -name 'Berksfile*' -not -name '*.lock' -exec berks install -b {} \;
       find . -name 'Berksfile*' -not -name '*.lock' -exec berks upload -b {} --no-freeze \;
-      knife cookbook upload cerner_splunk_test
     SCRIPT
 
     if ENV['KNIFE_ONLY']

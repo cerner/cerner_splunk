@@ -1,0 +1,23 @@
+{
+  "name": "splunk_monitors_windows",
+  "description": "Set the monitors for splunk",
+  "default_attributes": {
+    "splunk": {
+      "main_project_index": "opsinfra",
+      "monitors": [
+        {
+          "type": "WinEventLog",
+          "path": "Application"
+        },
+        {
+          "type": "WinEventLog",
+          "path": "System"
+        },
+        {
+          "type": "WinEventLog",
+          "path": "Security"
+        }
+      ]
+    }
+  }
+}
