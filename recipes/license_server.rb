@@ -7,7 +7,7 @@
 
 fail 'License Server installation not currently supported on windows' if platform_family?('windows')
 
-chef_gem 'nokogiri'
+include_recipe 'xml::ruby'
 require 'nokogiri'
 
 ## Attributes

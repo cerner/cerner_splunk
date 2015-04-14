@@ -7,6 +7,7 @@ long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version          '1.9.1'
 
 depends          'ulimit', '~> 0.3.2'
+depends          'xml', '~> 1.2'
 
 supports         'redhat', '>= 5.5'
 supports         'ubuntu', '>= 12.04'
