@@ -42,7 +42,7 @@ class Chef
 
         # If resource name is unambiguous, default values
         case name
-        when /^system\/(.+\.conf)$/
+        when %r{^system/(.+\.conf)$}
           @path = "etc/system/local/#{Regexp.last_match[1]}"
         when %r{^((?:master-)?app)s?/([^/]+)/(.+\.conf)$}
           @path = "etc/#{Regexp.last_match[1]}s/#{Regexp.last_match[2]}/local/#{Regexp.last_match[3]}"

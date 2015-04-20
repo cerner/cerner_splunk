@@ -5,7 +5,7 @@
 #
 # Performs the installation of the Splunk software via package.
 
-chef_gem 'chef-vault'
+include_recipe 'chef-vault::default'
 
 include_recipe 'cerner_splunk::_cleanup_aeon'
 

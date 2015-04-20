@@ -1,0 +1,16 @@
+{
+  "name": "splunk_forwarder_vagrant_new",
+  "default_attributes": {
+    "splunk": {
+      "config": {
+        "clusters": [
+          "cerner_splunk/cluster-standalone",
+          "cerner_splunk/cluster-vagrant"
+        ]
+      }
+    }
+  },
+  "run_list": [
+    "recipe[cerner_splunk]"
+  ]
+}

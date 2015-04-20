@@ -38,6 +38,7 @@ end
   c1_slave2:    { ip: '33.33.33.13', hostname: 'slave02.splunk', ports: { 8004 => 8000, 8094 => 8089 } },
   c1_slave3:    { ip: '33.33.33.14', hostname: 'slave03.splunk', ports: { 8005 => 8000, 8095 => 8089 } },
   s_standalone: { ip: '33.33.33.20', hostname: 'splunk2', ports: { 8006 => 8000, 8096 => 8089 } },
+  s_license:    { ip: '33.33.33.30', hostname: 'splunk-license', ports: { 8007 => 8000, 8097 => 8089 } },
   f_default:    { ip: '33.33.33.50', hostname: 'default.forward', ports: { 9090 => 8089 } },
   f_debian:     { ip: '33.33.33.51', hostname: 'debian.forward', ports: { 9091 => 8089 } },
   f_old:        { ip: '33.33.33.52', hostname: 'splunk4.forward', ports: { 9092 => 8089 } },
@@ -115,7 +116,7 @@ Vagrant.configure('2') do |config|
 
     cfg.vm.provision :shell, inline: <<-'SCRIPT'.gsub(/^\s+/, '')
       yum -y install git
-      rpm -q chefdk || rpm -Uvh https://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chefdk-0.3.5-1.x86_64.rpm
+      rpm -q chefdk || rpm -Uvh https://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chefdk-0.4.0-1.x86_64.rpm
     SCRIPT
 
     if ENV['KNIFE_ONLY']
@@ -130,14 +131,13 @@ Vagrant.configure('2') do |config|
       export PATH=$PATH:/opt/chefdk/bin:/opt/chefdk/embedded/bin
       nohup chef-zero -H 0.0.0.0 -p 4000 2>&1 > /dev/null &
       cd /vagrant/vagrant_repo
-      knife upload data_bags clients nodes
+      knife upload .
       find roles/ -iname *.rb -exec knife role from file {} \;
       find environments/ -iname *.rb -exec knife environment from file {} \;
       berks install -b ../Berksfile
       berks upload -b ../Berksfile --no-freeze
       find . -name 'Berksfile*' -not -name '*.lock' -exec berks install -b {} \;
       find . -name 'Berksfile*' -not -name '*.lock' -exec berks upload -b {} --no-freeze \;
-      knife cookbook upload cerner_splunk_test
     SCRIPT
 
     if ENV['KNIFE_ONLY']
@@ -165,6 +165,15 @@ Vagrant.configure('2') do |config|
     SCRIPT
 
     network cfg, :chef, false
+  end
+
+  config.vm.define :s_license do |cfg|
+    disk(cfg)
+    cfg.vm.provision :chef_client do |chef|
+      chef_defaults chef, :s_license, 'splunk_license'
+      chef.add_recipe 'cerner_splunk::license_server'
+    end
+    network cfg, :s_license
   end
 
   config.vm.define :c1_master do |cfg|
