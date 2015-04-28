@@ -4,6 +4,8 @@ Installs and Configures Splunk forwarders and servers, and other components rela
 
 Based on the work done by [BBY Solutions](https://github.com/bestbuycom/splunk_cookbook) and a previous Cerner team.
 
+[![Code Climate](https://codeclimate.com/github/cerner/cerner_splunk/badges/gpa.svg)](https://codeclimate.com/github/cerner/cerner_splunk)
+
 Requirements
 ------------
 * Red Hat Enterprise / CentOS 5.5+ / Windows Server 2008+ (forwarder only) or Ubuntu LTS 12.04+
