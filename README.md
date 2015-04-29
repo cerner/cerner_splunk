@@ -4,6 +4,7 @@ Installs and Configures Splunk forwarders and servers, and other components rela
 
 Based on the work done by [BBY Solutions](https://github.com/bestbuycom/splunk_cookbook) and a previous Cerner team.
 
+[![Github Version](https://badge.fury.io/gh/cerner%2Fcerner_splunk.svg)](http://badge.fury.io/gh/cerner%2Fcerner_splunk)
 [![Code Climate](https://codeclimate.com/github/cerner/cerner_splunk/badges/gpa.svg)](https://codeclimate.com/github/cerner/cerner_splunk)
 
 Requirements
