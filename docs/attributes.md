@@ -54,4 +54,5 @@ Docs Navigation
 * [Repository Readme](../README.md)
 
 [inputs.conf]: http://docs.splunk.com/Documentation/Splunk/6.0.1/admin/Inputsconf
+[limits.conf]: http://docs.splunk.com/Documentation/Splunk/6.0.1/admin/Limitsconf
 [ui-prefs.conf]: http://docs.splunk.com/Documentation/Splunk/6.0.1/Admin/Ui-prefsconf
