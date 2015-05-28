@@ -114,7 +114,6 @@ Docs Navigation
 [server.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Serverconf
 [indexes.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Indexesconf
 [user-prefs.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/User-prefsconf
-[limits.conf]: http://docs.splunk.com/Documentation/Splunk/latest/admin/Limitsconf
 [authorize.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Authorizeconf
 [authentication.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Authenticationconf
 [alert-actions.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Alert-actionsconf
