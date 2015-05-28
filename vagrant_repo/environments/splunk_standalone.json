@@ -11,6 +11,11 @@
           "cerner_splunk/cluster-standalone",
           "cerner_splunk/cluster-vagrant"
         ],
+        "limits": {
+          "thruput": {
+            "maxKBps" : "512"
+          }
+        },
         "roles": "cerner_splunk/authnz-vagrant:roles",
         "authentication": "cerner_splunk/authnz-vagrant:authn",
         "alerts": "cerner_splunk/alerts-vagrant:alerts"

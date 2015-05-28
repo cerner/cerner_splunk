@@ -6,6 +6,7 @@ default['splunk']['config']['ui_prefs']['default'] = {
   'dispatch.earliest_time' => '@d',
   'dispatch.latest_time' => 'now'
 }
+default['splunk']['config']['limits'] = nil
 
 # References 0 to many cluster configurations (arrays of Strings of data_bag/data_bag_item)
 default['splunk']['config']['clusters'] = []

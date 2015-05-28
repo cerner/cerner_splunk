@@ -85,6 +85,7 @@ class Chef
         server.conf
         user-prefs.conf
         ui-prefs.conf
+        limits.conf
       )
     end
   end
