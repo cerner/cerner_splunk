@@ -5,6 +5,7 @@
 #
 # Methods for working with data from a tarball.
 
+require 'rubygems'
 require 'rubygems/package'
 require 'zlib'
 require 'fileutils'
@@ -29,6 +30,9 @@ module CernerSplunk
       @reader = @data[1] =  Gem::Package::TarReader.new(Zlib::GzipReader.open @file_name)
       @prefix = options[:prefix]
       @options = options
+      # chown blows up on windows in unexpected ways
+      # so give us a marker to know if we can chown
+      @can_chown = !Gem.win_platform?
     end
 
     attr_reader :prefix
@@ -51,7 +55,7 @@ module CernerSplunk
         make_dirs extract_dir, path
         File.open(target, 'wb') { |f| f.print entry.read }
         FileUtils.chmod entry.header.mode, target
-        FileUtils.chown @options[:user], @options[:group], target
+        FileUtils.chown @options[:user], @options[:group], target if @can_chown
       end
 
       dir_handler = proc do |path, entry|
@@ -66,7 +70,7 @@ module CernerSplunk
         File.unlink target if File.exist? target
         File.symlink other[:linkname], target
         FileUtils.chmod entry.header.mode, target
-        FileUtils.chown @options[:user], @options[:group], target
+        FileUtils.chown @options[:user], @options[:group], target if @can_chown
       end
 
       iterate file: file_handler, directory: dir_handler, symlink: symlink_handler
@@ -103,7 +107,7 @@ module CernerSplunk
       segments.each_with_object(extract_dir.dup) do |segment, target|
         target << "/#{segment}"
         FileUtils.mkdir target unless File.directory? target
-        FileUtils.chown @options[:user], @options[:group], target
+        FileUtils.chown @options[:user], @options[:group], target if @can_chown
       end
     end
 

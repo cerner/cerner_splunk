@@ -27,9 +27,13 @@ bag_bag = CernerSplunk::DataBag.load(cluster_bag['bag']) || {}
 apps = CernerSplunk::SplunkApp.merge_hashes(bag_bag, cluster_bag)
 
 apps.each do |app_name, app_data|
+  download_data = app_data['download'] || {}
+
   splunk_app app_name do
     apps_dir "#{node['splunk']['home']}/etc/master-apps"
     action app_data['remove'] ? :remove : :create
+    url download_data['url']
+    version download_data['version']
     local app_data['local']
     files app_data['files']
     permissions app_data['permissions']
