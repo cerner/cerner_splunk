@@ -21,7 +21,6 @@ class Chef
 
       provides :splunk_template, (use_provider_resolver ? {} : { on_platforms: :all })
 
-      # rubocop:disable MethodLength
       def initialize(name, run_context = nil)
         super
         @resource_name = :splunk_template
@@ -48,7 +47,6 @@ class Chef
           @path = "etc/#{Regexp.last_match[1]}s/#{Regexp.last_match[2]}/local/#{Regexp.last_match[3]}"
         end
       end
-      # rubocop:enable MethodLength
 
       delayable_attribute :stanzas, default: {}, kind_of: Hash
 
