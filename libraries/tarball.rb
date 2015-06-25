@@ -27,7 +27,9 @@ module CernerSplunk
       ObjectSpace.define_finalizer(self, @clean_proc)
       # Setup the reader, and read the prefix option if present.
       @file_name = @data[0] = file_name
-      @reader = @data[1] =  Gem::Package::TarReader.new(Zlib::GzipReader.open @file_name)
+      @io = @data[1] = Zlib::GzipReader.open @file_name
+      @reader = @data[2] = Gem::Package::TarReader.new @io
+
       @prefix = options[:prefix]
       @options = options
       # chown blows up on windows in unexpected ways
@@ -153,9 +155,10 @@ module CernerSplunk
     end
 
     def close
-      @reader.close
+      @clean_proc.call
       @data[0] = @file_name = nil
-      @data[1] = @reader = nil
+      @data[1] = @io = nil
+      @data[2] = @reader = nil
       ObjectSpace.undefine_finalizer(self)
     end
 
@@ -170,8 +173,7 @@ module CernerSplunk
 
       def call(*)
         return if @pid != $PID
-        _, reader = *@data
-        reader.close if reader
+        @data.drop(1).reverse_each { |io| io.close if io }
       end
     end
   end
