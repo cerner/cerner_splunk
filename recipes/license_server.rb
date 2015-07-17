@@ -48,6 +48,7 @@ license_groups.each do |type, keys|
       owner node['splunk']['user']
       group node['splunk']['group']
       mode '0600'
+      sensitive true
       notifies :restart, 'service[splunk]'
     end
   end
