@@ -5,7 +5,7 @@ DEPENDENCIES
 
 GRAPH
   build-essential (2.2.3)
-  cerner_splunk (1.10.3)
+  cerner_splunk (1.10.4)
     chef-vault (~> 1.2)
     ulimit (~> 0.3.2)
     xml (~> 1.2)
