@@ -17,6 +17,7 @@ password_file = File.join node['splunk']['external_config_directory'], 'password
 
 execute 'apply-cluster-bundle' do
   command "cat #{password_file} | xargs #{node['splunk']['cmd']} apply cluster-bundle --answer-yes -auth admin:"
+  environment 'HOME' => node['splunk']['home']
   action :nothing
 end
 
