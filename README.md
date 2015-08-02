@@ -10,9 +10,7 @@ Based on the work done by [BBY Solutions](https://github.com/bestbuycom/splunk_c
 Requirements
 ------------
 * Red Hat Enterprise / CentOS 5.5+ / Windows Server 2008+ (forwarder only) or Ubuntu LTS 12.04+
-* Chef 10.24+ or 11+
-
-**_Important Note:_** The Cerner forked 0.10.8.x versions of Chef are NOT supported and will likely be [problematic](http://www.fireflyfans.net/bluesunimages/227243C5F193ACEE32D874D8BD22AFD1.jpg). We highly suggest moving to Omnibus packaged Chef 10.24+ as quickly as possible.
+* Chef 11.6+
 
 Getting your logs into Splunk
 -----------------------------
