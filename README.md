@@ -121,7 +121,7 @@ License & Authors
 - Author:: Aaron Peterson (aaron@opscode.com)
 
 ```text
-Copyright:: 2012-2014, Cerner Innovation, Inc.
+Copyright:: 2012-2015, Cerner Innovation, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
