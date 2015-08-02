@@ -18,7 +18,6 @@ end
     {
       newest: { box: 'rhel65-1.0.1', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel65/1.0.1/rhel65-1.0.1.box' },
       previous: { box: 'rhel64-1.2.1', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel64/1.2.1/rhel64-1.2.1.box' },
-      rhel55: { box: 'rhel55-1.0.0', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel55/1.0.0/rhel55-1.0.0.box' },
       win2012r2: { box: 'win2012r2-standard-nocm-1.0.0', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/win2012r2-standard-nocm/1.0.0/win2012r2-standard-nocm-1.0.0.box' },
       ubuntu1204: { box: 'opscode_ubuntu-12.04_provisionerless', box_url: 'http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-12.04_chef-provisionerless.box' }
     }
@@ -41,7 +40,6 @@ end
   s_license:    { ip: '33.33.33.30', hostname: 'splunk-license', ports: { 8007 => 8000, 8097 => 8089 } },
   f_default:    { ip: '33.33.33.50', hostname: 'default.forward', ports: { 9090 => 8089 } },
   f_debian:     { ip: '33.33.33.51', hostname: 'debian.forward', ports: { 9091 => 8089 } },
-  f_old:        { ip: '33.33.33.52', hostname: 'splunk4.forward', ports: { 9092 => 8089 } },
   f_win2012r2:  { ip: '33.33.33.53', hostname: 'windowsforward', ports: { 9093 => 8089 } }
 }
 
@@ -132,12 +130,8 @@ Vagrant.configure('2') do |config|
       nohup chef-zero -H 0.0.0.0 -p 4000 2>&1 > /dev/null &
       cd /vagrant/vagrant_repo
       knife upload .
-      find roles/ -iname *.rb -exec knife role from file {} \;
-      find environments/ -iname *.rb -exec knife environment from file {} \;
       berks install -b ../Berksfile
       berks upload -b ../Berksfile --no-freeze
-      find . -name 'Berksfile*' -not -name '*.lock' -exec berks install -b {} \;
-      find . -name 'Berksfile*' -not -name '*.lock' -exec berks upload -b {} --no-freeze \;
     SCRIPT
 
     if ENV['KNIFE_ONLY']
@@ -248,21 +242,6 @@ Vagrant.configure('2') do |config|
     end
     network cfg, :f_debian
   end
-
-  config.vm.define :f_old do |cfg|
-    set_box cfg, :rhel55
-    cfg.omnibus.chef_version = '10.24.0'
-    cfg.vm.provision :chef_client do |chef|
-      chef_defaults chef, :f_old, '_default'
-      chef.add_role 'splunk_forwarder_vagrant'
-    end unless ENV['RELOAD']
-    cfg.vm.provision :chef_client do |chef|
-      chef_defaults chef, :f_old, '_default'
-      chef.add_role 'splunk_forwarder_vagrant_new'
-      chef.add_recipe 'cerner_splunk_test'
-    end
-    network cfg, :f_old
-  end if @internal
 
   config.vm.define :f_win2012r2 do |cfg|
     set_box cfg, :win2012r2
