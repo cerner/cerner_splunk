@@ -22,13 +22,13 @@ node.default['splunk']['package']['url'] =
 
 if platform_family?('windows')
   if node['kernel']['machine'] == 'x86_64'
-    node.default['splunk']['home'] = "#{ENV['PROGRAMW6432'].gsub('\\', '/')}/#{nsp['base_name']}"
+    node.default['splunk']['home'] = "#{ENV['PROGRAMW6432'].tr('\\', '/')}/#{nsp['base_name']}"
   else
-    node.default['splunk']['home'] = "#{ENV['PROGRAMFILES'].gsub('\\', '/')}/#{nsp['base_name']}"
+    node.default['splunk']['home'] = "#{ENV['PROGRAMFILES'].tr('\\', '/')}/#{nsp['base_name']}"
   end
-  # The regex is intended to switch the direction of slashes to be windows friendly,
+  # The translate is intended to switch the direction of slashes to be windows friendly,
   # the second replacement surrounds any file names with spaces in quotes
-  node.default['splunk']['cmd'] = "#{node['splunk']['home']}/bin/splunk".gsub('/', '\\').gsub(/\w+\s\w+/) { |directory| %("#{directory}") }
+  node.default['splunk']['cmd'] = "#{node['splunk']['home']}/bin/splunk".tr('/', '\\').gsub(/\w+\s\w+/) { |directory| %("#{directory}") }
   service = 'SplunkForwarder'
 else
   node.default['splunk']['home'] = "/opt/#{nsp['base_name']}"
@@ -61,7 +61,7 @@ package node['splunk']['package']['base_name'] do
   only_if(&manifest_missing)
   if platform_family?('windows')
     # installing as the system user by default as Splunk has difficulties with being a limited user
-    options %(AGREETOLICENSE=Yes SERVICESTARTTYPE=auto LAUNCHSPLUNK=0 INSTALLDIR="#{node['splunk']['home'].gsub('/', '\\')}")
+    options %(AGREETOLICENSE=Yes SERVICESTARTTYPE=auto LAUNCHSPLUNK=0 INSTALLDIR="#{node['splunk']['home'].tr('/', '\\')}")
   else
     notifies :run, 'execute[splunk-first-run]', :immediately
   end

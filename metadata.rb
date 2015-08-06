@@ -4,7 +4,7 @@ maintainer_email 'splunk@cerner.com'
 license          'Apache 2.0'
 description      'Installs/Configures Splunk Servers'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          '1.10.4'
+version          '1.10.5'
 
 depends          'chef-vault', '~> 1.2'
 depends          'ulimit', '~> 0.3.2'

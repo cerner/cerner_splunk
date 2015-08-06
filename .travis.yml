@@ -2,10 +2,11 @@ branches:
   except:
     - master
 language: ruby
-bundler_args: --without deployment
+cache: bundler
+sudo: false
 rvm:
 - 1.9.3
-- 2.1.4
+- 2.1.6
 script:
 - bundle exec rubocop
 - bundle exec foodcritic -f any .
