@@ -1,33 +1,11 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-require 'socket'
-
-# rubocop:disable RescueModifier
-@internal = !Socket.gethostbyname('repo.release.cerner.corp').nil? rescue false
-# rubocop:enable RescueModifier
-
 Vagrant.require_version '>= 1.4.1'
 
 %w(vagrant-omnibus).each do |plugin|
   fail "Missing #{plugin}. Please install it!" unless Vagrant.has_plugin? plugin
 end
-
-@boxes =
-  if @internal
-    {
-      newest: { box: 'rhel65-1.0.1', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel65/1.0.1/rhel65-1.0.1.box' },
-      previous: { box: 'rhel64-1.2.1', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel64/1.2.1/rhel64-1.2.1.box' },
-      win2012r2: { box: 'win2012r2-standard-nocm-1.0.0', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/win2012r2-standard-nocm/1.0.0/win2012r2-standard-nocm-1.0.0.box' },
-      ubuntu1204: { box: 'opscode_ubuntu-12.04_provisionerless', box_url: 'http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-12.04_chef-provisionerless.box' }
-    }
-  else
-    {
-      newest: { box: 'opscode_centos-7.0_provisionerless', box_url: 'http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_centos-7.0_chef-provisionerless.box' },
-      previous: { box: 'opscode_centos-6.5_provisionerless', box_url: 'http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_centos-6.5_chef-provisionerless.box' },
-      ubuntu1204: { box: 'opscode_ubuntu-12.04_provisionerless', box_url: 'http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-12.04_chef-provisionerless.box' }
-    }
-  end
 
 @network = {
   chef:         { ip: '33.33.33.33', hostname: 'chef', ports: { 4000 => 4000 } },
@@ -76,11 +54,6 @@ def network(config, name, splunk_password = true)
   config.vm.provision :shell, inline: 'cat /etc/splunk/password; echo' if splunk_password
 end
 
-def set_box(config, name)
-  config.vm.box = @boxes[name][:box]
-  config.vm.box_url = @boxes[name][:box_url]
-end
-
 def chef_defaults(chef, name, environment = 'splunk_server')
   chef.environment = environment
   chef.chef_server_url = "http://#{@chefip}:4000/"
@@ -88,14 +61,13 @@ def chef_defaults(chef, name, environment = 'splunk_server')
   chef.client_key_path = "/vagrant/vagrant_repo/pems/#{name}.pem"
   chef.node_name = name.to_s
   chef.encrypted_data_bag_secret_key_path = 'vagrant_repo/encrypted_data_bag_secret'
-  # Switch roles only when you have setup local package mirroring per the Readme.
-  chef.add_role 'splunk_mirrors_cerner' if @internal
+  # Use this role only when you have setup local package mirroring per the readme.
   # chef.add_role 'splunk_mirrors_local'
   chef.add_role 'splunk_monitors'
 end
 
 Vagrant.configure('2') do |config|
-  set_box config, :newest
+  config.vm.box = 'chef/centos-6.6'
 
   if Vagrant.has_plugin? 'vagrant-berkshelf'
     config.berkshelf.enabled = false
@@ -218,7 +190,7 @@ Vagrant.configure('2') do |config|
 
   config.vm.define :f_default do |cfg|
     default_omnibus config
-    set_box cfg, :previous
+    cfg.vm.box = 'chef/centos-6.5'
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :f_default, 'splunk_standalone'
       chef.add_recipe 'cerner_splunk'
@@ -229,7 +201,7 @@ Vagrant.configure('2') do |config|
 
   config.vm.define :f_debian do |cfg|
     default_omnibus config
-    set_box cfg, :ubuntu1204
+    cfg.vm.box = 'chef/ubuntu-12.04'
     cfg.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', 256]
     end
@@ -241,7 +213,7 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :f_win2012r2 do |cfg|
-    set_box cfg, :win2012r2
+    cfg.vm.box = 'opentable/win-2012r2-standard-amd64-nocm'
     default_omnibus config
     cfg.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', 1024]
@@ -252,5 +224,5 @@ Vagrant.configure('2') do |config|
       chef.add_recipe 'cerner_splunk'
     end
     network cfg, :f_win2012r2, false
-  end if @internal
+  end
 end
