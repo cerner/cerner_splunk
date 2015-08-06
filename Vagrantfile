@@ -112,10 +112,7 @@ Vagrant.configure('2') do |config|
   config.vm.define :chef do |cfg|
     config.omnibus.chef_version = nil
 
-    cfg.vm.provision :shell, inline: <<-'SCRIPT'.gsub(/^\s+/, '')
-      yum -y install git
-      rpm -q chefdk || rpm -Uvh https://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chefdk-0.4.0-1.x86_64.rpm
-    SCRIPT
+    cfg.vm.provision :shell, inline: 'rpm -q chefdk || curl -L https://chef.sh | bash -s -- -P chefdk'
 
     if ENV['KNIFE_ONLY']
       cfg.vm.provision :shell, inline: 'cd /vagrant/vagrant_repo; mv nodes .nodes.bak', privileged: false
