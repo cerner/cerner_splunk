@@ -10,6 +10,9 @@
 *.DS_Store
 *.un~
 
+# Generated from metadata.rb
+metadata.json
+
 # Bundler
 Gemfile.lock
 bin/*
@@ -17,3 +20,4 @@ bin/*
 
 # Vagrant-Repo
 vagrant_repo/Berksfile.lock
+vagrant_repo/.chef/syntaxcache

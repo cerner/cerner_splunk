@@ -1,34 +1,11 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-require 'socket'
-
-# rubocop:disable RescueModifier
-@internal = !Socket.gethostbyname('repo.release.cerner.corp').nil? rescue false
-# rubocop:enable RescueModifier
-
 Vagrant.require_version '>= 1.4.1'
 
 %w(vagrant-omnibus).each do |plugin|
   fail "Missing #{plugin}. Please install it!" unless Vagrant.has_plugin? plugin
 end
-
-@boxes =
-  if @internal
-    {
-      newest: { box: 'rhel65-1.0.1', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel65/1.0.1/rhel65-1.0.1.box' },
-      previous: { box: 'rhel64-1.2.1', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel64/1.2.1/rhel64-1.2.1.box' },
-      rhel55: { box: 'rhel55-1.0.0', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/rhel55/1.0.0/rhel55-1.0.0.box' },
-      win2012r2: { box: 'win2012r2-standard-nocm-1.0.0', box_url: 'http://repo.release.cerner.corp/nexus/content/repositories/vagrant/com/cerner/vagrant/win2012r2-standard-nocm/1.0.0/win2012r2-standard-nocm-1.0.0.box' },
-      ubuntu1204: { box: 'opscode_ubuntu-12.04_provisionerless', box_url: 'http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-12.04_chef-provisionerless.box' }
-    }
-  else
-    {
-      newest: { box: 'opscode_centos-7.0_provisionerless', box_url: 'http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_centos-7.0_chef-provisionerless.box' },
-      previous: { box: 'opscode_centos-6.5_provisionerless', box_url: 'http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_centos-6.5_chef-provisionerless.box' },
-      ubuntu1204: { box: 'opscode_ubuntu-12.04_provisionerless', box_url: 'http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-12.04_chef-provisionerless.box' }
-    }
-  end
 
 @network = {
   chef:         { ip: '33.33.33.33', hostname: 'chef', ports: { 4000 => 4000 } },
@@ -41,7 +18,6 @@ end
   s_license:    { ip: '33.33.33.30', hostname: 'splunk-license', ports: { 8007 => 8000, 8097 => 8089 } },
   f_default:    { ip: '33.33.33.50', hostname: 'default.forward', ports: { 9090 => 8089 } },
   f_debian:     { ip: '33.33.33.51', hostname: 'debian.forward', ports: { 9091 => 8089 } },
-  f_old:        { ip: '33.33.33.52', hostname: 'splunk4.forward', ports: { 9092 => 8089 } },
   f_win2012r2:  { ip: '33.33.33.53', hostname: 'windowsforward', ports: { 9093 => 8089 } }
 }
 
@@ -78,11 +54,6 @@ def network(config, name, splunk_password = true)
   config.vm.provision :shell, inline: 'cat /etc/splunk/password; echo' if splunk_password
 end
 
-def set_box(config, name)
-  config.vm.box = @boxes[name][:box]
-  config.vm.box_url = @boxes[name][:box_url]
-end
-
 def chef_defaults(chef, name, environment = 'splunk_server')
   chef.environment = environment
   chef.chef_server_url = "http://#{@chefip}:4000/"
@@ -90,14 +61,13 @@ def chef_defaults(chef, name, environment = 'splunk_server')
   chef.client_key_path = "/vagrant/vagrant_repo/pems/#{name}.pem"
   chef.node_name = name.to_s
   chef.encrypted_data_bag_secret_key_path = 'vagrant_repo/encrypted_data_bag_secret'
-  # Switch roles only when you have setup local package mirroring per the Readme.
-  chef.add_role 'splunk_mirrors_cerner' if @internal
+  # Use this role only when you have setup local package mirroring per the readme.
   # chef.add_role 'splunk_mirrors_local'
   chef.add_role 'splunk_monitors'
 end
 
 Vagrant.configure('2') do |config|
-  set_box config, :newest
+  config.vm.box = 'chef/centos-6.6'
 
   if Vagrant.has_plugin? 'vagrant-berkshelf'
     config.berkshelf.enabled = false
@@ -114,10 +84,7 @@ Vagrant.configure('2') do |config|
   config.vm.define :chef do |cfg|
     config.omnibus.chef_version = nil
 
-    cfg.vm.provision :shell, inline: <<-'SCRIPT'.gsub(/^\s+/, '')
-      yum -y install git
-      rpm -q chefdk || rpm -Uvh https://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chefdk-0.4.0-1.x86_64.rpm
-    SCRIPT
+    cfg.vm.provision :shell, inline: 'rpm -q chefdk || curl -L https://chef.sh | bash -s -- -P chefdk'
 
     if ENV['KNIFE_ONLY']
       cfg.vm.provision :shell, inline: 'cd /vagrant/vagrant_repo; mv nodes .nodes.bak', privileged: false
@@ -132,12 +99,8 @@ Vagrant.configure('2') do |config|
       nohup chef-zero -H 0.0.0.0 -p 4000 2>&1 > /dev/null &
       cd /vagrant/vagrant_repo
       knife upload .
-      find roles/ -iname *.rb -exec knife role from file {} \;
-      find environments/ -iname *.rb -exec knife environment from file {} \;
       berks install -b ../Berksfile
       berks upload -b ../Berksfile --no-freeze
-      find . -name 'Berksfile*' -not -name '*.lock' -exec berks install -b {} \;
-      find . -name 'Berksfile*' -not -name '*.lock' -exec berks upload -b {} --no-freeze \;
     SCRIPT
 
     if ENV['KNIFE_ONLY']
@@ -227,7 +190,7 @@ Vagrant.configure('2') do |config|
 
   config.vm.define :f_default do |cfg|
     default_omnibus config
-    set_box cfg, :previous
+    cfg.vm.box = 'chef/centos-6.5'
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :f_default, 'splunk_standalone'
       chef.add_recipe 'cerner_splunk'
@@ -238,7 +201,7 @@ Vagrant.configure('2') do |config|
 
   config.vm.define :f_debian do |cfg|
     default_omnibus config
-    set_box cfg, :ubuntu1204
+    cfg.vm.box = 'chef/ubuntu-12.04'
     cfg.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', 256]
     end
@@ -249,23 +212,8 @@ Vagrant.configure('2') do |config|
     network cfg, :f_debian
   end
 
-  config.vm.define :f_old do |cfg|
-    set_box cfg, :rhel55
-    cfg.omnibus.chef_version = '10.24.0'
-    cfg.vm.provision :chef_client do |chef|
-      chef_defaults chef, :f_old, '_default'
-      chef.add_role 'splunk_forwarder_vagrant'
-    end unless ENV['RELOAD']
-    cfg.vm.provision :chef_client do |chef|
-      chef_defaults chef, :f_old, '_default'
-      chef.add_role 'splunk_forwarder_vagrant_new'
-      chef.add_recipe 'cerner_splunk_test'
-    end
-    network cfg, :f_old
-  end if @internal
-
   config.vm.define :f_win2012r2 do |cfg|
-    set_box cfg, :win2012r2
+    cfg.vm.box = 'opentable/win-2012r2-standard-amd64-nocm'
     default_omnibus config
     cfg.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', 1024]
@@ -276,5 +224,5 @@ Vagrant.configure('2') do |config|
       chef.add_recipe 'cerner_splunk'
     end
     network cfg, :f_win2012r2, false
-  end if @internal
+  end
 end
