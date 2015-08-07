@@ -143,6 +143,7 @@ splunk_template 'system/server.conf' do
       case key
       when 'general'
         server_stanzas['general']['guid'] = value['guid'] if value['guid']
+        server_stanzas['general']['pass4SymmKey'] = value['pass4SymmKey'] if value['pass4SymmKey']
       when 'sslConfig'
         server_stanzas['sslConfig']['sslKeysfilePassword'] = value['sslKeysfilePassword']
       end
