@@ -214,6 +214,9 @@ Vagrant.configure('2') do |config|
 
   config.vm.define :f_win2012r2 do |cfg|
     cfg.vm.box = 'opentable/win-2012r2-standard-amd64-nocm'
+    # Without the line below here or in the box, vagrant-omnibus breaks on windows.
+    # Reference: https://github.com/chef/vagrant-omnibus/issues/90#issuecomment-51816397
+    cfg.vm.guest = :windows
     default_omnibus config
     cfg.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', 1024]
