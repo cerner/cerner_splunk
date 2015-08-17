@@ -107,7 +107,7 @@ Vagrant.configure('2') do |config|
       cfg.vm.provision :shell, inline: 'cd /vagrant/vagrant_repo; mv .nodes.bak nodes', privileged: false
     end
 
-    cfg.vm.provision :shell, inline: <<-'SCRIPT'.gsub(/^\s+/, ''), privileged: false
+    app_gen = <<-'SCRIPT'.gsub(/^\s+/, '')
       mkdir -p "$HOME/app_service"
       rm -rf "$HOME/app_service/*"
       cd /vagrant/vagrant_repo/apps
@@ -123,9 +123,13 @@ Vagrant.configure('2') do |config|
         fi
       done
       cd "$HOME"
-      nohup /opt/chefdk/embedded/bin/ruby -run -e httpd "$HOME/app_service" -p5000 2>&1 > /dev/null &
+      netstat -nl | grep -q :5000 || nohup /opt/chefdk/embedded/bin/ruby -run -e httpd "$HOME/app_service" -p5000 2>&1 > /dev/null &
       sleep 10
     SCRIPT
+
+    app_gen.sub!('tar', '[ -f "$HOME/app_service/$D.tgz" ] || tar') unless ENV['REGEN_APPS']
+
+    cfg.vm.provision :shell, inline: app_gen, privileged: false
 
     network cfg, :chef, false
   end
@@ -214,6 +218,9 @@ Vagrant.configure('2') do |config|
 
   config.vm.define :f_win2012r2 do |cfg|
     cfg.vm.box = 'opentable/win-2012r2-standard-amd64-nocm'
+    # Without the line below here or in the box, vagrant-omnibus breaks on windows.
+    # Reference: https://github.com/chef/vagrant-omnibus/issues/90#issuecomment-51816397
+    cfg.vm.guest = :windows
     default_omnibus config
     cfg.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', 1024]
