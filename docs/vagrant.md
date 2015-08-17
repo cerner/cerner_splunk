@@ -2,9 +2,12 @@ Running with Vagrant
 ====================
 * The first vagrant box is for running chef zero. Provisioning it will upload all of the contents of the `vagrant_repo` directory, plus the cookbook and all dependencies using Berkshelf.
 * The other vagrant boxes all require the chef machine to be running, and setup Splunk running machines of various kinds, names being prefixed according to groupings, to enable using regular expressions to specify vagrant operations on subsets of machines. (See [Vagrant's documentation on controlling multiple machines](http://docs.vagrantup.com/v2/multi-machine/))
-* With the chef vm running, contents can be reloaded easily
+* With the chef vm running, chef contents can be reloaded easily
   * `vagrant provision chef` - will restart the chef-zero server as well as reloading everything (clearing all state)
   * `KNIFE_ONLY=1 vagrant provision chef` - will only update cookbooks and the chef-repo data. (maintaining state)
+* The chef vm also packages splunk apps from vagrant_repo/apps for consumption by the other vagrant machines over port 5000
+  * `vagrant provision chef` - Will only package splunk apps if they're not already packaged.
+  * `REGEN_APPS=1 vagrant provision chef` - Will repackage all apps.
 * You can speed up repeated provisioning attempts by mirroring the Splunk package downloads locally:
   1. Download the needed splunk packages locally, in a directory structure mirroring that of download.splunk.com
     * You can find the suffixes of files at the [Splunk download page](http://splunk.com/download)
