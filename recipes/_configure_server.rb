@@ -46,6 +46,8 @@ when :search_head, :server
     server_stanzas[stanza] = {}
     server_stanzas[stanza]['master_uri'] = master_uri
     server_stanzas[stanza]['pass4SymmKey'] = pass unless pass.empty?
+    # Until we support multisite clusters, set multisite explicitly false
+    server_stanzas[stanza]['multisite'] = false
     stanza
   end
 
