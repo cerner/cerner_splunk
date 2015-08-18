@@ -73,6 +73,13 @@ directory node['splunk']['external_config_directory'] do
   mode '0700'
 end
 
+# SPL-89640 On upgrades, the permissions of this directory is set incorrectly.
+directory "#{node['splunk']['home']}/var/log/introspection" do
+  owner node['splunk']['user']
+  group node['splunk']['group']
+  mode '0700'
+end
+
 file 'splunk_package' do
   path splunk_file
   backup false

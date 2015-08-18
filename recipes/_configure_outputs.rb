@@ -10,8 +10,8 @@ output_stanzas = {}
 if [:search_head, :forwarder, :cluster_master].include? node['splunk']['node_type']
   output_stanzas['tcpout'] = {
     'forwardedindex.0.whitelist' => '.*',
-    'forwardedindex.1.blacklist' => '_.*',
-    'forwardedindex.2.whitelist' => '(_audit|_internal)'
+    'forwardedindex.1.blacklist' => '_thefishbucket',
+    'forwardedindex.2.whitelist' => ''
   }
 
   # If we're part of a cluster, we only want to send events to our cluster.
