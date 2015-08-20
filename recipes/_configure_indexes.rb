@@ -51,6 +51,10 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
   result
 end
 
+if is_master && index_stanzas['_introspection'].nil?
+  index_stanzas['_introspection'] = { 'repFactor' => 'auto' }
+end
+
 path = is_master ? 'master-apps/_cluster/indexes.conf' : 'system/indexes.conf'
 
 splunk_template path do
