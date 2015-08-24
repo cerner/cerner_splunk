@@ -91,8 +91,8 @@ end
 
 # This gets rid of the change password prompt on first login
 file "#{node['splunk']['home']}/etc/.ui_login" do
-  action :nothing
-  subscribes :touch, "package[#{node['splunk']['package']['name']}]", :immediately
+  action :touch
+  not_if { ::File.exist? "#{node['splunk']['home']}/etc/.ui_login" }
 end
 
 # System file changes should be done after first run, but before we start the server
