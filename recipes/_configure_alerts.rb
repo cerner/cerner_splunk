@@ -37,5 +37,5 @@ end
 
 splunk_template 'system/alert_actions.conf' do
   stanzas alert_stanzas
-  notifies :restart, 'service[splunk]'
+  notifies :touch, 'file[splunk-marker]', :immediately
 end

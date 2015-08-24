@@ -29,6 +29,6 @@ apps.each do |app_name, app_data|
     local app_data['local']
     files app_data['files']
     permissions app_data['permissions']
-    notifies :restart, 'service[splunk]'
+    notifies :touch, 'file[splunk-marker]', :immediately
   end
 end

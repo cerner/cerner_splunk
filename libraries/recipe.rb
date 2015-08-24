@@ -20,6 +20,10 @@ module CernerSplunk
     node.default['splunk']['node_type'] = symbol.to_sym
   end
 
+  def self.restart_marker_file
+    "#{Chef::Config[:file_cache_path]}/.restart_splunk"
+  end
+
   # Returns the key identifing the current cluster
   def self.my_cluster_key(node)
     node['splunk']['config']['clusters'].first

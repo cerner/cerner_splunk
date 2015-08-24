@@ -55,6 +55,6 @@ path = is_master ? 'master-apps/_cluster/indexes.conf' : 'system/indexes.conf'
 
 splunk_template path do
   stanzas index_stanzas
-  notifies :restart, 'service[splunk]' unless is_master
+  notifies :touch, 'file[splunk-marker]', :immediately unless is_master
   notifies :run, 'execute[apply-cluster-bundle]' if is_master
 end
