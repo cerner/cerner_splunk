@@ -34,11 +34,6 @@ def default_omnibus(config)
   config.omnibus.chef_version = :latest
 end
 
-def disk(config)
-  default_omnibus config
-  config.vm.provision :shell, inline: 'lvextend -L 10G /dev/vg00/optlv00 && resize2fs /dev/vg00/optlv00 || echo "already resized"'
-end
-
 def network(config, name, splunk_password = true)
   net = @network.delete(name)
   throw "Unknown or duplicate config #{name}" unless net
@@ -135,7 +130,7 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :s_license do |cfg|
-    disk(cfg)
+    default_omnibus config
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :s_license, 'splunk_license'
       chef.add_recipe 'cerner_splunk::license_server'
@@ -144,7 +139,7 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :c1_master do |cfg|
-    disk(cfg)
+    default_omnibus config
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :c1_master
       chef.add_recipe 'cerner_splunk::cluster_master'
@@ -156,7 +151,7 @@ Vagrant.configure('2') do |config|
   (1..3).each do |n|
     symbol = "c1_slave#{n}".to_sym
     config.vm.define symbol do |cfg|
-      disk(cfg)
+      default_omnibus config
       cfg.vm.provider :virtualbox do |vb|
         vb.customize ['modifyvm', :id, '--memory', 256]
       end
@@ -169,7 +164,7 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :c1_search do |cfg|
-    disk(cfg)
+    default_omnibus config
     cfg.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', 256]
     end
@@ -181,7 +176,7 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :s_standalone do |cfg|
-    disk(cfg)
+    default_omnibus config
     cfg.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', 256]
     end
