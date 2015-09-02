@@ -285,7 +285,7 @@ class Chef
           file.variables(stanzas: contents)
         else
           file = Chef::Resource::File.new(path, run_context)
-          file.content(contents)
+          file.content(contents) unless contents.empty?
         end
         file.path(path)
         file.owner(node['splunk']['user'])
