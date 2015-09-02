@@ -67,7 +67,7 @@ def chef_defaults(chef, name, environment = 'splunk_server')
 end
 
 Vagrant.configure('2') do |config|
-  config.vm.box = 'chef/centos-6.6'
+  config.vm.box = 'bento/centos-6.7'
 
   if Vagrant.has_plugin? 'vagrant-berkshelf'
     config.berkshelf.enabled = false
@@ -194,7 +194,6 @@ Vagrant.configure('2') do |config|
 
   config.vm.define :f_default do |cfg|
     default_omnibus config
-    cfg.vm.box = 'chef/centos-6.5'
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :f_default, 'splunk_standalone'
       chef.add_recipe 'cerner_splunk'
@@ -205,7 +204,7 @@ Vagrant.configure('2') do |config|
 
   config.vm.define :f_debian do |cfg|
     default_omnibus config
-    cfg.vm.box = 'chef/ubuntu-12.04'
+    cfg.vm.box = 'bento/ubuntu-12.04'
     cfg.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', 256]
     end
