@@ -277,8 +277,8 @@ class Chef
       # function for dropping either a splunk template generated from a hash
       # or a simple file if the contents are a string. If the content of the file
       # is empty, then the file will be removed
-      def manage_file(path, contents)
-        if contents.class == Hash && contents.empty? == false
+      def manage_file(path, contents) # rubocop:disable Metrics/PerceivedComplexity
+        if contents.is_a?(Hash) && !contents.empty?
           file = Chef::Resource::Template.new(path, run_context)
           file.cookbook('cerner_splunk')
           file.source('generic.conf.erb')
