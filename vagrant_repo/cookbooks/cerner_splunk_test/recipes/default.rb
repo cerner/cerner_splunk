@@ -28,7 +28,7 @@ end
   end
 end
 
-cerner_splunk_forwarder_monitors 'foo' do
+cerner_splunk_test_lwrp 'foo' do
   index 'pop_health'
   monitors [{
     path: '/testlogs/one/*.log',
@@ -40,7 +40,7 @@ cerner_splunk_forwarder_monitors 'foo' do
   }]
 end
 
-cerner_splunk_forwarder_monitors 'baz' do
+cerner_splunk_test_lwrp 'baz' do
   monitors [{
     path: '/testlogs/three/access2.log',
     sourcetype: 'access_combined'

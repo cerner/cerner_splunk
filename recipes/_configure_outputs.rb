@@ -39,5 +39,5 @@ end
 splunk_template 'system/outputs.conf' do
   stanzas output_stanzas
   not_if { output_stanzas.empty? }
-  notifies :restart, 'service[splunk]'
+  notifies :touch, 'file[splunk-marker]', :immediately
 end

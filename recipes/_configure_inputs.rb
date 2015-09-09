@@ -27,5 +27,5 @@ end
 
 splunk_template 'system/inputs.conf' do
   stanzas input_stanzas
-  notifies :restart, 'service[splunk]'
+  notifies :touch, 'file[splunk-marker]', :immediately
 end

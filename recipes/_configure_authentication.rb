@@ -140,5 +140,5 @@ end
 splunk_template 'system/authentication.conf' do
   sensitive auth_stanzas.any? { |_, v| v.key? 'bindDNpassword' }
   stanzas auth_stanzas
-  notifies :restart, 'service[splunk]'
+  notifies :touch, 'file[splunk-marker]', :immediately
 end
