@@ -17,6 +17,7 @@ new_password = SecureRandom.hex(36)
 
 execute 'change-admin-password' do # ~FC009
   command "#{node['splunk']['cmd']} edit user admin -password #{new_password} -roles admin -auth admin:#{old_password}"
+  environment 'HOME' => node['splunk']['home']
   sensitive true
 end
 

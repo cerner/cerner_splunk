@@ -46,6 +46,8 @@ when :search_head, :server
     server_stanzas[stanza] = {}
     server_stanzas[stanza]['master_uri'] = master_uri
     server_stanzas[stanza]['pass4SymmKey'] = pass unless pass.empty?
+    # Until we support multisite clusters, set multisite explicitly false
+    server_stanzas[stanza]['multisite'] = false
     stanza
   end
 
@@ -143,6 +145,7 @@ splunk_template 'system/server.conf' do
       case key
       when 'general'
         server_stanzas['general']['guid'] = value['guid'] if value['guid']
+        server_stanzas['general']['pass4SymmKey'] = value['pass4SymmKey'] if value['pass4SymmKey']
       when 'sslConfig'
         server_stanzas['sslConfig']['sslKeysfilePassword'] = value['sslKeysfilePassword']
       end
