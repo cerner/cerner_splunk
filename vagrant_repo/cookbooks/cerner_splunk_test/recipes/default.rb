@@ -28,15 +28,20 @@ end
   end
 end
 
-cerner_splunk_test_lwrp 'foo' do
+splunk_forwarder_monitors 'foo' do
+  index 'pop_health'
+  monitors [{
+    path: '/testlogs/two/access1.log',
+    sourcetype: 'access_combined',
+    index: 'bobs_index_emporium'
+  }]
+end
+
+cerner_splunk_forwarder_monitors 'bar' do
   index 'pop_health'
   monitors [{
     path: '/testlogs/one/*.log',
     sourcetype: 'access_combined'
-  }, {
-    path: '/testlogs/two/access1.log',
-    sourcetype: 'access_combined',
-    index: 'bobs_index_emporium'
   }]
 end
 
