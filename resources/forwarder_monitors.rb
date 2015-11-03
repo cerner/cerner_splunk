@@ -11,9 +11,11 @@ attribute :app,      kind_of: String, name_attribute: true, regex: [/^[A-Za-z0-9
 attribute :index,    kind_of: String, required: false
 attribute :monitors, kind_of: Array, default: []
 
+provides :splunk_forwarder_monitors if respond_to?(:provides)
+provides :cerner_splunk_forwarder_monitors if respond_to?(:provides)
+
 def initialize(name, run_context = nil)
   super
-  @resource_name = :splunk_forwarder_monitors
   @index = node['splunk']['main_project_index']
   @action = :install
 end

@@ -5,6 +5,9 @@
 #
 # Drop in replacement for the existing splunk_forwarder_monitors
 
+provides :splunk_forwarder_monitors if respond_to?(:provides)
+provides :cerner_splunk_forwarder_monitors if respond_to?(:provides)
+
 action :install do # ~FC017
   input_stanzas = CernerSplunk::LWRP.convert_monitors(node, new_resource.monitors, new_resource.index)
 

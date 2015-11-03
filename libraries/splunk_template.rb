@@ -23,7 +23,6 @@ class Chef
 
       def initialize(name, run_context = nil)
         super
-        @resource_name = :splunk_template
         @variables = nil
         @fail_unknown = true
         backup false

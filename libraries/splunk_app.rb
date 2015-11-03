@@ -49,6 +49,8 @@ class Chef
   class Resource
     # Chef Resource for managing Splunk apps
     class SplunkApp < Chef::Resource
+      provides :splunk_app if respond_to?(:provides)
+
       def initialize(name, run_context = nil)
         super
         @resource_name = :splunk_app
@@ -120,6 +122,8 @@ class Chef
   class Provider
     # Chef Provider for managing Splunk apps
     class SplunkApp < Chef::Provider # rubocop:disable ClassLength
+      provides :splunk_app if respond_to?(:provides)
+
       def whyrun_supported?
         true
       end
