@@ -1,0 +1,17 @@
+{
+  "name": "splunk_heavy_forwarder",
+  "description": "Environment for the Splunk 6 Heavy Forwarder",
+  "default_attributes": {
+    "splunk": {
+      "apps": {
+        "bag": "cerner_splunk/apps-vagrant:apps"
+      },
+      "config": {
+        "clusters": [
+          "cerner_splunk/cluster-vagrant",
+          "cerner_splunk/cluster-standalone"
+        ]
+      }
+    }
+  }
+}

@@ -45,6 +45,16 @@ file 'splunk-marker' do
   path CernerSplunk.restart_marker_file
 end
 
+file 'splunk-seed' do
+  action :nothing
+  path "#{node['splunk']['home']}/old_splunk.seed"
+  content node['splunk']['cleanup_path']
+  backup false
+  owner node['splunk']['user']
+  group node['splunk']['group']
+  mode '0600'
+end
+
 # This service definition is used only for ensuring splunk is started during the run
 service 'splunk-start' do
   service_name service
@@ -80,6 +90,10 @@ package node['splunk']['package']['base_name'] do
   version "#{node['splunk']['package']['version']}-#{node['splunk']['package']['build']}"
   provider node['splunk']['package']['provider']
   only_if(&manifest_missing)
+  if node['splunk']['cleanup_path']
+    # Instruct splunk to seed the fishbucket from a previous installation
+    notifies :create, 'file[splunk-seed]', :immediately
+  end
   if platform_family?('windows')
     # installing as the system user by default as Splunk has difficulties with being a limited user
     options %(AGREETOLICENSE=Yes SERVICESTARTTYPE=auto LAUNCHSPLUNK=0 INSTALLDIR="#{node['splunk']['home'].tr('/', '\\')}")

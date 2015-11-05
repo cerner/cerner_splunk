@@ -18,7 +18,8 @@ end
   s_license:    { ip: '33.33.33.30', hostname: 'splunk-license', ports: { 8007 => 8000, 8097 => 8089 } },
   f_default:    { ip: '33.33.33.50', hostname: 'default.forward', ports: { 9090 => 8089 } },
   f_debian:     { ip: '33.33.33.51', hostname: 'debian.forward', ports: { 9091 => 8089 } },
-  f_win2012r2:  { ip: '33.33.33.53', hostname: 'windowsforward', ports: { 9093 => 8089 } }
+  f_win2012r2:  { ip: '33.33.33.53', hostname: 'windowsforward', ports: { 9093 => 8089 } },
+  hf_heavy:     { ip: '33.33.33.60', hostname: 'heavy.forward', ports: { 9094 => 8089 } }
 }
 
 @chefip = @network[:chef][:ip]
@@ -225,5 +226,18 @@ Vagrant.configure('2') do |config|
       chef.add_recipe 'cerner_splunk'
     end
     network cfg, :f_win2012r2, false
+  end
+
+  config.vm.define :hf_heavy do |cfg|
+    default_omnibus config
+    cfg.vm.provider :virtualbox do |vb|
+      vb.customize ['modifyvm', :id, '--memory', 256]
+    end
+    cfg.vm.provision :chef_client do |chef|
+      chef_defaults chef, :hf_heavy
+      chef.add_recipe 'cerner_splunk::heavy_forwarder'
+      chef.add_recipe 'cerner_splunk_test'
+    end
+    network cfg, :hf_heavy
   end
 end

@@ -4,9 +4,15 @@ These are all of the public facing recipes, and brief descriptions of what they 
 
 Forwarder Installation Recipes
 ------------------------------
+The forwarder installation recipes will clean up an existing forwarder if migrating from one type to another. Migrations to a Universal Forwarder should happen cleanly, however migrations away from a Universal Forwarder to another type will likely result in duplicates of past log entires being forwarded. You may wish to remove old log files first or clean up duplicates in the Splunk instance it is forwarding to.
+
 ### `cerner_splunk` / `cerner_splunk::forwarder`
 
 Installs the Splunk Universal Forwarder on your system. Most people will only want this recipe (hence why it's the default recipe)
+
+### `cerner_splunk::heavy_forwarder`
+
+Installs and configures Splunk Server as a heavy forwarder. Forwards logs.
 
 Server Installation Recipes
 ---------------------------

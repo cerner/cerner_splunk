@@ -95,7 +95,7 @@ license_uri =
   case node['splunk']['node_type']
   when :forwarder, :license_server
     'self'
-  when :cluster_master, :cluster_slave, :search_head, :server
+  when :cluster_master, :cluster_slave, :search_head, :server, :heavy_forwarder
     if node['splunk']['free_license']
       'self'
     else
@@ -105,7 +105,7 @@ license_uri =
 
 license_group =
   case node['splunk']['node_type']
-  when :license_server, :cluster_master, :cluster_slave
+  when :license_server, :cluster_master, :cluster_slave, :heavy_forwarder
     'Enterprise'
   when :forwarder
     'Forwarder'

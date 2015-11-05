@@ -6,13 +6,13 @@
 # Generates and sets a random password for the admin splunk account.
 # This recipe must be run while Splunk is running.
 
-return if node['splunk']['free_license'] && node['splunk']['node_type'] != :forwarder
+return if node['splunk']['free_license'] && !([:forwarder, :heavy_forwarder].include? node['splunk']['node_type'])
 
 require 'securerandom'
 
 password_file = File.join node['splunk']['external_config_directory'], 'password'
 
-old_password = File.exist?(password_file) ? File.read(password_file) : 'changeme'
+old_password = File.exist?(password_file) && !node['splunk']['cleanup_path'] ? File.read(password_file) : 'changeme'
 new_password = SecureRandom.hex(36)
 
 execute 'change-admin-password' do # ~FC009
