@@ -4,6 +4,7 @@ gem 'rubocop', '~> 0.33'
 gem 'foodcritic', '~> 4.0'
 gem 'rspec', '~> 3.3'
 gem 'chefspec', '~> 4.3'
+gem 'chef-vault'
 
 # https://github.com/opscode/chef/issues/2547
 if Bundler.current_ruby.on_19?

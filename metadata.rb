@@ -6,7 +6,9 @@ description      'Installs/Configures Splunk Servers'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version          '1.13.0'
 
-depends          'chef-vault', '~> 1.2'
+# Locking chef-vault to 1.3.0 due to the introduction of Ruby 2.x specific syntax in newer version. As long as Support
+# for Chef 11 is needed. See https://github.com/chef-cookbooks/chef-vault/issues/41
+depends          'chef-vault', '= 1.3.0'
 depends          'ulimit', '~> 0.3.2'
 depends          'xml', '~> 1.2'
 
