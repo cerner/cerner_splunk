@@ -38,13 +38,9 @@ end
 
 manifest_missing = proc { ::Dir.glob("#{node['splunk']['home']}/#{node['splunk']['package']['name']}-*").empty? }
 
-# Actions
-file 'splunk-marker' do
-  action :nothing
-  backup false
-  path CernerSplunk.restart_marker_file
-end
+include_recipe 'cerner_splunk::_restart_marker'
 
+# Actions
 # This service definition is used only for ensuring splunk is started during the run
 service 'splunk-start' do
   service_name service
