@@ -38,9 +38,13 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
 
   if stanza_type == :index
     unless index_flags['noGeneratePaths']
-      hash['coldPath'] = "$SPLUNK_DB/#{stanza}/colddb" unless hash['coldPath']
-      hash['homePath'] = "$SPLUNK_DB/#{stanza}/db" unless hash['homePath']
-      hash['thawedPath'] = "$SPLUNK_DB/#{stanza}/thaweddb" unless hash['thawedPath']
+      volume = hash.delete('_volume')
+      base_path = volume ? "volume:#{volume}" : '$SPLUNK_DB'
+      dir_name = hash.key?('_directory_name') ? hash.delete('_directory_name') : stanza
+      hash['coldPath'] = "#{base_path}/#{dir_name}/colddb" unless hash['coldPath']
+      hash['homePath'] = "#{base_path}/#{dir_name}/db" unless hash['homePath']
+      hash['thawedPath'] = "$SPLUNK_DB/#{dir_name}/thaweddb" unless hash['thawedPath']
+      hash['tstatsHomePath'] = "#{base_path}/#{dir_name}/datamodel_summary" if volume && !hash['tstatsHomePath']
     end
     if is_master && !index_flags['noRepFactor']
       hash['repFactor'] = 'auto' unless hash['repFactor']

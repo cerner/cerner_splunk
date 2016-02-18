@@ -37,7 +37,9 @@ Indexes Hash
 ------------
 An Indexes Hash is part of a plaintext data bag item that defines the set of indexes defined in a cluster. It is separate from the Cluster data bag primarily for size concerns.
 
-* `['config']` - These define the [indexes.conf] stanzas (in fairly raw form).
+* `['config']` - These define the [indexes.conf] stanzas (in fairly raw form). However there are a few special keys:
+    * `_volume` - The base volume for the coldPath, homePath and tstatsHomePath. Defaults to nil, so the index will be located in $SPLUNK_DB.
+    * `_directory_name` - The on-disk name of the directory to store the index. Defaults to the index name.
 * `['flags']` - These define boolean processing flags per index. All flags are default 'false' but can be set to true. Current flags include:
     * `noGeneratePaths` - Do not generate the homePath,coldPath,thawedPath to this index when not present in the config above
     * `noRepFactor` - Do not add 'repFactor = auto' to this index when not present in the config on a cluster master.
@@ -90,7 +92,7 @@ Apps Hash
 -----------
 An apps hash is a contextual (see above) Hash, part of a plaintext data bag item or specified directly as attributes that configures apps. A special key of 'master-apps' is looked for managing apps that should be installed and pushed by the cluster master, instead of locally.
 
-* `['bag']` - A string that points to an externalized Apps Hash in which all keys (except this one) are valid. 
+* `['bag']` - A string that points to an externalized Apps Hash in which all keys (except this one) are valid.
 * `[app]` - The name of an app to manage (disk name)
 * `[app]['remove']` - If true, remove this app instead of creating / managing  (default - false)
 * `[app]['local']` - If true, manage `[app]['files']` defined files and `[app]['permissions']` defined metadata in the "local" directory and "local.meta" instead of the "default" directory and "default.meta" (default - false, but forced true if download-url is specified)

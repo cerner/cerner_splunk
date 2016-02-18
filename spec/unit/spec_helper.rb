@@ -9,3 +9,11 @@ RSpec.configure do |config|
   config.order = 'random'
   config.expect_with(:rspec) { |c| c.syntax = :expect }
 end
+
+module CernerSplunk
+  # Need a way to reset the cached module level variables between specs
+  def self.reset
+    @my_cluster_data = nil
+    @all_cluster_data = nil
+  end
+end
