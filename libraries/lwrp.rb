@@ -39,8 +39,7 @@ module CernerSplunk
     #
     # Extension of the Resource DSL, defines an attribute that can be set upfront or can be calculated at convergence time.
     module DelayableAttribute
-      # rubocop:disable CyclomaticComplexity
-      def delayable_attribute(attr_name, validation = {})
+      def delayable_attribute(attr_name, validation = {}) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
         class_eval(<<-SHIM, __FILE__, __LINE__)
           def #{attr_name}(arg=nil,&block)
             _set_or_return_#{attr_name}(arg,block)
@@ -67,16 +66,14 @@ module CernerSplunk
           end
         end
       end
-      # rubocop:enable CyclomaticComplexity
     end
 
-    # rubocop:disable CyclomaticComplexity
     # Validate the indexes to which data is being forwarded to
-    def self.validate_indexes(node, monitors)
+    def self.validate_indexes(node, monitors) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
       index_error = []
       input_regex = /^(?:monitor|tcp|batch|udp|fifo|script|fschange)/
 
-      indexes = monitors.select { |key, _| (input_regex).match(key) }.collect { |_, v| v['index'] || node['splunk']['config']['assumed_index'] }.uniq
+      indexes = monitors.select { |key, _| input_regex.match(key) }.collect { |_, v| v['index'] || node['splunk']['config']['assumed_index'] }.uniq
 
       CernerSplunk.all_clusters(node).each do |(cluster, data_bag)|
         bag = CernerSplunk::DataBag.load(data_bag['indexes'], handle_load_failure: true)
@@ -107,15 +104,11 @@ module CernerSplunk
 
       unless index_error.empty?
         index_error_msg = "Data cannot be forwarded to respective index(es) due to the following reason(s):\n#{index_error.join("\n")}"
-        if node['splunk']['flags']['index_checks_fail']
-          fail index_error_msg
-        else
-          Chef::Log.warn index_error_msg
-        end
+        fail index_error_msg if node['splunk']['flags']['index_checks_fail']
+        Chef::Log.warn index_error_msg
       end
 
       monitors
     end
-    # rubocop:enable CyclomaticComplexity
   end
 end

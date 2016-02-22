@@ -38,7 +38,7 @@ def network(config, name, splunk_password = true)
   net = @network.delete(name)
   throw "Unknown or duplicate config #{name}" unless net
 
-  config.vm.hostname = "#{net[:hostname]}"
+  config.vm.hostname = net[:hostname]
   config.vm.network :private_network, ip: net[:ip]
   net[:ports].each do |hostport, guestport|
     config.vm.network :forwarded_port, guest: guestport, host: hostport, auto_correct: true

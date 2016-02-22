@@ -24,7 +24,7 @@ ASSUMPTIONS = {
   'scriptPath' => 'Scripted',
   'scriptSearchFilters' => 'Scripted',
   'passwordHashAlgorithm' => 'Splunk'
-}
+}.freeze
 
 unless hash['authType']
   guesses = ASSUMPTIONS.inject([]) do |result, (key, type)|

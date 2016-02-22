@@ -3,11 +3,12 @@
 default['splunk']['node_type'] = nil
 default['splunk']['cleanup'] = true
 
-if node['platform_family'] == 'windows'
-  default['splunk']['external_config_directory'] = "#{ENV['PROGRAMDATA']}/splunk"
-else
-  default['splunk']['external_config_directory'] = '/etc/splunk'
-end
+default['splunk']['external_config_directory'] =
+  if node['platform_family'] == 'windows'
+    "#{ENV['PROGRAMDATA']}/splunk"
+  else
+    '/etc/splunk'
+  end
 
 default['splunk']['package']['version'] = '6.2.5'
 default['splunk']['package']['build'] = '272645'

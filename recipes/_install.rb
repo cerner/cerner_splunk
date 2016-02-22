@@ -21,11 +21,12 @@ node.default['splunk']['package']['url'] =
   "#{nsp['base_url']}/#{nsp['version']}/#{nsp['download_group']}/#{nsp['platform']}/#{nsp['file_name']}"
 
 if platform_family?('windows')
-  if node['kernel']['machine'] == 'x86_64'
-    node.default['splunk']['home'] = "#{ENV['PROGRAMW6432'].tr('\\', '/')}/#{nsp['base_name']}"
-  else
-    node.default['splunk']['home'] = "#{ENV['PROGRAMFILES'].tr('\\', '/')}/#{nsp['base_name']}"
-  end
+  node.default['splunk']['home'] =
+    if node['kernel']['machine'] == 'x86_64'
+      "#{ENV['PROGRAMW6432'].tr('\\', '/')}/#{nsp['base_name']}"
+    else
+      "#{ENV['PROGRAMFILES'].tr('\\', '/')}/#{nsp['base_name']}"
+    end
   # The translate is intended to switch the direction of slashes to be windows friendly,
   # the second replacement surrounds any file names with spaces in quotes
   node.default['splunk']['cmd'] = "#{node['splunk']['home']}/bin/splunk".tr('/', '\\').gsub(/\w+\s\w+/) { |directory| %("#{directory}") }

@@ -50,8 +50,7 @@ module CernerSplunk #:nodoc:
     # Converts an array of the form [data_bag,bag_item,key] to a string of the form "(data_bag/)bag_item(:key)"
     # If provided nil, will return nil
     # Inverse of to_a
-    # rubocop:disable CyclomaticComplexity
-    def self.to_value(array, _options = {})
+    def self.to_value(array, _options = {}) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
       case array
       when nil
         nil
@@ -69,12 +68,10 @@ module CernerSplunk #:nodoc:
         fail "Unexpected argument of type #{array.class}: #{array}"
       end
     end
-    # rubocop:enable CyclomaticComplexity
 
     # Loads a data_bag item / based on the string
     # If provided nil or a string that doesn't resolve to a data_bag + item at least will return nil
-    # rubocop:disable CyclomaticComplexity
-    def self.load(string, options = {})
+    def self.load(string, options = {}) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
       opts = {
         type: :simple,
         pick_context: nil,
@@ -113,9 +110,6 @@ module CernerSplunk #:nodoc:
         value
       end
     end
-    # rubocop:enable CyclomaticComplexity
-
-    private
 
     # Process a string. Helper for the to_a method, Not part of the public API
     def self.process(string, default, strip, default_empty)
@@ -139,5 +133,8 @@ module CernerSplunk #:nodoc:
       end
       value
     end
+
+    private_class_method :process
+    private_class_method :resolve
   end
 end
