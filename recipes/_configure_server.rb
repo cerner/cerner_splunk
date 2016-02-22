@@ -19,7 +19,7 @@ SLAVE_ONLY_CONFIGS = %w(
   register_search_address
   heartbeat_period
   enableS2SHeartbeat
-)
+).freeze
 
 MASTER_ONLY_CONFIGS = %w(
   replication_factor
@@ -31,7 +31,7 @@ MASTER_ONLY_CONFIGS = %w(
   searchable_targets
   target_wait_time
   commit_retry_time
-)
+).freeze
 
 case node['splunk']['node_type']
 when :search_head, :server

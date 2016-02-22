@@ -82,7 +82,7 @@ class Chef
         server.conf
         user-prefs.conf
         ui-prefs.conf
-      )
+      ).freeze
     end
   end
 end

@@ -37,7 +37,7 @@ module CernerSplunk
     end
 
     attr_reader :version, :base, :prerelease, :type
-    alias_method :to_s, :version
+    alias to_s version
 
     def ==(other)
       version == other.version

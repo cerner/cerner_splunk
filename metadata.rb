@@ -1,10 +1,13 @@
 name             'cerner_splunk'
-maintainer       'Operations Infrastructure Team - Cerner Innovation, Inc.'
+maintainer       'Healthe Intent Infrastructure - Cerner Innovation, Inc.'
 maintainer_email 'splunk@cerner.com'
 license          'Apache 2.0'
-description      'Installs/Configures Splunk Servers'
+description      'Installs/Configures Splunk Servers and Forwarders'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version          '1.13.1'
+
+source_url       'https://github.com/cerner/cerner_splunk'
+issues_url       'https://github.com/cerner/cerner_splunk/issues'
 
 # Locking chef-vault to 1.3.0 due to the introduction of Ruby 2.x specific syntax in newer version. As long as Support
 # for Chef 11 is needed. See https://github.com/chef-cookbooks/chef-vault/issues/41

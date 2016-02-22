@@ -36,11 +36,12 @@ hash.each do |stanza, values|
         end
       end
     else
-      if value.is_a? Array
-        auth[key] = value.join(';')
-      else
-        auth[key] = value
-      end
+      auth[key] =
+        if value.is_a? Array
+          value.join(';')
+        else
+          value
+        end
     end
     result
   end
