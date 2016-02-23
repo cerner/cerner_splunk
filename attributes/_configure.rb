@@ -4,7 +4,9 @@ default['splunk']['config']['host'] = node['ec2'] ? node['ec2']['instance_id'] :
 default['splunk']['config']['licenses'] = nil
 default['splunk']['config']['ui_prefs']['default'] = {
   'dispatch.earliest_time' => '@d',
-  'dispatch.latest_time' => 'now'
+  'dispatch.latest_time' => 'now',
+  'display.prefs.enableMetaData' => 0,
+  'display.prefs.showDataSummary' => 0
 }
 
 # References 0 to many cluster configurations (arrays of Strings of data_bag/data_bag_item)
