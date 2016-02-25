@@ -5,6 +5,12 @@
       "maxTotalDataSizeMB": 81920,
       "frozenTimePeriodInSecs": 15778800
     },
+    "volume:foo": {
+      "path": "/opt/splunk/data/foo_indexes"
+    },
+    "volume:bar": {
+      "path": "/opt/splunk/data/bar_indexes"
+    },
     "_audit": { "maxTotalDataSizeMB": 500000 },
     "_internal": {
       "maxTotalDataSizeMB": 500000,
@@ -16,8 +22,8 @@
       "maxDataSize": "auto",
       "maxMemMB": 1
     },
-    "opsinfra" : {},
-    "pop_health" : {},
+    "opsinfra" : { "_volume": "foo" },
+    "pop_health" : { "_volume": "bar" },
     "bobs_index_emporium": {},
     "summary": { "maxTotalDataSizeMB": 500000 }
   },

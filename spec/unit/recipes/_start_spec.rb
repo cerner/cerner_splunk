@@ -15,16 +15,14 @@ describe 'cerner_splunk::_start' do
 
   let(:cluster_config) do
     {
-      cluster: {
-        receivers: ['33.33.33.20'],
-        license_uri: nil,
-        receiver_settings: {
-          splunktcp: {
-            port: '9997'
-          }
-        },
-        indexes: 'cerner_splunk/indexes'
-      }
+      'receivers' => ['33.33.33.20'],
+      'license_uri' => nil,
+      'receiver_settings' => {
+        'splunktcp' => {
+          'port' => '9997'
+        }
+      },
+      'indexes' => 'cerner_splunk/indexes'
     }
   end
 
@@ -38,6 +36,7 @@ describe 'cerner_splunk::_start' do
 
   before do
     allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'cluster').and_return(cluster_config)
+    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'indexes').and_return({})
     allow(Chef::Recipe).to receive(:platform_family?).with('windows').and_return(windows)
 
     allow(File).to receive(:exist?).and_call_original
@@ -47,6 +46,10 @@ describe 'cerner_splunk::_start' do
 
     # Stub alt separator for windows in Ruby 1.9.3
     stub_const('::File::ALT_SEPARATOR', '|')
+  end
+
+  after do
+    CernerSplunk.reset
   end
 
   context 'when platform is windows' do
