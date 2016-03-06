@@ -6,8 +6,8 @@ description      'Installs/Configures Splunk Servers and Forwarders'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version          '1.14.0'
 
-source_url       'https://github.com/cerner/cerner_splunk'
-issues_url       'https://github.com/cerner/cerner_splunk/issues'
+source_url       'https://github.com/cerner/cerner_splunk' if defined?(:source_url)
+issues_url       'https://github.com/cerner/cerner_splunk/issues' if defined?(:issues_url)
 
 # Locking chef-vault to 1.3.0 due to the introduction of Ruby 2.x specific syntax in newer version. As long as Support
 # for Chef 11 is needed. See https://github.com/chef-cookbooks/chef-vault/issues/41
