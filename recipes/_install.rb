@@ -18,7 +18,7 @@ end
 node.default['splunk']['package']['name'] = "#{nsp['base_name']}-#{nsp['version']}-#{nsp['build']}"
 node.default['splunk']['package']['file_name'] = "#{nsp['name']}#{nsp['file_suffix']}"
 node.default['splunk']['package']['url'] =
-  "#{nsp['base_url']}/#{nsp['version']}/#{nsp['download_group']}/#{nsp['platform']}/#{nsp['file_name']}"
+  "#{nsp['base_url']}/#{nsp['download_group']}/releases/#{nsp['version']}/#{nsp['platform']}/#{nsp['file_name']}"
 
 if platform_family?('windows')
   node.default['splunk']['home'] =
