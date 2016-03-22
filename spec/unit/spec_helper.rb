@@ -7,6 +7,7 @@ require 'chefspec/berkshelf'
 
 RSpec.configure do |config|
   config.order = 'random'
+  config.file_cache_path = '/var/chef/cache'
   config.expect_with(:rspec) { |c| c.syntax = :expect }
 end
 
