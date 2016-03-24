@@ -13,6 +13,7 @@ if Bundler.current_ruby.on_19?
   gem 'faraday', '= 0.9.1'
   gem 'ridley', '= 4.2.0'
   gem 'varia_model', '= 0.4.1'
+  gem 'unicode-display_width', '= 0.3.1'
 else
   gem 'chef', '~> 12.4'
   gem 'berkshelf', '~> 4.0'
