@@ -13,6 +13,9 @@
 # Generated from metadata.rb
 metadata.json
 
+# Generated from berks
+Berksfile.lock
+
 # Bundler
 Gemfile.lock
 bin/*
