@@ -18,6 +18,7 @@ end
   s_license:    { ip: '33.33.33.30', hostname: 'splunk-license', ports: { 8007 => 8000, 8097 => 8089 } },
   f_default:    { ip: '33.33.33.50', hostname: 'default.forward', ports: { 9090 => 8089 } },
   f_debian:     { ip: '33.33.33.51', hostname: 'debian.forward', ports: { 9091 => 8089 } },
+  f_heavy:      { ip: '33.33.33.52', hostname: 'heavy.forward', ports: { 9092 => 8089 } },
   f_win2012r2:  { ip: '33.33.33.53', hostname: 'windowsforward', ports: { 9093 => 8089 } }
 }
 
@@ -208,6 +209,15 @@ Vagrant.configure('2') do |config|
       chef.add_recipe 'cerner_splunk'
     end
     network cfg, :f_debian
+  end
+
+  config.vm.define :f_heavy do |cfg|
+    default_omnibus config
+    cfg.vm.provision :chef_client do |chef|
+      chef_defaults chef, :f_heavy, 'splunk_standalone'
+      chef.add_recipe 'cerner_splunk::heavy_forwarder'
+    end
+    network cfg, :f_heavy
   end
 
   config.vm.define :f_win2012r2 do |cfg|

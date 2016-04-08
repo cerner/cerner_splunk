@@ -20,7 +20,8 @@
         }
       }]
     },
-    "forwarder":null
+    "forwarder":null,
+    "heavy_forwarder":null
   },
   "ldap":{
     "strategy_name":"ADDomain",
