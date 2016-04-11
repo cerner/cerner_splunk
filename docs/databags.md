@@ -33,6 +33,14 @@ The License Hash is part of a data bag item encrypted with [Chef Vault](https://
 
 * `[A Decriptive File-Name]` - Corresponding License (XML) contents. (There can be many of these) Remember to change newlines to `\n` to conform to proper JSON format.
 
+License Pool Hash
+------------
+This hash is part of a plaintext data bag item that defines multiple license pools. Indexers can be assigned to a specific pool and license quota can be set for each pool by configuring this databag. Quota can be specified in units of B, KB(or KiB), MB(MiB), GB(GiB) or TB(TiB)(e.g. '400MB' or '400GiB'). If the unit is not specified then the quota is assumed to be in bytes.
+
+* `['auto_generated_pool_size']` - This is the pool size for the auto generated pool. Indexers that connect to the license server, when not assigned to a specific pool will land in this pool.
+* `['pools'][pool_name]['size']` -  Size of the pool
+* `['pools'][pool_name]['GUIDs']` - List of Indexer GUIDs that needs to be assigned to this pool.
+
 Indexes Hash
 ------------
 An Indexes Hash is part of a plaintext data bag item that defines the set of indexes defined in a cluster. It is separate from the Cluster data bag primarily for size concerns.
