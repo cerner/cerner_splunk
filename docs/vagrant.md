@@ -18,6 +18,11 @@ Running with Vagrant
     * `splunkforwarder-6.3.3-f44afce176d0-linux-2.6-x86_64.rpm` and `splunkforwarder-6.3.3-f44afce176d0-linux-2.6-amd64.deb` ~ 16MB each
 * `vagrant-omnibus` installer currently requires internet access to function.
 
+**Note**: 
+If you want to set up the vagrant cluster to use the license pools defined in the [license pool hash](databags.md#license-pool-hash) databag, add the `configure_guids` recipe to the run_list on the cluster slave (to update the GUIDs on these slaves to predefined values) and update the `license_uri` attribute in the cluster-vagrant databag item to point to the cluster master (_https://33.33.33.30:8089_).
+After you spin up the cluster slaves you will have to restart the cluster master to bring the cluster to a stable state. While spinning up the cluster slaves, they are re-assigned with different GUIDS by the `configure_guids` recipe which requires a restart (this restart can take a while to complete). Cluster master is restarted so that it can identify the new GUIDS.
+
+
 Docs Navigation
 ===============
 * [Docs Readme](README.md)

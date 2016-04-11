@@ -132,6 +132,27 @@ license_group =
   }
 end if license_uri == 'self'
 
+license_pools = CernerSplunk::DataBag.load(node['splunk']['config']['license-pool'])
+
+if node['splunk']['node_type'] == :license_server && !license_pools.nil?
+  auto_generated_pool_size = CernerSplunk.convert_to_bytes license_pools['auto_generated_pool_size']
+  server_stanzas['lmpool:auto_generated_pool_enterprise']['quota'] = auto_generated_pool_size
+  allotted_pool_size = 0
+
+  license_pools['pools'].each do |pool, pool_config|
+    pool_max_size = CernerSplunk.convert_to_bytes pool_config['size']
+    server_stanzas["lmpool:#{pool}"] = {
+      'description' => pool,
+      'quota' => pool_max_size,
+      'slaves' => pool_config['GUIDs'].join(','),
+      'stack_id' => 'enterprise'
+    }
+    allotted_pool_size += pool_max_size
+  end
+  node.run_state['cerner_splunk'] ||= {}
+  node.run_state['cerner_splunk']['total_allotted_pool_size'] = allotted_pool_size + auto_generated_pool_size
+end
+
 server_stanzas['license'] = {
   'master_uri' => license_uri,
   'active_group' => license_group

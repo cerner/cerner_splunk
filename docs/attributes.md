@@ -31,7 +31,8 @@ Configurable (with defaults)
 * `node['splunk']['package']['provider']` - Provider to use to install file (set based on ohai attributes)
 * `node['splunk']['config']['host']` - Hostname to configure the Splunk instance to report as. (EC2 Instance ID or Fully Qualified Domain Name)
 * `node['splunk']['config']['roles']` - Data bag item used to configure roles (`nil` - roles not managed by chef)
-* `node['splunk']['config']['licenses']` - Data bag item that the license server recipe uses as the source of truth for the license data (`cerner_splunk/licenses`)
+* `node['splunk']['config']['licenses']` - Data bag item that the license server recipe uses as the source of truth for the license data.
+* `node['splunk']['config']['license-pool']` - Data bag item used to configure license pools.
 * `node['splunk']['config']['ui_prefs']` - Hash of stanzas used to configure [ui-prefs.conf][] on the search head in a clustered configuration or a standalone instance.
 * `node['splunk']['config']['assumed_index']` - Name of the index to which data is forwarded to by default, when the index is not configured for the input.(`main`)
 * `node['splunk']['flags']['index_checks_fail']` - If `true` raises an exception failing the chef run, when monitors are configured to be sent to non-existent indexes. If `false` logs a warning, but does not fail the chef run for the same condition.(`true`)

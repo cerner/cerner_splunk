@@ -158,6 +158,8 @@ Vagrant.configure('2') do |config|
       cfg.vm.provision :chef_client do |chef|
         chef_defaults chef, symbol
         chef.add_recipe 'cerner_splunk::cluster_slave'
+        # Uncomment the line below to set predefined GUIDs on the cluster slaves (for playing with license pooling)
+        # chef.add_recipe 'cerner_splunk_test::configure_guids'
       end
       network cfg, symbol
     end
