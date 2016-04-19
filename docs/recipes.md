@@ -8,6 +8,10 @@ Forwarder Installation Recipes
 
 Installs the Splunk Universal Forwarder on your system. Most people will only want this recipe (hence why it's the default recipe)
 
+### `cerner_splunk::heavy_forwarder`
+
+Installs the Enterprise Splunk artifact on your system to be configured as a heavy forwarder.
+
 Server Installation Recipes
 ---------------------------
 These are installations of Full Splunk. Unless you are a Splunk Administrator, these are not the droids you are looking for.

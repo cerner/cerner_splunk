@@ -63,4 +63,57 @@ module CernerSplunk
     order << ''
     order
   end
+
+  # Return Splunk home location based on package, platform, and kernel
+  def self.splunk_home(platform_family, machine_kernel, package_base_name)
+    if platform_family == 'windows'
+      if machine_kernel == 'x86_64'
+        "#{ENV['PROGRAMW6432'].tr('\\', '/')}/#{package_base_name}"
+      else
+        "#{ENV['PROGRAMFILES'].tr('\\', '/')}/#{package_base_name}"
+      end
+    else
+      "/opt/#{package_base_name}"
+    end
+  end
+
+  # Returns filepath to splunk bin based on platform family
+  def self.splunk_command(node)
+    filepath = "#{node['splunk']['home']}/bin/splunk"
+
+    return filepath.tr('/', '\\').gsub(/\w+\s\w+/) { |directory| %("#{directory}") } if node['platform_family'] == 'windows'
+
+    filepath
+  end
+
+  # Returns the opposite package name of the currently set package base name
+  def self.opposite_package_name(package_base_name)
+    package_base_name == 'splunk' ? 'splunkforwarder' : 'splunk'
+  end
+
+  # Returns the installed package name based on platform and package base name.
+  # Written because Windows is dumb
+  def self.installed_package_name(platform_family, package_base_name)
+    return package_base_name unless platform_family == 'windows'
+
+    # Windows package names
+    return 'Splunk Enterprise' if package_base_name == 'splunk'
+    'UniversalForwarder'
+  end
+
+  # Returns Boolean for whether a separate Splunk artifact is already installed.
+  def self.separate_splunk_installed?(node)
+    opposite_package_name = opposite_package_name(node['splunk']['package']['base_name'])
+    Dir.exist?(splunk_home(node['platform_family'], node['kernel']['machine'], opposite_package_name))
+  end
+
+  # Returns the Splunk service name based on platform and package name
+  def self.splunk_service_name(platform_family, package_base_name)
+    if platform_family == 'windows'
+      return 'SplunkForwarder' if package_base_name == 'splunkforwarder'
+      return 'Splunkd' if package_base_name == 'splunk'
+    end
+
+    'splunk'
+  end
 end

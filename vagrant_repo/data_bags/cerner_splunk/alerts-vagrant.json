@@ -19,8 +19,7 @@
         "reportServerEnabled":false
       }
     },
-    "forwarder":null,
-    "heavy_forwarder":null
+    "forwarder":null
   },
   "base": {
     "email": {
