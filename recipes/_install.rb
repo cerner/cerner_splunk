@@ -19,23 +19,10 @@ node.default['splunk']['package']['name'] = "#{nsp['base_name']}-#{nsp['version'
 node.default['splunk']['package']['file_name'] = "#{nsp['name']}#{nsp['file_suffix']}"
 node.default['splunk']['package']['url'] =
   "#{nsp['base_url']}/#{nsp['download_group']}/releases/#{nsp['version']}/#{nsp['platform']}/#{nsp['file_name']}"
+node.default['splunk']['home'] = CernerSplunk.splunk_home(node['platform_family'], node['kernel']['machine'], nsp['base_name'])
+node.default['splunk']['cmd'] = CernerSplunk.splunk_command(node)
 
-if platform_family?('windows')
-  node.default['splunk']['home'] =
-    if node['kernel']['machine'] == 'x86_64'
-      "#{ENV['PROGRAMW6432'].tr('\\', '/')}/#{nsp['base_name']}"
-    else
-      "#{ENV['PROGRAMFILES'].tr('\\', '/')}/#{nsp['base_name']}"
-    end
-  # The translate is intended to switch the direction of slashes to be windows friendly,
-  # the second replacement surrounds any file names with spaces in quotes
-  node.default['splunk']['cmd'] = "#{node['splunk']['home']}/bin/splunk".tr('/', '\\').gsub(/\w+\s\w+/) { |directory| %("#{directory}") }
-  service = 'SplunkForwarder'
-else
-  node.default['splunk']['home'] = "/opt/#{nsp['base_name']}"
-  node.default['splunk']['cmd'] = "#{node['splunk']['home']}/bin/splunk"
-  service = 'splunk'
-end
+service = CernerSplunk.splunk_service_name(node['platform_family'], nsp['base_name'])
 
 manifest_missing = proc { ::Dir.glob("#{node['splunk']['home']}/#{node['splunk']['package']['name']}-*").empty? }
 
