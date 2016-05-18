@@ -10,7 +10,7 @@ Based on the work done by [BBY Solutions](https://github.com/bestbuycom/splunk_c
 Requirements
 ------------
 * Red Hat Enterprise / CentOS 5.5+ / Windows Server 2008+ (forwarder only) or Ubuntu LTS 12.04+
-* Chef 11.6+
+* Chef 12+
 
 Getting your logs into Splunk
 -----------------------------
