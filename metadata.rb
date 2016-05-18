@@ -4,10 +4,10 @@ maintainer_email 'splunk@cerner.com'
 license          'Apache 2.0'
 description      'Installs/Configures Splunk Servers and Forwarders'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          '1.17.0'
+version          '2.0.0'
 
-source_url       'https://github.com/cerner/cerner_splunk' if defined?(:source_url)
-issues_url       'https://github.com/cerner/cerner_splunk/issues' if defined?(:issues_url)
+source_url       'https://github.com/cerner/cerner_splunk'
+issues_url       'https://github.com/cerner/cerner_splunk/issues'
 
 depends          'chef-vault', '~> 1.3'
 depends          'ulimit', '~> 0.3.2'
