@@ -4,6 +4,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', '..', 'libraries'))
 require 'rspec'
 require 'chefspec'
 require 'chefspec/berkshelf'
+require 'chef-vault'
 
 RSpec.configure do |config|
   config.order = 'random'

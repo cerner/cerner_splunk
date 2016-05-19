@@ -31,6 +31,7 @@ describe 'cerner_splunk::_install' do
 
   let(:initd_exists) { nil }
   let(:ui_login_exists) { nil }
+  let(:ftr_exists) { nil }
   let(:glob) { [] }
 
   let(:windows) { nil }
@@ -46,6 +47,7 @@ describe 'cerner_splunk::_install' do
     allow(File).to receive(:exist?).and_call_original
     allow(File).to receive(:exist?).with('/etc/init.d/splunk').and_return(initd_exists)
     allow(File).to receive(:exist?).with('/opt/splunkforwarder/etc/.ui_login').and_return(ui_login_exists)
+    allow(File).to receive(:exist?).with('/opt/splunkforwarder/ftr').and_return(ftr_exists)
 
     allow(Dir).to receive(:glob).and_call_original
     allow(Dir).to receive(:glob).with('/opt/splunkforwarder/splunkforwarder-6.3.4-cae2458f4aef-*').and_return(glob)
@@ -131,7 +133,6 @@ describe 'cerner_splunk::_install' do
           provider: Chef::Provider::Package::Rpm
         }
         expect(subject).to install_package('splunkforwarder').with(expected_attrs)
-        expect(subject.package('splunkforwarder')).to notify('execute[splunk-first-run]').to(:run).immediately
       end
     end
 
@@ -145,7 +146,6 @@ describe 'cerner_splunk::_install' do
           provider: Chef::Provider::Package::Dpkg
         }
         expect(subject).to install_package('splunkforwarder').with(expected_attrs)
-        expect(subject.package('splunkforwarder')).to notify('execute[splunk-first-run]').to(:run).immediately
       end
     end
   end
@@ -163,6 +163,26 @@ describe 'cerner_splunk::_install' do
 
     it 'deletes the downloaded splunk package' do
       expect(subject).to delete_file(splunk_filepath)
+    end
+  end
+
+  it 'includes cerner_splunk::_configure_secret recipe' do
+    expect(subject).to include_recipe('cerner_splunk::_configure_secret')
+  end
+
+  context 'when ftr file exists' do
+    let(:ftr_exists) { true }
+
+    it 'executes splunk-first-run' do
+      expect(subject).to run_execute('splunk-first-run')
+    end
+  end
+
+  context 'when ftr file does not exist' do
+    let(:ftr_exists) { false }
+
+    it 'does not execute splunk-first-run' do
+      expect(subject).not_to run_execute('splunk-first-run')
     end
   end
 
@@ -186,10 +206,6 @@ describe 'cerner_splunk::_install' do
 
   it 'includes cerner_splunk::_user_management recipe' do
     expect(subject).to include_recipe('cerner_splunk::_user_management')
-  end
-
-  it 'does nothing with splunk-first-run execution' do
-    expect(subject.execute('splunk-first-run')).to do_nothing
   end
 
   context 'when .ui_login file exists' do
