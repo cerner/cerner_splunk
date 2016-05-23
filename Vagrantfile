@@ -106,6 +106,8 @@ Vagrant.configure('2') do |config|
     app_gen = <<-'SCRIPT'.gsub(/^\s+/, '')
       mkdir -p "$HOME/app_service"
       rm -rf "$HOME/app_service/*"
+      cd /vagrant/vagrant_repo/files
+      cp -R lookups "$HOME/app_service/"
       cd /vagrant/vagrant_repo/apps
       timestamp=`date -u +%Y%m%d%H%M%S`
       for D in *; do
