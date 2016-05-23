@@ -109,6 +109,7 @@ An apps hash is a contextual (see above) Hash, part of a plaintext data bag item
 * `[app]['download']['version']` - Expected [version number][app.conf] (if any) used to determine if a new app should be downloaded.
 * `[app]['files']` - Hash of files to manage under the "default" or "local" directory.
 * `[app]['files'][filename]` - Contents of a particular file to manage. It can take 3 values, a hash of stanzas -> key-value pairs (then written with the splunk template), a string (written as is), or nil / false (deleted). If the hash or string is empty, the file is also deleted.
+* `[app]['lookups']` - Hash of lookup files for the app. The key in the hash will be the name of file when it lands in the Splunk app and the value will be the url to lookup file. To delete an existing lookup file, set the value of the lookup file to `false` or `null` or to an empty string. The only supported file name extensions are .csv, .csv.gz and .kmz. Please see [splunk docs](http://docs.splunk.com/Documentation/Splunk/6.3.2/Knowledge/Addfieldsfromexternaldatasources) for more information about the supported file formats. `[app]['files']` hash can be used to specify any .conf setting that is required for the lookup.
 * `[app]['permissions']` - Hash of permissions to manage for the app.
 * `[app]['permissions'][object]` - Permissions to manage for a particular knowledge object or class of knowledge objects
 * `[app]['permissions'][object]['access']['read']` - array of roles or String '*' allowed to read the object

@@ -28,6 +28,7 @@ apps.each do |app_name, app_data|
     version download_data['version']
     local app_data['local']
     files app_data['files']
+    lookups app_data['lookups']
     permissions app_data['permissions']
     notifies :touch, 'file[splunk-marker]', :immediately
   end

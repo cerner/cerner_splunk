@@ -27,6 +27,10 @@
         "data/ui/views/all_index.xml": "<dashboard><label>Awesome_Dashboard</label><description>Bacon for all</description><row><chart><searchString>index=* | timechart count</searchString><earliestTime>@d</earliestTime><latestTime>now</latestTime></chart></row></dashboard>",
         "data/ui/nav/default.xml": "<nav search_view=\"search\" color=\"#72231F\"><view name=\"search\" default='true' /><view name=\"data_models\" /><view name=\"reports\" /><view name=\"alerts\" /><view name=\"dashboards\" /></nav>"
       },
+      "lookups": {
+        "index-owners.csv": "http://33.33.33.33:5000/lookups/index-owners.csv",
+        "test.csv": "http://33.33.33.33:5000/lookups/test.txt"
+      },
       "permissions": {
         "": {
           "access": {
