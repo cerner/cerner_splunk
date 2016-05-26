@@ -67,9 +67,16 @@ package node['splunk']['package']['base_name'] do
   if platform_family?('windows')
     # installing as the system user by default as Splunk has difficulties with being a limited user
     options %(AGREETOLICENSE=Yes SERVICESTARTTYPE=auto LAUNCHSPLUNK=0 INSTALLDIR="#{node['splunk']['home'].tr('/', '\\')}")
-  else
-    notifies :run, 'execute[splunk-first-run]', :immediately
   end
+end
+
+include_recipe 'cerner_splunk::_configure_secret'
+
+execute 'splunk-first-run' do
+  command "#{node['splunk']['cmd']} help commands --accept-license --answer-yes --no-prompt"
+  user node['splunk']['user']
+  group node['splunk']['group']
+  only_if { ::File.exist? "#{node['splunk']['home']}/ftr" }
 end
 
 directory node['splunk']['external_config_directory'] do
@@ -94,13 +101,6 @@ file 'splunk_package' do
 end
 
 include_recipe 'cerner_splunk::_user_management'
-
-execute 'splunk-first-run' do
-  command "#{node['splunk']['cmd']} help commands --accept-license --answer-yes --no-prompt"
-  user node['splunk']['user']
-  group node['splunk']['group']
-  action :nothing
-end
 
 # This gets rid of the change password prompt on first login
 file "#{node['splunk']['home']}/etc/.ui_login" do
