@@ -54,6 +54,12 @@ class Chef
         if args || val
           val
         else
+          # evaluating the procs if an attribute in the stanza has a value which is a proc
+          stanzas.each do |stanza, contents|
+            contents.each do |attribute, value|
+              stanzas[stanza][attribute] = value.call if value.is_a? Proc
+            end
+          end
           { stanzas: stanzas }
         end
       end
