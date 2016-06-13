@@ -186,6 +186,10 @@ describe 'cerner_splunk::_install' do
     end
   end
 
+  it 'runs ruby block read splunk.secret' do
+    expect(subject).to run_ruby_block('read splunk.secret')
+  end
+
   it 'creates external config directory' do
     expected_attrs = {
       owner: 'splunk',

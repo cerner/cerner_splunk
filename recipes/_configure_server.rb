@@ -33,6 +33,11 @@ MASTER_ONLY_CONFIGS = %w(
   commit_retry_time
 ).freeze
 
+# default pass4SymmKey value is 'changeme'
+server_stanzas['general']['pass4SymmKey'] = proc { CernerSplunk.splunk_encrypt_password 'changeme', node.run_state['cerner_splunk']['splunk.secret'] }
+# default sslKeysfilePassword value is 'password'
+server_stanzas['sslConfig']['sslKeysfilePassword'] = proc { CernerSplunk.splunk_encrypt_password 'password', node.run_state['cerner_splunk']['splunk.secret'], false }
+
 case node['splunk']['node_type']
 when :search_head, :server
   clusters = CernerSplunk.all_clusters(node).collect do |(cluster, bag)|
@@ -45,7 +50,7 @@ when :search_head, :server
 
     server_stanzas[stanza] = {}
     server_stanzas[stanza]['master_uri'] = master_uri
-    server_stanzas[stanza]['pass4SymmKey'] = pass unless pass.empty?
+    server_stanzas[stanza]['pass4SymmKey'] = proc { CernerSplunk.splunk_encrypt_password pass, node.run_state['cerner_splunk']['splunk.secret'] } unless pass.empty?
     # Until we support multisite clusters, set multisite explicitly false
     server_stanzas[stanza]['multisite'] = false
     stanza
@@ -159,20 +164,6 @@ server_stanzas['license'] = {
 }
 
 splunk_template 'system/server.conf' do
-  stanzas do
-    old_stanzas = CernerSplunk::Conf::Reader.new("#{node['splunk']['home']}/etc/system/local/server.conf").read
-
-    old_stanzas.each do |key, value|
-      case key
-      when 'general'
-        server_stanzas['general']['guid'] = value['guid'] if value['guid']
-        server_stanzas['general']['pass4SymmKey'] = value['pass4SymmKey'] if value['pass4SymmKey']
-      when 'sslConfig'
-        server_stanzas['sslConfig']['sslKeysfilePassword'] = value['sslKeysfilePassword']
-      end
-    end
-
-    server_stanzas
-  end
+  stanzas server_stanzas
   notifies :restart, 'service[splunk]'
 end
