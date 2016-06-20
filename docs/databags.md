@@ -18,6 +18,7 @@ The Cluster Hash is part of a plaintext data bag item that defines a logical gro
 * `['master_uri']` - SplunkAPI URI of the cluster master (Required for servers connecting to managed clusters)
 * `['settings']` -  Hash of Cluster settings (Required for servers connecting to managed clusters),
 * `['settings'][???]` - Valid values are those under the clustering stanza of [server.conf][]
+* `['settings'][???]['_cerner_splunk_indexer_count']` - The number of indexers to use for calculating maxTotalDataSizeMB for each index in combination with _maxDailyDataSizeMB in the index configuration.
 * `['replication_ports']` - Configuration for cluster slave replication ports (required for cluster slaves)
 * `['replication_ports']['###']` - Port number to listen on
 * `['replication_ports']['###']['_cerner_splunk_ssl']` - boolean if the port is ssl enabled (false)
@@ -48,6 +49,8 @@ An Indexes Hash is part of a plaintext data bag item that defines the set of ind
 * `['config']` - These define the [indexes.conf] stanzas (in fairly raw form). However there are a few special keys:
     * `_volume` - The base volume for the coldPath, homePath and tstatsHomePath. Defaults to nil, so the index will be located in $SPLUNK_DB.
     * `_directory_name` - The on-disk name of the directory to store the index. Defaults to the index name.
+    * `_maxDailyDataSizeMB` - The amount of daily usage this index is expected to consume.  Used to calculate the maxTotalDataSizeMB if maxTotalDataSizeMB has not already been specified for the index.
+    * `_dataSizePaddingPercent` - The percentage of padding to apply to the amount of space this index is expected to consume.  Used to calculate the maxTotalDataSizeMB if maxTotalDataSizeMB has not already been specified for the index. Defaults to 10 if no value is specified.
 * `['flags']` - These define boolean processing flags per index. All flags are default 'false' but can be set to true. Current flags include:
     * `noGeneratePaths` - Do not generate the homePath,coldPath,thawedPath to this index when not present in the config above
     * `noRepFactor` - Do not add 'repFactor = auto' to this index when not present in the config on a cluster master.

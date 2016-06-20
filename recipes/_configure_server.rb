@@ -65,7 +65,7 @@ when :search_head, :server
   end
 when :cluster_master
   bag = CernerSplunk.my_cluster_data(node)
-  settings = (bag['settings'] || {}).delete_if do |k, _|
+  settings = (bag['settings'] || {}).reject do |k, _|
     k.start_with?('_cerner_splunk') || SLAVE_ONLY_CONFIGS.include?(k)
   end
 
@@ -75,7 +75,7 @@ when :cluster_slave
   cluster, bag = CernerSplunk.my_cluster(node)
   master_uri = bag['master_uri'] || ''
   replication_ports = bag['replication_ports'] || {}
-  settings = (bag['settings'] || {}).delete_if do |k, _|
+  settings = (bag['settings'] || {}).reject do |k, _|
     k.start_with?('_cerner_splunk') || MASTER_ONLY_CONFIGS.include?(k)
   end
 
@@ -89,7 +89,7 @@ when :cluster_slave
   replication_ports.each do |port, port_settings|
     ssl = port_settings['_cerner_splunk_ssl'] == true
     stanza = ssl ? "replication_port-ssl://#{port}" : "replication_port://#{port}"
-    server_stanzas[stanza] = port_settings.delete_if do |k, _|
+    server_stanzas[stanza] = port_settings.reject do |k, _|
       k.start_with? '_cerner_splunk'
     end
   end
