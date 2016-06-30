@@ -38,16 +38,12 @@ module CernerSplunk
     end
 
     def encrypt!(text)
-      index = 0
-      while index < text.length
+      text.force_encoding('binary').unpack('C*').map do |encoded_byte|
         @q1 = (@q1 + 1) % 256
         @q2 = (@q2 + @state[@q1]) % 256
         @state[@q1], @state[@q2] = @state[@q2], @state[@q1]
-        text.setbyte(index, text.getbyte(index) ^ @state[
-        (@state[@q1] + @state[@q2]) % 256])
-        index += 1
-      end
-      text
+        encoded_byte ^ @state[(@state[@q1] + @state[@q2]) % 256]
+      end.pack 'C*'
     end
 
     alias decrypt! encrypt!
@@ -67,9 +63,10 @@ module CernerSplunk
     def initialize_state(key)
       i = j = 0
       @state = INITIAL_STATE.dup
+      key = key.force_encoding('binary').unpack('C*')
       key_length = key.length
       while i < 256
-        j = (j + @state[i] + key.getbyte(i % key_length)) % 256
+        j = (j + @state[i] + key[i % key_length]) % 256
         @state[i], @state[j] = @state[j], @state[i]
         i += 1
       end

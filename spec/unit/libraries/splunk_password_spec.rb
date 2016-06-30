@@ -5,7 +5,7 @@ require 'splunk_password'
 require 'rc4'
 
 describe 'CernerSplunk::splunk_password' do
-  let(:splunk_secret) { 'this_is_the_splunk_secret_key' }
+  let(:splunk_secret) { 'qYFEHts8G0E/ABbp' }
   let(:password) { 'password' }
 
   describe '.splunk_decrypt_password' do
