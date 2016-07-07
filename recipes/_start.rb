@@ -33,7 +33,7 @@ end
 # but we'd need to refactor the determination of the service name away from the _install recipe.
 ruby_block 'start-splunk' do
   block { true }
-  notifies :start, 'service[splunk-start]', :immediately
+  notifies :start, 'service[splunk]', :immediately
 end
 
 include_recipe 'cerner_splunk::_generate_password'

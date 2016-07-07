@@ -143,6 +143,6 @@ describe 'cerner_splunk::_start' do
 
   it 'notifies the start splunk resource' do
     expect(subject).to run_ruby_block('start-splunk')
-    expect(subject.ruby_block('start-splunk')).to notify('service[splunk-start]').to(:start).immediately
+    expect(subject.ruby_block('start-splunk')).to notify('service[splunk]').to(:start).immediately
   end
 end

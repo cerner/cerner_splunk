@@ -72,21 +72,21 @@ describe 'cerner_splunk::_install' do
     expect(subject).to include_recipe('cerner_splunk::_restart_marker')
   end
 
-  it 'does nothing with the splunk-start service and notifies the deletion of the splunk file marker immediately' do
-    splunk_start_service = subject.service('splunk-start')
-    expect(splunk_start_service).to do_nothing
-    expect(splunk_start_service).to notify('file[splunk-marker]').to(:delete).immediately
-  end
-
   it 'does nothing with the splunk service and notifies the deletion of the splunk file marker immediately' do
     splunk_service = subject.service('splunk')
     expect(splunk_service).to do_nothing
     expect(splunk_service).to notify('file[splunk-marker]').to(:delete).immediately
   end
 
+  it 'does nothing with the splunk-restart service and notifies the deletion of the splunk file marker immediately' do
+    splunk_restart_service = subject.service('splunk-restart')
+    expect(splunk_restart_service).to do_nothing
+    expect(splunk_restart_service).to notify('file[splunk-marker]').to(:delete).immediately
+  end
+
   it 'runs ruby block splunk-delayed-restart' do
     expect(subject).to run_ruby_block('splunk-delayed-restart')
-    expect(subject.ruby_block('splunk-delayed-restart')).to notify('service[splunk]').to(:restart)
+    expect(subject.ruby_block('splunk-delayed-restart')).to notify('service[splunk-restart]').to(:restart)
   end
 
   context 'when remote file has missing manifest' do

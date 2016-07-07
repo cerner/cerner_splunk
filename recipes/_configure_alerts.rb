@@ -12,30 +12,7 @@ unless hash
   return
 end
 
-hash = hash.clone
-default_coords = CernerSplunk::DataBag.to_a node['splunk']['config']['alerts']
-bag = CernerSplunk::DataBag.load hash.delete('bag'), default: default_coords
-
-alert_stanzas =
-  if bag
-    bag.merge(hash) do |_key, default_hash, override_hash|
-      default_hash.merge(override_hash)
-    end
-  else
-    hash
-  end
-
-fail 'Unexpected property \'bag\'' if alert_stanzas.delete('bag')
-
-email_settings = alert_stanzas['email'] || {}
-
-if email_settings['auth_password']
-  password = CernerSplunk::DataBag.load email_settings['auth_password'], default: default_coords, type: :vault
-  fail 'Password must be a String' unless password.is_a?(String)
-  email_settings['auth_password'] = password
-end
-
 splunk_template 'system/alert_actions.conf' do
-  stanzas alert_stanzas
+  stanzas CernerSplunk::Alerts.configure_alerts(node, hash)
   notifies :touch, 'file[splunk-marker]', :immediately
 end

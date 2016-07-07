@@ -4,7 +4,7 @@
   "default_attributes": {
     "splunk": {
       "apps": {
-        "bag": "cerner_splunk/apps-vagrant:apps"
+        "bag": "cerner_splunk/cluster-apps-vagrant:search_head"
       },
       "config": {
         "clusters": [

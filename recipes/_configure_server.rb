@@ -38,8 +38,9 @@ server_stanzas['general']['pass4SymmKey'] = proc { CernerSplunk.splunk_encrypt_p
 # default sslKeysfilePassword value is 'password'
 server_stanzas['sslConfig']['sslKeysfilePassword'] = proc { CernerSplunk.splunk_encrypt_password 'password', node.run_state['cerner_splunk']['splunk.secret'], false }
 
+# Indexer Cluster Configuration
 case node['splunk']['node_type']
-when :search_head, :server
+when :search_head, :shc_search_head, :shc_captain, :server
   clusters = CernerSplunk.all_clusters(node).collect do |(cluster, bag)|
     stanza = "clustermaster:#{cluster}"
     master_uri = bag['master_uri'] || ''
@@ -95,12 +96,45 @@ when :cluster_slave
   end
 end
 
+# Search Head Cluster configuration
+if [:shc_search_head, :shc_captain].include? node['splunk']['node_type']
+  cluster, bag = CernerSplunk.my_cluster(node)
+  deployer_uri = bag['deployer_uri'] || ''
+  replication_ports = bag['shc_replication_ports'] || bag['replication_ports'] || {}
+  settings = (bag['shc_settings'] || {}).reject do |k, _|
+    k.start_with?('_cerner_splunk')
+  end
+  pass = settings.delete('pass4SymmKey')
+
+  fail "Missing deployer URI for #{cluster}" if deployer_uri.empty?
+  fail "Missing replication port configuration for cluster '#{cluster}'" if replication_ports.empty?
+
+  replication_ports.each do |port, port_settings|
+    ssl = port_settings['_cerner_splunk_ssl'] == true
+    stanza = ssl ? "replication_port-ssl://#{port}" : "replication_port://#{port}"
+    server_stanzas[stanza] = port_settings.reject do |k, _|
+      k.start_with? '_cerner_splunk'
+    end
+  end
+
+  path = "#{node['splunk']['home']}/etc/system/local/server.conf"
+  old_stanzas = CernerSplunk::Conf::Reader.new(path).read if File.exist?(path)
+  old_id = (old_stanzas['shclustering'] || {})['id'] if old_stanzas
+
+  server_stanzas['shclustering'] = settings
+  server_stanzas['shclustering']['pass4SymmKey'] = proc { CernerSplunk.splunk_encrypt_password pass, node.run_state['cerner_splunk']['splunk.secret'] } if pass
+  server_stanzas['shclustering']['conf_deploy_fetch_url'] = deployer_uri
+  server_stanzas['shclustering']['disabled'] = 0
+  server_stanzas['shclustering']['mgmt_uri'] = "https://#{node['splunk']['mgmt_host']}:8089"
+  server_stanzas['shclustering']['id'] = old_id if old_id
+end
+
 # License Configuration
 license_uri =
   case node['splunk']['node_type']
   when :forwarder, :license_server
     'self'
-  when :cluster_master, :cluster_slave, :search_head, :server
+  when :cluster_master, :cluster_slave, :server, :search_head, :shc_search_head, :shc_captain, :shc_deployer
     if node['splunk']['free_license']
       'self'
     else
@@ -110,7 +144,7 @@ license_uri =
 
 license_group =
   case node['splunk']['node_type']
-  when :license_server, :cluster_master, :cluster_slave
+  when :license_server, :cluster_master, :cluster_slave, :shc_search_head, :shc_captain, :shc_deployer
     'Enterprise'
   when :forwarder
     'Forwarder'
@@ -165,5 +199,5 @@ server_stanzas['license'] = {
 
 splunk_template 'system/server.conf' do
   stanzas server_stanzas
-  notifies :restart, 'service[splunk]'
+  notifies :touch, 'file[splunk-marker]', :immediately
 end
