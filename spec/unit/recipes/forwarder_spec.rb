@@ -33,6 +33,10 @@ describe 'cerner_splunk::forwarder' do
     allow(Dir).to receive(:exist?).with('/opt/splunk').and_return(splunk_installed)
   end
 
+  after do
+    CernerSplunk.reset
+  end
+
   context 'when splunk is installed' do
     let(:splunk_installed) { true }
 

@@ -42,6 +42,8 @@ class Chef
         case name
         when %r{^system/(.+\.conf)$}
           @path = "etc/system/local/#{Regexp.last_match[1]}"
+        when %r{^shcluster/([^/]+)/(.+\.conf)$}
+          @path = "etc/shcluster/apps/#{Regexp.last_match[1]}/local/#{Regexp.last_match[2]}"
         when %r{^((?:master-)?app)s?/([^/]+)/(.+\.conf)$}
           @path = "etc/#{Regexp.last_match[1]}s/#{Regexp.last_match[2]}/local/#{Regexp.last_match[3]}"
         end

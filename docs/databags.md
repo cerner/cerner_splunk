@@ -16,13 +16,18 @@ The Cluster Hash is part of a plaintext data bag item that defines a logical gro
 
 * `['license_uri']` - SplunkAPI URI of the License Server (Required for getting onto the Enterprise license, if unset, use trial license)
 * `['master_uri']` - SplunkAPI URI of the cluster master (Required for servers connecting to managed clusters)
+* `['deployer_uri']` - SplunkAPI URI of the Deployer in the Search Head Cluster
+* `['shc_members']` - Array of Splunk API URIs of the search head members that are in the SH (Search Head) cluster. For adding members to an existing cluster make sure that the first SH member in the array is an existing member in the cluster.
 * `['settings']` -  Hash of Cluster settings (Required for servers connecting to managed clusters),
 * `['settings'][???]` - Valid values are those under the clustering stanza of [server.conf][]
 * `['settings'][???]['_cerner_splunk_indexer_count']` - The number of indexers to use for calculating maxTotalDataSizeMB for each index in combination with _maxDailyDataSizeMB in the index configuration.
-* `['replication_ports']` - Configuration for cluster slave replication ports (required for cluster slaves)
+* `['shc_settings'] - Hash of SH Cluster settings
+* `['shc_settings']['???']` - Valid values are those under the shclustering stanza of [server.conf][]
+* `['replication_ports']` - Configuration for cluster slave replication ports (required for cluster slaves and Search Head Cluster members/captain)
 * `['replication_ports']['###']` - Port number to listen on
 * `['replication_ports']['###']['_cerner_splunk_ssl']` - boolean if the port is ssl enabled (false)
 * `['replication_ports']['###']['???']` - Other replication-port stanza properties from [server.conf][]
+* `['shc_replication_ports']` - identical as `['replication_ports']` but take precedence for Search Head Cluster members/captain when replication port settings need to differ between SHC members and indexer cluster slaves in the same cluster.
 * `['receivers']` - Array of strings of hosts where this cluster's indexers are listening. (Required for forwarders)
 * `['receiver_settings']['splunktcp']['port']` - Port indexers are listening on, and forwarders are sending data (required for forwarders and receivers)
 * `['indexes']` - A String pointing to an indexes data bag hash. (Coordinate form as described above)
@@ -58,7 +63,7 @@ An Indexes Hash is part of a plaintext data bag item that defines the set of ind
 
 Roles Hash
 ----------
-A Roles Hash is a contextual (see above) Hash, part of a plaintext data bag item that defines roles for every node in a cluster, and is pointed to by the `node[:splunk][:config][:roles]` attribute (usually set in your environment).
+A Roles Hash is a contextual (see above) Hash, part of a plaintext data bag item that defines roles for every node in a cluster, and is pointed to by the `node[:splunk][:config][:roles]` attribute (usually set in your environment). A special key of 'shcluster' is used for managing the roles on the search heads in a search head cluster.
 
 * `[context]` - Final Hash, String Alias, or force unconfigured (null)
 * `[context]['default']` - defines the base settings for all roles
@@ -72,6 +77,7 @@ A Roles Hash is a contextual (see above) Hash, part of a plaintext data bag item
 Authentication Hash
 -------------------
 An Authentication Hash is a contextual (see above) Hash, part of a plaintext data bag item that is used to configure how users authenticate to the system per [authentication.conf][].
+A special key of 'shcluster' is used for managing the authentication on the search heads in a search head cluster.
 
 * `['authType']` - Matches the key of the same name in the authentication stanza. One of Splunk, LDAP, Scripted, but we'll attempt to guess it based on the other configured keys
 * `['passwordHashAlgorithm']` - Only valid for 'Splunk' authType. See key of the same name in the authentication stanza
@@ -93,7 +99,7 @@ An LDAP Hash is part of a plaintext data bag item that configures connection inf
 
 Alerts Hash
 -----------
-An Alerts hash is a contextual (see above) Hash, part of a plaintext data bag item that configures [alert-actions.conf][]
+An Alerts hash is a contextual (see above) Hash, part of a plaintext data bag item that configures [alert-actions.conf][]. A special key of 'shcluster' is used for managing the alerts on the search heads in a search head cluster.
 
 * `['bag']` - A string that points to an externalized Alerts Hash in which all keys (except this one) are valid
 * `['email']['auth_password']` - Coordinate String (see above), pointing to a String within a Chef Vault encrypted data bag item.
@@ -101,7 +107,7 @@ An Alerts hash is a contextual (see above) Hash, part of a plaintext data bag it
 
 Apps Hash
 -----------
-An apps hash is a contextual (see above) Hash, part of a plaintext data bag item or specified directly as attributes that configures apps. A special key of 'master-apps' is looked for managing apps that should be installed and pushed by the cluster master, instead of locally.
+An apps hash is a contextual (see above) Hash, part of a plaintext data bag item or specified directly as attributes that configures apps. A special key of 'master-apps' is looked for managing apps that should be installed and pushed by the cluster master, instead of locally. On a deployer in a Search Head Cluster, the key 'deployer-apps' is used for managing the apps that should be installed on the deployer and then pushed to the search heads.
 
 * `['bag']` - A string that points to an externalized Apps Hash in which all keys (except this one) are valid.
 * `[app]` - The name of an app to manage (disk name)
@@ -118,7 +124,6 @@ An apps hash is a contextual (see above) Hash, part of a plaintext data bag item
 * `[app]['permissions'][object]['access']['read']` - array of roles or String '*' allowed to read the object
 * `[app]['permissions'][object]['access']['write']` - array of roles or String '*' allowed to write the object
 * `[app]['permissions'][object][???]` - Any other stanza from [default.meta][]
-
 
 Docs Navigation
 ===============

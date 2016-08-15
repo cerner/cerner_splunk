@@ -15,3 +15,9 @@ Style/BracesAroundHashParameters:
 
 Style/SignalException:
   EnforcedStyle: semantic
+
+Style/NumericPredicate:
+  EnforcedStyle: comparison
+
+Style/TernaryParentheses:
+  Enabled: false

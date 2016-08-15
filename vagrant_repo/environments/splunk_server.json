@@ -9,7 +9,14 @@
         ],
         "roles": "cerner_splunk/authnz-vagrant:roles",
         "authentication": "cerner_splunk/authnz-vagrant:authn",
-        "alerts": "cerner_splunk/alerts-vagrant:alerts"
+        "alerts": "cerner_splunk/alerts-vagrant:alerts",
+        "secrets": {
+          "c2_boot1": "cerner_splunk/passwords:splunk.secret",
+          "c2_boot2": "cerner_splunk/passwords:splunk.secret",
+          "c2_captain": "cerner_splunk/passwords:splunk.secret",
+          "c2_deployer": "cerner_splunk/passwords:splunk.secret",
+          "c2_newnode": "cerner_splunk/passwords:splunk.secret"
+        }
       }
     }
   }

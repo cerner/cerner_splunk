@@ -29,16 +29,16 @@ manifest_missing = proc { ::Dir.glob("#{node['splunk']['home']}/#{node['splunk']
 include_recipe 'cerner_splunk::_restart_marker'
 
 # Actions
-# This service definition is used only for ensuring splunk is started during the run
-service 'splunk-start' do
+# This service definition is used for ensuring splunk is started during the run and to stop splunk service
+service 'splunk' do
   service_name service
   action :nothing
-  supports status: true, start: true
+  supports status: true, start: true, stop: true
   notifies :delete, 'file[splunk-marker]', :immediately
 end
 
 # This service definition is used for restarting splunk when the run is over
-service 'splunk' do
+service 'splunk-restart' do
   service_name service
   action :nothing
   supports status: true, restart: true
@@ -48,7 +48,7 @@ end
 
 ruby_block 'splunk-delayed-restart' do
   block { true }
-  notifies :restart, 'service[splunk]'
+  notifies :restart, 'service[splunk-restart]'
 end
 
 splunk_file = "#{Chef::Config[:file_cache_path]}/#{node['splunk']['package']['file_name']}"
