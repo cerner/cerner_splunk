@@ -12,7 +12,8 @@ unless hash
   return
 end
 
-splunk_template 'shcluster/_shcluster/alert_actions.conf' do
-  stanzas CernerSplunk::Alerts.configure_alerts(node, hash)
+splunk_conf 'shcluster/apps/_shcluster/alert_actions.conf' do
+  config CernerSplunk::Alerts.configure_alerts(node, hash)
   notifies :run, 'execute[apply-shcluster-bundle]'
+  action :configure
 end

@@ -25,7 +25,8 @@ if [:server, :cluster_slave].include? node['splunk']['node_type']
   end
 end
 
-splunk_template 'system/inputs.conf' do
-  stanzas input_stanzas
-  notifies :touch, 'file[splunk-marker]', :immediately
+splunk_conf 'system/inputs.conf' do
+  path 'system/inputs.conf'
+  config input_stanzas
+  action :configure
 end

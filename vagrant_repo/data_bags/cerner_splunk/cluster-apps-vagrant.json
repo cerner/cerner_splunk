@@ -51,7 +51,7 @@
           },
           "ui": {
             "is_visible": "1",
-            "label": "Awesome Splunk App"
+            "label": "Awesome Splunk New App"
           }
         },
         "props.conf": {

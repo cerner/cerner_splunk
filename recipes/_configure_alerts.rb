@@ -12,7 +12,8 @@ unless hash
   return
 end
 
-splunk_template 'system/alert_actions.conf' do
-  stanzas CernerSplunk::Alerts.configure_alerts(node, hash)
-  notifies :touch, 'file[splunk-marker]', :immediately
+splunk_conf 'system/alert_actions.conf' do
+  path 'system/alert_actions.conf'
+  config CernerSplunk::Alerts.configure_alerts(node, hash)
+  action :configure
 end

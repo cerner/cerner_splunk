@@ -7,8 +7,9 @@
 
 output_stanzas = CernerSplunk::Outputs.configure_outputs(node)
 
-splunk_template 'shcluster/_shcluster/outputs.conf' do
-  stanzas output_stanzas
+splunk_conf 'shcluster/apps/_shcluster/outputs.conf' do
+  config output_stanzas
   not_if { output_stanzas.empty? }
   notifies :run, 'execute[apply-shcluster-bundle]'
+  action :configure
 end

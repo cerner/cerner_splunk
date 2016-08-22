@@ -53,22 +53,39 @@ end
 
 splunk_file = "#{Chef::Config[:file_cache_path]}/#{node['splunk']['package']['file_name']}"
 
-remote_file splunk_file do
-  source node['splunk']['package']['url']
-  action :create
-  only_if(&manifest_missing)
+
+splunk_install node['splunk']['package']['base_name'] do
+  user node['splunk']['user']
+  version node['splunk']['package']['version']
+  build node['splunk']['package']['build']
+  base_url node['splunk']['package']['base_url']
 end
 
-package node['splunk']['package']['base_name'] do
-  source splunk_file
-  version "#{node['splunk']['package']['version']}-#{node['splunk']['package']['build']}"
-  provider node['splunk']['package']['provider']
-  only_if(&manifest_missing)
-  if platform_family?('windows')
-    # installing as the system user by default as Splunk has difficulties with being a limited user
-    options %(AGREETOLICENSE=Yes SERVICESTARTTYPE=auto LAUNCHSPLUNK=0 INSTALLDIR="#{node['splunk']['home'].tr('/', '\\')}")
-  end
-end
+# splunk_service node['splunk']['package']['base_name'] do
+#   package node['splunk']['package']['base_name']
+#   user node['splunk']['user']
+#   ulimit node['splunk']['limits']['open_files']
+#   action :init 
+# end
+
+
+
+# remote_file splunk_file do
+#   source node['splunk']['package']['url']
+#   action :create
+#   only_if(&manifest_missing)
+# end
+
+# package node['splunk']['package']['base_name'] do
+#   source splunk_file
+#   version "#{node['splunk']['package']['version']}-#{node['splunk']['package']['build']}"
+#   provider node['splunk']['package']['provider']
+#   only_if(&manifest_missing)
+#   if platform_family?('windows')
+#     # installing as the system user by default as Splunk has difficulties with being a limited user
+#     options %(AGREETOLICENSE=Yes SERVICESTARTTYPE=auto LAUNCHSPLUNK=0 INSTALLDIR="#{node['splunk']['home'].tr('/', '\\')}")
+#   end
+# end
 
 include_recipe 'cerner_splunk::_configure_secret'
 
