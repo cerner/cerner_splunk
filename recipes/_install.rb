@@ -61,33 +61,21 @@ splunk_install node['splunk']['package']['base_name'] do
   base_url node['splunk']['package']['base_url']
 end
 
-# splunk_service node['splunk']['package']['base_name'] do
-#   package node['splunk']['package']['base_name']
-#   user node['splunk']['user']
-#   ulimit node['splunk']['limits']['open_files']
-#   action :init 
-# end
-
-
-
-# remote_file splunk_file do
-#   source node['splunk']['package']['url']
-#   action :create
-#   only_if(&manifest_missing)
-# end
-
-# package node['splunk']['package']['base_name'] do
-#   source splunk_file
-#   version "#{node['splunk']['package']['version']}-#{node['splunk']['package']['build']}"
-#   provider node['splunk']['package']['provider']
-#   only_if(&manifest_missing)
-#   if platform_family?('windows')
-#     # installing as the system user by default as Splunk has difficulties with being a limited user
-#     options %(AGREETOLICENSE=Yes SERVICESTARTTYPE=auto LAUNCHSPLUNK=0 INSTALLDIR="#{node['splunk']['home'].tr('/', '\\')}")
-#   end
-# end
+splunk_service node['splunk']['package']['base_name'] do
+  package node['splunk']['package']['base_name'].to_sym
+  user node['splunk']['user']
+  ulimit 8192
+  action :init
+end
 
 include_recipe 'cerner_splunk::_configure_secret'
+
+splunk_service node['splunk']['package']['base_name'] do
+  package node['splunk']['package']['base_name'].to_sym
+  user node['splunk']['user']
+  ulimit 8192
+  action :start
+end
 
 execute 'splunk-first-run' do
   command "#{node['splunk']['cmd']} help commands --accept-license --answer-yes --no-prompt"

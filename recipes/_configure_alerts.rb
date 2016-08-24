@@ -13,7 +13,7 @@ unless hash
 end
 
 splunk_conf 'system/alert_actions.conf' do
-  path 'system/alert_actions.conf'
   config CernerSplunk::Alerts.configure_alerts(node, hash)
   action :configure
+  notifies :restart, "splunk_service[#{node['splunk']['package']['base_name']}]"
 end

@@ -21,7 +21,6 @@
     "SSLEnabled":1,
     "port":636,
     "bindDN":"bindacct@example.com",
-    "bindDNpassword":"passwords:bindacct",
     "userBaseDN":["OU=Users,DC=example,DC=com"],
     "userBaseFilter":"(objectClass=user)",
     "userNameAttribute":"sAMAccountName",

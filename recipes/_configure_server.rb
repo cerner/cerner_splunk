@@ -200,7 +200,7 @@ server_stanzas['license'] = {
   'active_group' => license_group
 }
 
-# Old technique of reading from local/server.conf
+# For now the old technique of reading passwords from local/server.conf
 
 old_stanzas = CernerSplunk::Conf::Reader.new("#{node['splunk']['home']}/etc/system/local/server.conf").read
 
@@ -214,8 +214,7 @@ old_stanzas.each do |key, value|
 end
 
 splunk_conf 'system/server.conf' do
-  path 'system/server.conf'
   config server_stanzas
-  notifies :touch, 'file[splunk-marker]', :immediately
   action :configure
+  notifies :restart, "splunk_service[#{node['splunk']['package']['base_name']}]"
 end

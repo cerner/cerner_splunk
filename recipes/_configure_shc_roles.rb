@@ -15,15 +15,12 @@ end
 
 authorize, user_prefs = CernerSplunk::Roles.configure_roles(hash)
 
-authorize_action = authorize.empty? ? :delete : :configure
 
 splunk_conf 'shcluster/apps/_shcluster/authorize.conf' do
   config authorize
   notifies :run, 'execute[apply-shcluster-bundle]'
   action :configure
 end
-
-user_prefs_action = user_prefs.empty? ? :delete : :configure
 
 splunk_conf 'shcluster/apps/_shcluster/user-prefs.conf' do
   config user_prefs

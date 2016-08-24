@@ -15,8 +15,8 @@ end
 auth_stanzas = CernerSplunk::Authentication.configure_authentication(node, hash)
 
 splunk_conf 'system/authentication.conf' do
-  path 'system/authentication.conf'
   config auth_stanzas
   sensitive auth_stanzas.any? { |_, v| v.key? 'bindDNpassword' }
   action :configure
+  notifies :restart, "splunk_service[#{node['splunk']['package']['base_name']}]"
 end

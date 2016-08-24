@@ -81,8 +81,8 @@ end
 path = is_master ? 'master-apps/_cluster/indexes.conf' : 'system/indexes.conf'
 
 splunk_conf path do
-  path path
   config index_stanzas
   notifies :run, 'execute[apply-cluster-bundle]' if is_master
   action :configure
+  notifies :restart, "splunk_service[#{node['splunk']['package']['base_name']}]"
 end

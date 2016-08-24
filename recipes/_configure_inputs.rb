@@ -26,7 +26,7 @@ if [:server, :cluster_slave].include? node['splunk']['node_type']
 end
 
 splunk_conf 'system/inputs.conf' do
-  path 'system/inputs.conf'
   config input_stanzas
   action :configure
+  notifies :restart, "splunk_service[#{node['splunk']['package']['base_name']}]"
 end

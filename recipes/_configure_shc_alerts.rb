@@ -14,6 +14,7 @@ end
 
 splunk_conf 'shcluster/apps/_shcluster/alert_actions.conf' do
   config CernerSplunk::Alerts.configure_alerts(node, hash)
-  notifies :run, 'execute[apply-shcluster-bundle]'
   action :configure
+  notifies :run, 'execute[apply-shcluster-bundle]'
 end
+
