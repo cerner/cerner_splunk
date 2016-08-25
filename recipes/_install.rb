@@ -24,8 +24,6 @@ node.default['splunk']['cmd'] = CernerSplunk.splunk_command(node)
 
 service = CernerSplunk.splunk_service_name(node['platform_family'], nsp['base_name'])
 
-manifest_missing = proc { ::Dir.glob("#{node['splunk']['home']}/#{node['splunk']['package']['name']}-*").empty? }
-
 include_recipe 'cerner_splunk::_restart_marker'
 
 # Actions
@@ -50,9 +48,6 @@ ruby_block 'splunk-delayed-restart' do
   block { true }
   notifies :restart, 'service[splunk-restart]'
 end
-
-splunk_file = "#{Chef::Config[:file_cache_path]}/#{node['splunk']['package']['file_name']}"
-
 
 splunk_install 'splunk' do
   package node['splunk']['package']['type']
