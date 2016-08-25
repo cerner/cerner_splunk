@@ -103,7 +103,7 @@ module CernerSplunk
           if hash['bindDNpassword']
             password = CernerSplunk::DataBag.load hash['bindDNpassword'], default: default_coords, type: :vault
             fail 'Password must be a String' unless password.is_a?(String)
-            hash['bindDNpassword'] = proc { CernerSplunk.splunk_encrypt_password password, node.run_state['cerner_splunk']['splunk.secret'] }
+            hash['bindDNpassword'] = password
           end
 
           # Verify Attributes

@@ -24,8 +24,6 @@ node.default['splunk']['cmd'] = CernerSplunk.splunk_command(node)
 
 service = CernerSplunk.splunk_service_name(node['platform_family'], nsp['base_name'])
 
-manifest_missing = proc { ::Dir.glob("#{node['splunk']['home']}/#{node['splunk']['package']['name']}-*").empty? }
-
 include_recipe 'cerner_splunk::_restart_marker'
 
 # Actions
@@ -51,32 +49,21 @@ ruby_block 'splunk-delayed-restart' do
   notifies :restart, 'service[splunk-restart]'
 end
 
-splunk_file = "#{Chef::Config[:file_cache_path]}/#{node['splunk']['package']['file_name']}"
-
-remote_file splunk_file do
-  source node['splunk']['package']['url']
-  action :create
-  only_if(&manifest_missing)
-end
-
-package node['splunk']['package']['base_name'] do
-  source splunk_file
-  version "#{node['splunk']['package']['version']}-#{node['splunk']['package']['build']}"
-  provider node['splunk']['package']['provider']
-  only_if(&manifest_missing)
-  if platform_family?('windows')
-    # installing as the system user by default as Splunk has difficulties with being a limited user
-    options %(AGREETOLICENSE=Yes SERVICESTARTTYPE=auto LAUNCHSPLUNK=0 INSTALLDIR="#{node['splunk']['home'].tr('/', '\\')}")
-  end
+splunk_install 'splunk' do
+  package node['splunk']['package']['type']
+  version node['splunk']['package']['version']
+  build node['splunk']['package']['build']
+  user node['splunk']['user']
+  base_url node['splunk']['package']['base_url']
 end
 
 include_recipe 'cerner_splunk::_configure_secret'
 
-execute 'splunk-first-run' do
-  command "#{node['splunk']['cmd']} help commands --accept-license --answer-yes --no-prompt"
+splunk_service 'splunk service' do
+  package node['splunk']['package']['type']
   user node['splunk']['user']
-  group node['splunk']['group']
-  only_if { ::File.exist? "#{node['splunk']['home']}/ftr" }
+  ulimit node['splunk']['limits']['open_files'].to_i
+  action :init
 end
 
 ruby_block 'read splunk.secret' do
@@ -84,6 +71,13 @@ ruby_block 'read splunk.secret' do
     node.run_state['cerner_splunk'] ||= {}
     node.run_state['cerner_splunk']['splunk.secret'] = ::File.open(::File.join(node['splunk']['home'], 'etc/auth/splunk.secret'), 'r') { |file| file.readline.chomp }
   end
+end
+
+ruby_block 'delayed restart' do
+  block do
+    CernerSplunk::Restart.ensure_restart
+  end
+  action :nothing
 end
 
 directory node['splunk']['external_config_directory'] do
@@ -98,13 +92,6 @@ directory "#{node['splunk']['home']}/var/log/introspection" do
   owner node['splunk']['user']
   group node['splunk']['group']
   mode '0700'
-end
-
-file 'splunk_package' do
-  path splunk_file
-  backup false
-  not_if(&manifest_missing)
-  action :delete
 end
 
 include_recipe 'cerner_splunk::_user_management'

@@ -33,10 +33,13 @@ MASTER_ONLY_CONFIGS = %w(
   commit_retry_time
 ).freeze
 
+
+# Commenting the lines below as Proc evaluation is not supported by the splunk_conf
+
 # default pass4SymmKey value is 'changeme'
-server_stanzas['general']['pass4SymmKey'] = proc { CernerSplunk.splunk_encrypt_password 'changeme', node.run_state['cerner_splunk']['splunk.secret'] }
+# server_stanzas['general']['pass4SymmKey'] = proc { CernerSplunk.splunk_encrypt_password 'changeme', node.run_state['cerner_splunk']['splunk.secret'] }
 # default sslKeysfilePassword value is 'password'
-server_stanzas['sslConfig']['sslKeysfilePassword'] = proc { CernerSplunk.splunk_encrypt_password 'password', node.run_state['cerner_splunk']['splunk.secret'], false }
+# server_stanzas['sslConfig']['sslKeysfilePassword'] = proc { CernerSplunk.splunk_encrypt_password 'password', node.run_state['cerner_splunk']['splunk.secret'], false }
 
 # Indexer Cluster Configuration
 case node['splunk']['node_type']
@@ -197,7 +200,21 @@ server_stanzas['license'] = {
   'active_group' => license_group
 }
 
-splunk_template 'system/server.conf' do
-  stanzas server_stanzas
-  notifies :touch, 'file[splunk-marker]', :immediately
+# For now the old technique of reading passwords from local/server.conf
+
+old_stanzas = CernerSplunk::Conf::Reader.new("#{node['splunk']['home']}/etc/system/local/server.conf").read
+
+old_stanzas.each do |key, value|
+  case key
+    when 'general'
+      server_stanzas['general']['pass4SymmKey'] = value['pass4SymmKey'] if value['pass4SymmKey']
+    when 'sslConfig'
+      server_stanzas['sslConfig']['sslKeysfilePassword'] = value['sslKeysfilePassword']
+  end
+end
+
+splunk_conf 'system/server.conf' do
+  config server_stanzas
+  action :configure
+  notifies :restart, "splunk_service[#{node['splunk']['package']['base_name']}]"
 end

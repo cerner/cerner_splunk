@@ -80,8 +80,9 @@ end
 
 path = is_master ? 'master-apps/_cluster/indexes.conf' : 'system/indexes.conf'
 
-splunk_template path do
-  stanzas index_stanzas
-  notifies :touch, 'file[splunk-marker]', :immediately unless is_master
+splunk_conf path do
+  config index_stanzas
   notifies :run, 'execute[apply-cluster-bundle]' if is_master
+  action :configure
+  notifies :restart, "splunk_service[#{node['splunk']['package']['base_name']}]"
 end

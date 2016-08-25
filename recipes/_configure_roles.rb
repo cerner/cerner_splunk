@@ -15,12 +15,10 @@ end
 
 authorize, user_prefs = CernerSplunk::Roles.configure_roles(hash)
 
-authorize_action = authorize.empty? ? :delete : :create
-
-splunk_template 'system/authorize.conf' do
-  stanzas authorize
-  action authorize_action
-  notifies :touch, 'file[splunk-marker]', :immediately
+splunk_conf 'system/authorize.conf' do
+  config authorize
+  action :configure #Only configure option for now
+  notifies :restart, "splunk_service[#{node['splunk']['package']['base_name']}]"
 end
 
 directory "#{node['splunk']['home']}/etc/apps/user-prefs/local" do
@@ -29,10 +27,8 @@ directory "#{node['splunk']['home']}/etc/apps/user-prefs/local" do
   mode '0700'
 end
 
-user_prefs_action = user_prefs.empty? ? :delete : :create
-
-splunk_template 'apps/user-prefs/user-prefs.conf' do
-  stanzas user_prefs
-  action user_prefs_action
-  notifies :touch, 'file[splunk-marker]', :immediately
+splunk_conf 'apps/user-prefs/user-prefs.conf' do
+  config user_prefs
+  action :configure # Only configure option for now
+  notifies :restart, "splunk_service[#{node['splunk']['package']['base_name']}]"
 end
