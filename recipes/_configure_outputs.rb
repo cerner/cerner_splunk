@@ -6,8 +6,9 @@
 # Configures the system outputs.conf file
 output_stanzas = CernerSplunk::Outputs.configure_outputs(node)
 
-splunk_template 'system/outputs.conf' do
-  stanzas output_stanzas
+splunk_conf 'system/outputs.conf' do
+  config output_stanzas
   not_if { output_stanzas.empty? }
-  notifies :run, 'ruby_block[delayed restart]', :immediately
+  action :configure
+  notifies :restart, "splunk_service[#{node['splunk']['package']['base_name']}]"
 end

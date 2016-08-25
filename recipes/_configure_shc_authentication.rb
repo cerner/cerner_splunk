@@ -14,8 +14,10 @@ end
 
 auth_stanzas = CernerSplunk::Authentication.configure_authentication(node, hash)
 
-splunk_template 'shcluster/_shcluster/authentication.conf' do
+
+splunk_conf 'shcluster/apps/_shcluster/authentication.conf' do
+  config CernerSplunk::Alerts.configure_alerts(node, hash)
   sensitive auth_stanzas.any? { |_, v| v.key? 'bindDNpassword' }
-  stanzas auth_stanzas
   notifies :run, 'execute[apply-shcluster-bundle]'
+  action :configure
 end

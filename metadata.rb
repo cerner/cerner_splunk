@@ -12,6 +12,7 @@ issues_url       'https://github.com/cerner/cerner_splunk/issues'
 depends          'chef-vault', '~> 1.3'
 depends          'cerner_splunk_ingredient', '~> 0.1'
 depends          'xml', '~> 1.2'
+depends          'cerner_splunk_ingredient'
 
 supports         'redhat', '>= 5.5'
 supports         'ubuntu', '>= 12.04'

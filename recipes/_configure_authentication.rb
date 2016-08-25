@@ -14,8 +14,9 @@ end
 
 auth_stanzas = CernerSplunk::Authentication.configure_authentication(node, hash)
 
-splunk_template 'system/authentication.conf' do
+splunk_conf 'system/authentication.conf' do
+  config auth_stanzas
   sensitive auth_stanzas.any? { |_, v| v.key? 'bindDNpassword' }
-  stanzas auth_stanzas
-  notifies :run, 'ruby_block[delayed restart]', :immediately
+  action :configure
+  notifies :restart, "splunk_service[#{node['splunk']['package']['base_name']}]"
 end

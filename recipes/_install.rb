@@ -22,12 +22,37 @@ node.default['splunk']['package']['url'] =
 node.default['splunk']['home'] = CernerSplunk.splunk_home(node['platform_family'], node['kernel']['machine'], nsp['base_name'])
 node.default['splunk']['cmd'] = CernerSplunk.splunk_command(node)
 
-node.default['splunk']['package']['type'] = case node['splunk']['package']['base_name']
-                                            when 'splunk'
-                                              :splunk
-                                            when 'splunkforwarder'
-                                              :universal_forwarder
-                                            end
+service = CernerSplunk.splunk_service_name(node['platform_family'], nsp['base_name'])
+
+manifest_missing = proc { ::Dir.glob("#{node['splunk']['home']}/#{node['splunk']['package']['name']}-*").empty? }
+
+include_recipe 'cerner_splunk::_restart_marker'
+
+# Actions
+# This service definition is used for ensuring splunk is started during the run and to stop splunk service
+service 'splunk' do
+  service_name service
+  action :nothing
+  supports status: true, start: true, stop: true
+  notifies :delete, 'file[splunk-marker]', :immediately
+end
+
+# This service definition is used for restarting splunk when the run is over
+service 'splunk-restart' do
+  service_name service
+  action :nothing
+  supports status: true, restart: true
+  only_if { ::File.exist? CernerSplunk.restart_marker_file }
+  notifies :delete, 'file[splunk-marker]', :immediately
+end
+
+ruby_block 'splunk-delayed-restart' do
+  block { true }
+  notifies :restart, 'service[splunk-restart]'
+end
+
+splunk_file = "#{Chef::Config[:file_cache_path]}/#{node['splunk']['package']['file_name']}"
+
 
 splunk_install 'splunk' do
   package node['splunk']['package']['type']
