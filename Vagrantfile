@@ -3,7 +3,7 @@
 
 Vagrant.require_version '>= 1.4.1'
 
-%w(vagrant-omnibus).each do |plugin|
+%w(vagrant-ohai vagrant-omnibus).each do |plugin|
   fail "Missing #{plugin}. Please install it!" unless Vagrant.has_plugin? plugin
 end
 
@@ -16,8 +16,14 @@ end
   c1_slave3:    { ip: '33.33.33.14', hostname: 'slave03.splunk', ports: { 8005 => 8000, 8095 => 8089 } },
   s_standalone: { ip: '33.33.33.20', hostname: 'splunk2', ports: { 8006 => 8000, 8096 => 8089 } },
   s_license:    { ip: '33.33.33.30', hostname: 'splunk-license', ports: { 8007 => 8000, 8097 => 8089 } },
+  c2_boot1:     { ip: '33.33.33.15', hostname: 'search01.splunk', ports: { 8008 => 8000, 8098 => 8089 } },
+  c2_boot2:     { ip: '33.33.33.16', hostname: 'search02.splunk', ports: { 8009 => 8000, 8099 => 8089 } },
+  c2_captain:   { ip: '33.33.33.17', hostname: 'search03.splunk', ports: { 8010 => 8000, 8100 => 8089 } },
+  c2_newnode:   { ip: '33.33.33.18', hostname: 'search04.splunk', ports: { 8011 => 8000, 8101 => 8089 } },
+  c2_deployer:  { ip: '33.33.33.28', hostname: 'deployer.splunk', ports: { 8012 => 8000, 8102 => 8089 } },
   f_default:    { ip: '33.33.33.50', hostname: 'default.forward', ports: { 9090 => 8089 } },
   f_debian:     { ip: '33.33.33.51', hostname: 'debian.forward', ports: { 9091 => 8089 } },
+  f_heavy:      { ip: '33.33.33.52', hostname: 'heavy.forward', ports: { 9092 => 8089 } },
   f_win2012r2:  { ip: '33.33.33.53', hostname: 'windowsforward', ports: { 9093 => 8089 } }
 }
 
@@ -63,6 +69,7 @@ end
 
 Vagrant.configure('2') do |config|
   config.vm.box = 'bento/centos-6.7'
+  config.ohai.primary_nic = 'eth1'
 
   if Vagrant.has_plugin? 'vagrant-berkshelf'
     config.berkshelf.enabled = false
@@ -79,7 +86,7 @@ Vagrant.configure('2') do |config|
   config.vm.define :chef do |cfg|
     config.omnibus.chef_version = nil
 
-    cfg.vm.provision :shell, inline: 'rpm -q chefdk || curl -L https://chef.sh | bash -s -- -P chefdk'
+    cfg.vm.provision :shell, inline: 'rpm -q chefdk || curl -L https://omnitruck.chef.io/install.sh | bash -s -- -P chefdk'
 
     if ENV['KNIFE_ONLY']
       cfg.vm.provision :shell, inline: 'cd /vagrant/vagrant_repo; mv nodes .nodes.bak', privileged: false
@@ -105,6 +112,8 @@ Vagrant.configure('2') do |config|
     app_gen = <<-'SCRIPT'.gsub(/^\s+/, '')
       mkdir -p "$HOME/app_service"
       rm -rf "$HOME/app_service/*"
+      cd /vagrant/vagrant_repo/files
+      cp -R lookups "$HOME/app_service/"
       cd /vagrant/vagrant_repo/apps
       timestamp=`date -u +%Y%m%d%H%M%S`
       for D in *; do
@@ -158,6 +167,8 @@ Vagrant.configure('2') do |config|
       cfg.vm.provision :chef_client do |chef|
         chef_defaults chef, symbol
         chef.add_recipe 'cerner_splunk::cluster_slave'
+        # Uncomment the line below to set predefined GUIDs on the cluster slaves (for playing with license pooling)
+        # chef.add_recipe 'cerner_splunk_test::configure_guids'
       end
       network cfg, symbol
     end
@@ -173,6 +184,62 @@ Vagrant.configure('2') do |config|
       chef.add_recipe 'cerner_splunk::search_head'
     end
     network cfg, :c1_search
+  end
+
+  (1..2).each do |n|
+    symbol = "c2_boot#{n}".to_sym
+    config.vm.define symbol do |cfg|
+      default_omnibus config
+      cfg.vm.provider :virtualbox do |vb|
+        vb.customize ['modifyvm', :id, '--memory', 256]
+      end
+      cfg.vm.provision :chef_client do |chef|
+        chef_defaults chef, symbol
+        chef.add_recipe 'cerner_splunk::shc_search_head'
+        chef.json = {
+          'splunk' => {
+            'bootstrap_shc_member' => true
+          }
+        }
+      end
+      network cfg, symbol
+    end
+  end
+
+  config.vm.define :c2_captain do |cfg|
+    default_omnibus config
+    cfg.vm.provider :virtualbox do |vb|
+      vb.customize ['modifyvm', :id, '--memory', 256]
+    end
+    cfg.vm.provision :chef_client do |chef|
+      chef_defaults chef, :c2_captain
+      chef.add_recipe 'cerner_splunk::shc_captain'
+    end
+    network cfg, :c2_captain
+  end
+
+  config.vm.define :c2_deployer do |cfg|
+    default_omnibus config
+    cfg.vm.provider :virtualbox do |vb|
+      vb.customize ['modifyvm', :id, '--memory', 256]
+    end
+    cfg.vm.provision :chef_client do |chef|
+      chef_defaults chef, :c2_deployer
+      chef.add_recipe 'cerner_splunk::shc_deployer'
+    end
+    network cfg, :c2_deployer
+  end
+
+  config.vm.define :c2_newnode do |cfg|
+    default_omnibus config
+    cfg.vm.provider :virtualbox do |vb|
+      vb.customize ['modifyvm', :id, '--memory', 256]
+    end
+    cfg.vm.provision :chef_client do |chef|
+      chef_defaults chef, :c2_newnode
+      chef.add_recipe 'cerner_splunk::shc_search_head'
+    end
+    network cfg, :c2_newnode
   end
 
   config.vm.define :s_standalone do |cfg|
@@ -208,6 +275,15 @@ Vagrant.configure('2') do |config|
       chef.add_recipe 'cerner_splunk'
     end
     network cfg, :f_debian
+  end
+
+  config.vm.define :f_heavy do |cfg|
+    default_omnibus config
+    cfg.vm.provision :chef_client do |chef|
+      chef_defaults chef, :f_heavy, 'splunk_standalone'
+      chef.add_recipe 'cerner_splunk::heavy_forwarder'
+    end
+    network cfg, :f_heavy
   end
 
   config.vm.define :f_win2012r2 do |cfg|

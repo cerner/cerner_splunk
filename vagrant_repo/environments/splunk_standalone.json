@@ -4,7 +4,7 @@
   "default_attributes": {
     "splunk": {
       "apps": {
-        "bag": "cerner_splunk/apps-vagrant:apps"
+        "bag": "cerner_splunk/cluster-apps-vagrant:search_head"
       },
       "config": {
         "clusters": [
@@ -13,7 +13,10 @@
         ],
         "roles": "cerner_splunk/authnz-vagrant:roles",
         "authentication": "cerner_splunk/authnz-vagrant:authn",
-        "alerts": "cerner_splunk/alerts-vagrant:alerts"
+        "alerts": "cerner_splunk/alerts-vagrant:alerts",
+        "secrets": {
+          "s_standalone": "cerner_splunk/passwords:splunk.secret"
+        }
       }
     }
   }

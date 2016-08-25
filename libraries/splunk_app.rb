@@ -58,6 +58,7 @@ class Chef
         @allowed_actions = [:create, :remove]
         @local = false
         @permissions = {}
+        @lookups = {}
         @files = {}
         @app = name
       end
@@ -73,6 +74,10 @@ class Chef
 
       def files(arg = nil)
         set_or_return(:files, arg, kind_of: Hash)
+      end
+
+      def lookups(arg = nil)
+        set_or_return(:lookups, arg, kind_of: Hash)
       end
 
       def permissions(arg = nil)
@@ -106,6 +111,10 @@ class Chef
 
       def files_dir
         local ? "#{root_dir}/local" : default_dir
+      end
+
+      def lookup_dir
+        "#{root_dir}/lookups"
       end
 
       def perms_file
@@ -143,6 +152,7 @@ class Chef
         download_and_install
         create_app_directories unless new_resource.updated_by_last_action?
         manage_metaconf unless new_resource.permissions.empty?
+        manage_lookups unless new_resource.lookups.empty?
         new_resource.files.each do |file_name, contents|
           *directories, file_name = file_name.split('/')
           file_path = new_resource.files_dir
@@ -202,10 +212,7 @@ class Chef
 
         filename = "#{Chef::Config[:file_cache_path]}/#{new_resource.app}.tgz"
 
-        download = Chef::Resource::RemoteFile.new(filename, run_context)
-        download.source(new_resource.url)
-        download.run_action(:create)
-        download.backup(false)
+        download = download_file filename, new_resource.url
 
         install_from_tar filename, expected_version, installed_version
       ensure
@@ -266,6 +273,18 @@ class Chef
         tarfile.close if tarfile
       end
 
+      def manage_lookups
+        lookups = new_resource.lookups
+        lookups.each do |file_name, url|
+          if url && !url.empty?
+            fail "Unsupported lookup file format for #{file_name} in the app #{new_resource.app}" unless file_name =~ /\.(?:csv\.gz|csv|kmz)$/i
+            download_file ::File.join(new_resource.lookup_dir, file_name), url
+          else
+            delete_file ::File.join(new_resource.lookup_dir, file_name)
+          end
+        end
+      end
+
       def manage_metaconf
         permissions = new_resource.permissions
         permissions.each do |stanza, hash|
@@ -276,6 +295,18 @@ class Chef
           end
         end
         manage_file(new_resource.perms_file, permissions)
+      end
+
+      def download_file(file_path, url)
+        download = Chef::Resource::RemoteFile.new(file_path, run_context)
+        download.source(url)
+        download.backup(false)
+        download.run_action(:create)
+      end
+
+      def delete_file(file_path)
+        download = Chef::Resource::File.new(file_path, run_context)
+        download.run_action(:delete)
       end
 
       # function for dropping either a splunk template generated from a hash

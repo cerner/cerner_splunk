@@ -1,9 +1,11 @@
 {
   "id": "cluster-vagrant",
   "master_uri": "https://33.33.33.11:8089",
+  "deployer_uri" : "https://33.33.33.28:8089",
   "settings": {
     "replication_factor" : 2,
-    "search_factor" : 2
+    "search_factor" : 2,
+    "_cerner_splunk_indexer_count": 3
   },
   "replication_ports": {
     "8080" : { }
@@ -19,6 +21,15 @@
       "port": 9997
     }
   },
+  "shc_members": [
+    "https://33.33.33.15:8089",
+    "https://33.33.33.16:8089",
+    "https://33.33.33.17:8089"
+  ],
+  "shc_settings":{
+    "replication_factor" : 2,
+    "shcluster_label": "main-cluster"
+  },
   "indexes" : "cerner_splunk/indexes-vagrant",
-  "apps": "cerner_splunk/master-apps-vagrant"
+  "apps": "cerner_splunk/cluster-apps-vagrant"
 }

@@ -33,8 +33,14 @@ MASTER_ONLY_CONFIGS = %w(
   commit_retry_time
 ).freeze
 
+# default pass4SymmKey value is 'changeme'
+server_stanzas['general']['pass4SymmKey'] = proc { CernerSplunk.splunk_encrypt_password 'changeme', node.run_state['cerner_splunk']['splunk.secret'] }
+# default sslKeysfilePassword value is 'password'
+server_stanzas['sslConfig']['sslKeysfilePassword'] = proc { CernerSplunk.splunk_encrypt_password 'password', node.run_state['cerner_splunk']['splunk.secret'], false }
+
+# Indexer Cluster Configuration
 case node['splunk']['node_type']
-when :search_head, :server
+when :search_head, :shc_search_head, :shc_captain, :server
   clusters = CernerSplunk.all_clusters(node).collect do |(cluster, bag)|
     stanza = "clustermaster:#{cluster}"
     master_uri = bag['master_uri'] || ''
@@ -45,7 +51,7 @@ when :search_head, :server
 
     server_stanzas[stanza] = {}
     server_stanzas[stanza]['master_uri'] = master_uri
-    server_stanzas[stanza]['pass4SymmKey'] = pass unless pass.empty?
+    server_stanzas[stanza]['pass4SymmKey'] = proc { CernerSplunk.splunk_encrypt_password pass, node.run_state['cerner_splunk']['splunk.secret'] } unless pass.empty?
     # Until we support multisite clusters, set multisite explicitly false
     server_stanzas[stanza]['multisite'] = false
     stanza
@@ -60,7 +66,7 @@ when :search_head, :server
   end
 when :cluster_master
   bag = CernerSplunk.my_cluster_data(node)
-  settings = (bag['settings'] || {}).delete_if do |k, _|
+  settings = (bag['settings'] || {}).reject do |k, _|
     k.start_with?('_cerner_splunk') || SLAVE_ONLY_CONFIGS.include?(k)
   end
 
@@ -70,7 +76,7 @@ when :cluster_slave
   cluster, bag = CernerSplunk.my_cluster(node)
   master_uri = bag['master_uri'] || ''
   replication_ports = bag['replication_ports'] || {}
-  settings = (bag['settings'] || {}).delete_if do |k, _|
+  settings = (bag['settings'] || {}).reject do |k, _|
     k.start_with?('_cerner_splunk') || MASTER_ONLY_CONFIGS.include?(k)
   end
 
@@ -84,10 +90,43 @@ when :cluster_slave
   replication_ports.each do |port, port_settings|
     ssl = port_settings['_cerner_splunk_ssl'] == true
     stanza = ssl ? "replication_port-ssl://#{port}" : "replication_port://#{port}"
-    server_stanzas[stanza] = port_settings.delete_if do |k, _|
+    server_stanzas[stanza] = port_settings.reject do |k, _|
       k.start_with? '_cerner_splunk'
     end
   end
+end
+
+# Search Head Cluster configuration
+if [:shc_search_head, :shc_captain].include? node['splunk']['node_type']
+  cluster, bag = CernerSplunk.my_cluster(node)
+  deployer_uri = bag['deployer_uri'] || ''
+  replication_ports = bag['shc_replication_ports'] || bag['replication_ports'] || {}
+  settings = (bag['shc_settings'] || {}).reject do |k, _|
+    k.start_with?('_cerner_splunk')
+  end
+  pass = settings.delete('pass4SymmKey')
+
+  fail "Missing deployer URI for #{cluster}" if deployer_uri.empty?
+  fail "Missing replication port configuration for cluster '#{cluster}'" if replication_ports.empty?
+
+  replication_ports.each do |port, port_settings|
+    ssl = port_settings['_cerner_splunk_ssl'] == true
+    stanza = ssl ? "replication_port-ssl://#{port}" : "replication_port://#{port}"
+    server_stanzas[stanza] = port_settings.reject do |k, _|
+      k.start_with? '_cerner_splunk'
+    end
+  end
+
+  path = "#{node['splunk']['home']}/etc/system/local/server.conf"
+  old_stanzas = CernerSplunk::Conf::Reader.new(path).read if File.exist?(path)
+  old_id = (old_stanzas['shclustering'] || {})['id'] if old_stanzas
+
+  server_stanzas['shclustering'] = settings
+  server_stanzas['shclustering']['pass4SymmKey'] = proc { CernerSplunk.splunk_encrypt_password pass, node.run_state['cerner_splunk']['splunk.secret'] } if pass
+  server_stanzas['shclustering']['conf_deploy_fetch_url'] = deployer_uri
+  server_stanzas['shclustering']['disabled'] = 0
+  server_stanzas['shclustering']['mgmt_uri'] = "https://#{node['splunk']['mgmt_host']}:8089"
+  server_stanzas['shclustering']['id'] = old_id if old_id
 end
 
 # License Configuration
@@ -95,7 +134,7 @@ license_uri =
   case node['splunk']['node_type']
   when :forwarder, :license_server
     'self'
-  when :cluster_master, :cluster_slave, :search_head, :server
+  when :cluster_master, :cluster_slave, :server, :search_head, :shc_search_head, :shc_captain, :shc_deployer
     if node['splunk']['free_license']
       'self'
     else
@@ -105,7 +144,7 @@ license_uri =
 
 license_group =
   case node['splunk']['node_type']
-  when :license_server, :cluster_master, :cluster_slave
+  when :license_server, :cluster_master, :cluster_slave, :shc_search_head, :shc_captain, :shc_deployer
     'Enterprise'
   when :forwarder
     'Forwarder'
@@ -132,26 +171,33 @@ license_group =
   }
 end if license_uri == 'self'
 
+license_pools = CernerSplunk::DataBag.load(node['splunk']['config']['license-pool'])
+
+if node['splunk']['node_type'] == :license_server && !license_pools.nil?
+  auto_generated_pool_size = CernerSplunk.convert_to_bytes license_pools['auto_generated_pool_size']
+  server_stanzas['lmpool:auto_generated_pool_enterprise']['quota'] = auto_generated_pool_size
+  allotted_pool_size = 0
+
+  license_pools['pools'].each do |pool, pool_config|
+    pool_max_size = CernerSplunk.convert_to_bytes pool_config['size']
+    server_stanzas["lmpool:#{pool}"] = {
+      'description' => pool,
+      'quota' => pool_max_size,
+      'slaves' => pool_config['GUIDs'].join(','),
+      'stack_id' => 'enterprise'
+    }
+    allotted_pool_size += pool_max_size
+  end
+  node.run_state['cerner_splunk'] ||= {}
+  node.run_state['cerner_splunk']['total_allotted_pool_size'] = allotted_pool_size + auto_generated_pool_size
+end
+
 server_stanzas['license'] = {
   'master_uri' => license_uri,
   'active_group' => license_group
 }
 
 splunk_template 'system/server.conf' do
-  stanzas do
-    old_stanzas = CernerSplunk::Conf::Reader.new("#{node['splunk']['home']}/etc/system/local/server.conf").read
-
-    old_stanzas.each do |key, value|
-      case key
-      when 'general'
-        server_stanzas['general']['guid'] = value['guid'] if value['guid']
-        server_stanzas['general']['pass4SymmKey'] = value['pass4SymmKey'] if value['pass4SymmKey']
-      when 'sslConfig'
-        server_stanzas['sslConfig']['sslKeysfilePassword'] = value['sslKeysfilePassword']
-      end
-    end
-
-    server_stanzas
-  end
-  notifies :restart, 'service[splunk]'
+  stanzas server_stanzas
+  notifies :touch, 'file[splunk-marker]', :immediately
 end

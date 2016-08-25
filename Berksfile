@@ -1,7 +1,5 @@
-if respond_to? :source
-  source 'https://supermarket.chef.io'
-else
-  site :opscode
-end
+source 'https://supermarket.chef.io'
 
 metadata
+
+cookbook 'cerner_splunk_test', path: 'spec/cookbooks/cerner_splunk_test'

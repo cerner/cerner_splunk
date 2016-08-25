@@ -16,12 +16,18 @@ The Cluster Hash is part of a plaintext data bag item that defines a logical gro
 
 * `['license_uri']` - SplunkAPI URI of the License Server (Required for getting onto the Enterprise license, if unset, use trial license)
 * `['master_uri']` - SplunkAPI URI of the cluster master (Required for servers connecting to managed clusters)
+* `['deployer_uri']` - SplunkAPI URI of the Deployer in the Search Head Cluster
+* `['shc_members']` - Array of Splunk API URIs of the search head members that are in the SH (Search Head) cluster. For adding members to an existing cluster make sure that the first SH member in the array is an existing member in the cluster.
 * `['settings']` -  Hash of Cluster settings (Required for servers connecting to managed clusters),
 * `['settings'][???]` - Valid values are those under the clustering stanza of [server.conf][]
-* `['replication_ports']` - Configuration for cluster slave replication ports (required for cluster slaves)
+* `['settings'][???]['_cerner_splunk_indexer_count']` - The number of indexers to use for calculating maxTotalDataSizeMB for each index in combination with _maxDailyDataSizeMB in the index configuration.
+* `['shc_settings'] - Hash of SH Cluster settings
+* `['shc_settings']['???']` - Valid values are those under the shclustering stanza of [server.conf][]
+* `['replication_ports']` - Configuration for cluster slave replication ports (required for cluster slaves and Search Head Cluster members/captain)
 * `['replication_ports']['###']` - Port number to listen on
 * `['replication_ports']['###']['_cerner_splunk_ssl']` - boolean if the port is ssl enabled (false)
 * `['replication_ports']['###']['???']` - Other replication-port stanza properties from [server.conf][]
+* `['shc_replication_ports']` - identical as `['replication_ports']` but take precedence for Search Head Cluster members/captain when replication port settings need to differ between SHC members and indexer cluster slaves in the same cluster.
 * `['receivers']` - Array of strings of hosts where this cluster's indexers are listening. (Required for forwarders)
 * `['receiver_settings']['splunktcp']['port']` - Port indexers are listening on, and forwarders are sending data (required for forwarders and receivers)
 * `['indexes']` - A String pointing to an indexes data bag hash. (Coordinate form as described above)
@@ -33,6 +39,14 @@ The License Hash is part of a data bag item encrypted with [Chef Vault](https://
 
 * `[A Decriptive File-Name]` - Corresponding License (XML) contents. (There can be many of these) Remember to change newlines to `\n` to conform to proper JSON format.
 
+License Pool Hash
+------------
+This hash is part of a plaintext data bag item that defines multiple license pools. Indexers can be assigned to a specific pool and license quota can be set for each pool by configuring this databag. Quota can be specified in units of B, KB(or KiB), MB(MiB), GB(GiB) or TB(TiB)(e.g. '400MB' or '400GiB'). If the unit is not specified then the quota is assumed to be in bytes.
+
+* `['auto_generated_pool_size']` - This is the pool size for the auto generated pool. Indexers that connect to the license server, when not assigned to a specific pool will land in this pool.
+* `['pools'][pool_name]['size']` -  Size of the pool
+* `['pools'][pool_name]['GUIDs']` - List of Indexer GUIDs that needs to be assigned to this pool.
+
 Indexes Hash
 ------------
 An Indexes Hash is part of a plaintext data bag item that defines the set of indexes defined in a cluster. It is separate from the Cluster data bag primarily for size concerns.
@@ -40,6 +54,8 @@ An Indexes Hash is part of a plaintext data bag item that defines the set of ind
 * `['config']` - These define the [indexes.conf] stanzas (in fairly raw form). However there are a few special keys:
     * `_volume` - The base volume for the coldPath, homePath and tstatsHomePath. Defaults to nil, so the index will be located in $SPLUNK_DB.
     * `_directory_name` - The on-disk name of the directory to store the index. Defaults to the index name.
+    * `_maxDailyDataSizeMB` - The amount of daily usage this index is expected to consume.  Used to calculate the maxTotalDataSizeMB if maxTotalDataSizeMB has not already been specified for the index.
+    * `_dataSizePaddingPercent` - The percentage of padding to apply to the amount of space this index is expected to consume.  Used to calculate the maxTotalDataSizeMB if maxTotalDataSizeMB has not already been specified for the index. Defaults to 10 if no value is specified.
 * `['flags']` - These define boolean processing flags per index. All flags are default 'false' but can be set to true. Current flags include:
     * `noGeneratePaths` - Do not generate the homePath,coldPath,thawedPath to this index when not present in the config above
     * `noRepFactor` - Do not add 'repFactor = auto' to this index when not present in the config on a cluster master.
@@ -47,7 +63,7 @@ An Indexes Hash is part of a plaintext data bag item that defines the set of ind
 
 Roles Hash
 ----------
-A Roles Hash is a contextual (see above) Hash, part of a plaintext data bag item that defines roles for every node in a cluster, and is pointed to by the `node[:splunk][:config][:roles]` attribute (usually set in your environment).
+A Roles Hash is a contextual (see above) Hash, part of a plaintext data bag item that defines roles for every node in a cluster, and is pointed to by the `node[:splunk][:config][:roles]` attribute (usually set in your environment). A special key of 'shcluster' is used for managing the roles on the search heads in a search head cluster.
 
 * `[context]` - Final Hash, String Alias, or force unconfigured (null)
 * `[context]['default']` - defines the base settings for all roles
@@ -61,6 +77,7 @@ A Roles Hash is a contextual (see above) Hash, part of a plaintext data bag item
 Authentication Hash
 -------------------
 An Authentication Hash is a contextual (see above) Hash, part of a plaintext data bag item that is used to configure how users authenticate to the system per [authentication.conf][].
+A special key of 'shcluster' is used for managing the authentication on the search heads in a search head cluster.
 
 * `['authType']` - Matches the key of the same name in the authentication stanza. One of Splunk, LDAP, Scripted, but we'll attempt to guess it based on the other configured keys
 * `['passwordHashAlgorithm']` - Only valid for 'Splunk' authType. See key of the same name in the authentication stanza
@@ -82,7 +99,7 @@ An LDAP Hash is part of a plaintext data bag item that configures connection inf
 
 Alerts Hash
 -----------
-An Alerts hash is a contextual (see above) Hash, part of a plaintext data bag item that configures [alert-actions.conf][]
+An Alerts hash is a contextual (see above) Hash, part of a plaintext data bag item that configures [alert-actions.conf][]. A special key of 'shcluster' is used for managing the alerts on the search heads in a search head cluster.
 
 * `['bag']` - A string that points to an externalized Alerts Hash in which all keys (except this one) are valid
 * `['email']['auth_password']` - Coordinate String (see above), pointing to a String within a Chef Vault encrypted data bag item.
@@ -90,7 +107,7 @@ An Alerts hash is a contextual (see above) Hash, part of a plaintext data bag it
 
 Apps Hash
 -----------
-An apps hash is a contextual (see above) Hash, part of a plaintext data bag item or specified directly as attributes that configures apps. A special key of 'master-apps' is looked for managing apps that should be installed and pushed by the cluster master, instead of locally.
+An apps hash is a contextual (see above) Hash, part of a plaintext data bag item or specified directly as attributes that configures apps. A special key of 'master-apps' is looked for managing apps that should be installed and pushed by the cluster master, instead of locally. On a deployer in a Search Head Cluster, the key 'deployer-apps' is used for managing the apps that should be installed on the deployer and then pushed to the search heads.
 
 * `['bag']` - A string that points to an externalized Apps Hash in which all keys (except this one) are valid.
 * `[app]` - The name of an app to manage (disk name)
@@ -101,12 +118,12 @@ An apps hash is a contextual (see above) Hash, part of a plaintext data bag item
 * `[app]['download']['version']` - Expected [version number][app.conf] (if any) used to determine if a new app should be downloaded.
 * `[app]['files']` - Hash of files to manage under the "default" or "local" directory.
 * `[app]['files'][filename]` - Contents of a particular file to manage. It can take 3 values, a hash of stanzas -> key-value pairs (then written with the splunk template), a string (written as is), or nil / false (deleted). If the hash or string is empty, the file is also deleted.
+* `[app]['lookups']` - Hash of lookup files for the app. The key in the hash will be the name of file when it lands in the Splunk app and the value will be the url to lookup file. To delete an existing lookup file, set the value of the lookup file to `false` or `null` or to an empty string. The only supported file name extensions are .csv, .csv.gz and .kmz. Please see [splunk docs](http://docs.splunk.com/Documentation/Splunk/6.3.2/Knowledge/Addfieldsfromexternaldatasources) for more information about the supported file formats. `[app]['files']` hash can be used to specify any .conf setting that is required for the lookup.
 * `[app]['permissions']` - Hash of permissions to manage for the app.
 * `[app]['permissions'][object]` - Permissions to manage for a particular knowledge object or class of knowledge objects
 * `[app]['permissions'][object]['access']['read']` - array of roles or String '*' allowed to read the object
 * `[app]['permissions'][object]['access']['write']` - array of roles or String '*' allowed to write the object
 * `[app]['permissions'][object][???]` - Any other stanza from [default.meta][]
-
 
 Docs Navigation
 ===============

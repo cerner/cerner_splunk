@@ -1,0 +1,14 @@
+{
+  "id": "license-vagrant",
+  "auto_generated_pool_size": "100KiB",
+  "pools":{
+    "pool1": {
+      "size": "200KiB",
+      "GUIDs": ["aae84706-a70d-4134-951d-93a6541011fa", "9d8f6bb8-49b2-463e-afdd-aedf267526e4"]
+    },
+    "pool2": {
+      "size": "400KiB",
+      "GUIDs": ["3da644f5-6750-4d07-b158-0cf42c8a6153"]
+    }
+  }
+}

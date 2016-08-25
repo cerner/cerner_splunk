@@ -1,6 +1,42 @@
 {
-  "id": "apps-vagrant",
-  "apps": {
+  "id": "cluster-apps-vagrant",
+  "master-apps": {
+    "awesome_splunk_master_app": {
+      "files": {
+        "app.conf": {
+          "install": {
+            "is_configured": "0"
+          },
+          "ui": {
+            "is_visible": "false",
+            "label": "Awesome Splunk Master App"
+          }
+        },
+        "props.conf": {
+          "sendmail": {
+            "FIELDALIAS-msgid": "mid AS msgid",
+            "EXTRACT-qid": "sendmail[^\\]]*\\]:\\s+(?<qid>[^:]*):"
+          }
+        }
+      },
+      "permissions": {
+        "": {
+          "access": {
+            "read": "*",
+            "write": [
+              "admin",
+              "power"
+            ]
+          }
+        },
+        "tags": {
+          "export": "system"
+        }
+      }
+    }
+  },
+  "deployer-apps": "search_head",
+  "search_head": {
     "my_app": {
       "download": {
         "url" : "http://33.33.33.33:5000/my_app.tgz",
@@ -26,6 +62,10 @@
         },
         "data/ui/views/all_index.xml": "<dashboard><label>Awesome_Dashboard</label><description>Bacon for all</description><row><chart><searchString>index=* | timechart count</searchString><earliestTime>@d</earliestTime><latestTime>now</latestTime></chart></row></dashboard>",
         "data/ui/nav/default.xml": "<nav search_view=\"search\" color=\"#72231F\"><view name=\"search\" default='true' /><view name=\"data_models\" /><view name=\"reports\" /><view name=\"alerts\" /><view name=\"dashboards\" /></nav>"
+      },
+      "lookups": {
+        "index-owners.csv": "http://33.33.33.33:5000/lookups/index-owners.csv",
+        "test.csv": "http://33.33.33.33:5000/lookups/test.txt"
       },
       "permissions": {
         "": {

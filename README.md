@@ -10,7 +10,7 @@ Based on the work done by [BBY Solutions](https://github.com/bestbuycom/splunk_c
 Requirements
 ------------
 * Red Hat Enterprise / CentOS 5.5+ / Windows Server 2008+ (forwarder only) or Ubuntu LTS 12.04+
-* Chef 11.6+
+* Chef 12+
 
 Getting your logs into Splunk
 -----------------------------
@@ -35,7 +35,7 @@ Getting your logs into Splunk
         * Splunk has a number of [pretrained sourcetypes](http://docs.splunk.com/Documentation/Splunk/6.0.1/Data/Listofpretrainedsourcetypes) which should be preferred over custom sourcetypes if applicable.
         * The [Splunk Community](docs/contributing.md) may have additional sourcetypes that can be leveraged prior to building a custom sourcetype as well.
 4. Create / add a role to configure Splunk for your system.
-    * The role needs to have `'recipe[cerner_splunk]'` on the run_list
+    * The role needs to have `'recipe[cerner_splunk]'` or `'recipe[cerner_splunk::heavy_forwarder]'` on the run_list
     * In your role, set `node.default[:splunk][:main_project_index]` to the index you are sending your logs (from step 2)
     * Set `node.default[:splunk][:monitors]` to the files with sourcetypes you want to monitor.
 5. Upload and run!

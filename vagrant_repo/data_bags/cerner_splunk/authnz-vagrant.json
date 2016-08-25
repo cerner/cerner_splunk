@@ -12,14 +12,7 @@
     },
     "license_server": "search_head",
     "server": "search_head",
-    "": {
-      "LDAP_strategies": [{
-        "bag": ":ldap",
-        "roleMap" : {
-          "admin": "DevOps_SuperAdmins"
-        }
-      }]
-    },
+    "shcluster":"search_head",
     "forwarder":null
   },
   "ldap":{
@@ -42,6 +35,7 @@
   },
   "roles":{
     "server":"search_head",
+    "shcluster":"search_head",
     "search_head": {
       "default":{
         "app":"launcher",

@@ -18,8 +18,8 @@ Configurable (with defaults)
   * `node['splunk']['monitors'][]['type']` - Type of stanza (`monitor`). See [inputs.conf][] for stanzas.
   * `node['splunk']['monitors'][][???]` - Other attributes for an inputs.conf stanza. See [inputs.conf][]
 * `node['splunk']['cleanup']` - Determines whether the recipe should attempt to clean up the old forwarder install (`true`)
-* `node['splunk']['package']['version']` - Major version to install (`6.0.6`)
-* `node['splunk']['package']['build']` - Corresponding build number (`228831`)
+* `node['splunk']['package']['version']` - Major version to install (`6.3.4`)
+* `node['splunk']['package']['build']` - Corresponding build number (`cae2458f4aef`)
 * `node['splunk']['package']['base_url']` - Base download path (`https://download.splunk.com/products`)
 * `node['splunk']['package']['base_name']` - Name of the package to install (`splunkforwarder`/`splunk`)
 * `node['splunk']['package']['name']` - Name of the package being installed (`"#{node['splunk']['package']['base_name']}-#{node['splunk']['package']['version']}-#{node['splunk']['package']['build']}"`)
@@ -29,11 +29,17 @@ Configurable (with defaults)
 * `node['splunk']['package']['file_name']` - Actual package file name (`"#{node['splunk']['package']['name']}#{node['splunk']['package']['file_suffix']}"`)
 * `node['splunk']['package']['url']` - Full URI to the Splunk package to download (Constructed from above package attributes)
 * `node['splunk']['package']['provider']` - Provider to use to install file (set based on ohai attributes)
+* `node['splunk']['config']['alerts']` - Data bag item used to configure alerts (`nil` - alerts not managed by chef)
+* `node['splunk']['config']['authentication']` - Data bag item used to configure authentication (`nil` - authentication not managed by chef)
 * `node['splunk']['config']['host']` - Hostname to configure the Splunk instance to report as. (EC2 Instance ID or Fully Qualified Domain Name)
 * `node['splunk']['config']['roles']` - Data bag item used to configure roles (`nil` - roles not managed by chef)
-* `node['splunk']['config']['licenses']` - Data bag item that the license server recipe uses as the source of truth for the license data (`cerner_splunk/licenses`)
+* `node['splunk']['config']['secrets']` - Coordinate String (see [data bags documentation][data_bags]), pointing to a key within a Chef Vault encrypted data bag item used to configure the splunk.secret file. The value must be a string. (`nil` - secrets not managed by chef).  Note: this is currently not supported on windows.
+* `node['splunk']['config']['licenses']` - Data bag item that the license server recipe uses as the source of truth for the license data.
+* `node['splunk']['config']['license-pool']` - Data bag item used to configure license pools.
 * `node['splunk']['config']['ui_prefs']` - Hash of stanzas used to configure [ui-prefs.conf][] on the search head in a clustered configuration or a standalone instance.
 * `node['splunk']['config']['assumed_index']` - Name of the index to which data is forwarded to by default, when the index is not configured for the input.(`main`)
+* `node['splunk']['bootstrap_shc_member']` - Set this attribute to `true` to bootstrap a member to the Search Head Cluster (SHC). (`false`)
+* `node['splunk']['mgmt_host']` - The host other SHC members use when connecting to the current node. You probably want a wrapper cookbook to override this. (`node['ipaddress']`)
 * `node['splunk']['flags']['index_checks_fail']` - If `true` raises an exception failing the chef run, when monitors are configured to be sent to non-existent indexes. If `false` logs a warning, but does not fail the chef run for the same condition.(`true`)
 * `node['splunk']['apps']` - An [apps hash](databags.md#apps-hash) of apps to configure locally. (Does not support downloading apps ... yet...)
 
@@ -53,5 +59,6 @@ Docs Navigation
 * [Docs Readme](README.md)
 * [Repository Readme](../README.md)
 
+[data_bags]: databags.md#contextual-hashes
 [inputs.conf]: http://docs.splunk.com/Documentation/Splunk/6.0.1/admin/Inputsconf
 [ui-prefs.conf]: http://docs.splunk.com/Documentation/Splunk/6.0.1/Admin/Ui-prefsconf

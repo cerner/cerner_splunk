@@ -13,13 +13,13 @@
         "hostname":"http://33.33.33.20:8000"
       }
     },
-    "": {
+    "search_head": {
       "bag": ":base",
       "email": {
         "reportServerEnabled":false
       }
     },
-    "forwarder":null
+    "shcluster": "search_head"
   },
   "base": {
     "email": {
