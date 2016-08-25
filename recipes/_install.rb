@@ -73,13 +73,6 @@ ruby_block 'read splunk.secret' do
   end
 end
 
-ruby_block 'delayed restart' do
-  block do
-    CernerSplunk::Restart.ensure_restart
-  end
-  action :nothing
-end
-
 directory node['splunk']['external_config_directory'] do
   owner node['splunk']['user']
   group node['splunk']['group']
