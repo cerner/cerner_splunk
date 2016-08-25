@@ -9,5 +9,5 @@ output_stanzas = CernerSplunk::Outputs.configure_outputs(node)
 splunk_template 'system/outputs.conf' do
   stanzas output_stanzas
   not_if { output_stanzas.empty? }
-  notifies :touch, 'file[splunk-marker]', :immediately
+  notifies :run, 'ruby_block[delayed restart]', :immediately
 end

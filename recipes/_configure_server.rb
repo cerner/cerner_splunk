@@ -199,5 +199,5 @@ server_stanzas['license'] = {
 
 splunk_template 'system/server.conf' do
   stanzas server_stanzas
-  notifies :touch, 'file[splunk-marker]', :immediately
+  notifies :run, 'ruby_block[delayed restart]', :immediately
 end

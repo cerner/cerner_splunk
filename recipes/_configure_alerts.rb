@@ -14,5 +14,5 @@ end
 
 splunk_template 'system/alert_actions.conf' do
   stanzas CernerSplunk::Alerts.configure_alerts(node, hash)
-  notifies :touch, 'file[splunk-marker]', :immediately
+  notifies :run, 'ruby_block[delayed restart]', :immediately
 end

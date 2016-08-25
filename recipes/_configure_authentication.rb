@@ -17,5 +17,5 @@ auth_stanzas = CernerSplunk::Authentication.configure_authentication(node, hash)
 splunk_template 'system/authentication.conf' do
   sensitive auth_stanzas.any? { |_, v| v.key? 'bindDNpassword' }
   stanzas auth_stanzas
-  notifies :touch, 'file[splunk-marker]', :immediately
+  notifies :run, 'ruby_block[delayed restart]', :immediately
 end

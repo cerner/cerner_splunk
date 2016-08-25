@@ -20,7 +20,7 @@ authorize_action = authorize.empty? ? :delete : :create
 splunk_template 'system/authorize.conf' do
   stanzas authorize
   action authorize_action
-  notifies :touch, 'file[splunk-marker]', :immediately
+  notifies :run, 'ruby_block[delayed restart]', :immediately
 end
 
 directory "#{node['splunk']['home']}/etc/apps/user-prefs/local" do
@@ -34,5 +34,5 @@ user_prefs_action = user_prefs.empty? ? :delete : :create
 splunk_template 'apps/user-prefs/user-prefs.conf' do
   stanzas user_prefs
   action user_prefs_action
-  notifies :touch, 'file[splunk-marker]', :immediately
+  notifies :run, 'ruby_block[delayed restart]', :immediately
 end

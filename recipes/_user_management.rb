@@ -29,7 +29,7 @@ groups_to_add.uniq.each do |grp|
     group_name grp
     members [node['splunk']['user']]
     action :manage
-    notifies :touch, 'file[splunk-marker]', :immediately
+    notifies :run, 'ruby_block[delayed restart]', :immediately
   end
 end
 
@@ -42,16 +42,9 @@ if Chef::Resource::Group.instance_methods.include?(:excluded_members)
       group_name grp
       excluded_members [node['splunk']['user']]
       action :manage
-      notifies :touch, 'file[splunk-marker]', :immediately
+      notifies :run, 'ruby_block[delayed restart]', :immediately
     end
   end
 else
   Chef::Log.info "This version of Chef client does not support removing users from groups. If you need to remove '#{node['splunk']['user']}' from groups you must do so manually."
-end
-
-# We need to run the recipe so that it fixes debian systems
-include_recipe 'ulimit'
-
-user_ulimit node['splunk']['user'] do
-  filehandle_limit node['splunk']['limits']['open_files']
 end

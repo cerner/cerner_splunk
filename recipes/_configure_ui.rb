@@ -7,5 +7,5 @@
 
 splunk_template 'system/ui-prefs.conf' do
   stanzas node['splunk']['config']['ui_prefs']
-  notifies :touch, 'file[splunk-marker]', :immediately
+  notifies :run, 'ruby_block[delayed restart]', :immediately
 end
