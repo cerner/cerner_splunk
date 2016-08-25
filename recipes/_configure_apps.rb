@@ -30,6 +30,6 @@ apps.each do |app_name, app_data|
     files app_data['files']
     lookups app_data['lookups']
     permissions app_data['permissions']
-    notifies :run, 'ruby_block[delayed restart]', :immediately
+    notifies :touch, 'file[splunk-marker]', :immediately
   end
 end
