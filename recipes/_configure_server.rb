@@ -33,10 +33,13 @@ MASTER_ONLY_CONFIGS = %w(
   commit_retry_time
 ).freeze
 
+encrypt_password = CernerSplunk::ConfTemplate::Transform.splunk_encrypt node: node
+encrypt_noxor_password = CernerSplunk::ConfTemplate::Transform.splunk_encrypt node: node, xor: false
+
 # default pass4SymmKey value is 'changeme'
-server_stanzas['general']['pass4SymmKey'] = proc { CernerSplunk.splunk_encrypt_password 'changeme', node.run_state['cerner_splunk']['splunk.secret'] }
+server_stanzas['general']['pass4SymmKey'] = CernerSplunk::ConfTemplate.compose encrypt_password, CernerSplunk::ConfTemplate::Value.constant(value: 'changeme')
 # default sslKeysfilePassword value is 'password'
-server_stanzas['sslConfig']['sslKeysfilePassword'] = proc { CernerSplunk.splunk_encrypt_password 'password', node.run_state['cerner_splunk']['splunk.secret'], false }
+server_stanzas['sslConfig']['sslKeysfilePassword'] = CernerSplunk::ConfTemplate.compose encrypt_noxor_password, CernerSplunk::ConfTemplate::Value.constant(value: 'password')
 
 # Indexer Cluster Configuration
 case node['splunk']['node_type']
@@ -51,7 +54,7 @@ when :search_head, :shc_search_head, :shc_captain, :server
 
     server_stanzas[stanza] = {}
     server_stanzas[stanza]['master_uri'] = master_uri
-    server_stanzas[stanza]['pass4SymmKey'] = proc { CernerSplunk.splunk_encrypt_password pass, node.run_state['cerner_splunk']['splunk.secret'] } unless pass.empty?
+    server_stanzas[stanza]['pass4SymmKey'] = CernerSplunk::ConfTemplate.compose encrypt_password, CernerSplunk::ConfTemplate::Value.constant(value: pass) unless pass.empty?
     # Until we support multisite clusters, set multisite explicitly false
     server_stanzas[stanza]['multisite'] = false
     stanza
@@ -122,7 +125,7 @@ if [:shc_search_head, :shc_captain].include? node['splunk']['node_type']
   old_id = (old_stanzas['shclustering'] || {})['id'] if old_stanzas
 
   server_stanzas['shclustering'] = settings
-  server_stanzas['shclustering']['pass4SymmKey'] = proc { CernerSplunk.splunk_encrypt_password pass, node.run_state['cerner_splunk']['splunk.secret'] } if pass
+  server_stanzas['shclustering']['pass4SymmKey'] = CernerSplunk::ConfTemplate.compose encrypt_password, CernerSplunk::ConfTemplate::Value.constant(value: pass) if pass
   server_stanzas['shclustering']['conf_deploy_fetch_url'] = deployer_uri
   server_stanzas['shclustering']['disabled'] = 0
   server_stanzas['shclustering']['mgmt_uri'] = "https://#{node['splunk']['mgmt_host']}:8089"
