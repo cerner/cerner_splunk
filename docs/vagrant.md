@@ -14,8 +14,8 @@ Running with Vagrant
   * Host the root of your mirrored structure on port 8080 using a lightweight HTTP server such as the node package [http-server](https://npmjs.org/package/http-server)
   * Un-comment the `splunk-mirrors` role in the Vagrant file. (Do not check in this modification of your Vagrantfile)
   * Required files and sizes (assuming current cookbook versions)
-    * `splunk-6.3.4-cae2458f4aef-linux-2.6-x86_64.rpm` and `splunk-6.3.4-cae2458f4aef-linux-2.6-amd64.deb` ~ 137MB each
-    * `splunkforwarder-6.3.4-cae2458f4aef-linux-2.6-x86_64.rpm` and `splunkforwarder-6.3.4-cae2458f4aef-linux-2.6-amd64.deb` ~ 16MB each
+    * `splunk-6.3.7-8bf976cd6a7c-linux-2.6-x86_64.rpm` and `splunk-6.3.7-8bf976cd6a7c-linux-2.6-amd64.deb` ~ 137MB each
+    * `splunkforwarder-6.3.7-8bf976cd6a7c-linux-2.6-x86_64.rpm` and `splunkforwarder-6.3.7-8bf976cd6a7c-linux-2.6-amd64.deb` ~ 16MB each
 * `vagrant-omnibus` installer currently requires internet access to function.
 
 **Note**:
