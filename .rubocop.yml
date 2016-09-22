@@ -24,3 +24,6 @@ Style/NumericPredicate:
 
 Style/TernaryParentheses:
   Enabled: false
+
+Style/VariableNumber:
+  Enabled: false
