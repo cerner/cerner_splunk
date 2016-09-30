@@ -101,9 +101,9 @@ module CernerSplunk
           end
 
           if hash['bindDNpassword']
-            password = CernerSplunk::DataBag.load hash['bindDNpassword'], default: default_coords, type: :vault
-            fail 'Password must be a String' unless password.is_a?(String)
-            hash['bindDNpassword'] = password
+            vault_password = CernerSplunk::ConfTemplate::Value.vault coordinate: hash['bindDNpassword'], default_coords: default_coords
+            encrypt = CernerSplunk::ConfTemplate::Transform.splunk_encrypt node: node
+            hash['bindDNpassword'] = CernerSplunk::ConfTemplate.compose encrypt, vault_password
           end
 
           # Verify Attributes

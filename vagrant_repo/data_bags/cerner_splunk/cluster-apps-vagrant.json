@@ -51,7 +51,10 @@
           },
           "ui": {
             "is_visible": "1",
-            "label": "Awesome Splunk App"
+            "label": {"value":{"proc":"vault","coordinate":"cerner_splunk/passwords:description"}}
+          },
+          "launcher": {
+            "description":{"value":{"proc":"vault","coordinate":"cerner_splunk/passwords:description"},"transform":{"proc":"splunk_encrypt"}}
           }
         },
         "props.conf": {

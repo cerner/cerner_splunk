@@ -1,3 +1,6 @@
+AllCops:
+  TargetRubyVersion: 2.1
+
 LineLength:
   Enabled: false
 
@@ -20,4 +23,7 @@ Style/NumericPredicate:
   EnforcedStyle: comparison
 
 Style/TernaryParentheses:
+  Enabled: false
+
+Style/VariableNumber:
   Enabled: false
