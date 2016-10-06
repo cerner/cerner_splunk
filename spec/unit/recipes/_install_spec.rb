@@ -4,7 +4,8 @@ describe 'cerner_splunk::_install' do
   subject do
     runner = ChefSpec::SoloRunner.new(platform: platform, version: platform_version) do |node|
       node.set['splunk']['cmd'] = 'splunk'
-      node.set['splunk']['user'] = 'splunk'
+      # node.set['splunk']['user'] = 'splunk
+      node.set['splunk']['package']['type'] = :universal_forwarder
       node.set['splunk']['package']['base_name'] = 'splunkforwarder'
       node.set['splunk']['package']['download_group'] = 'universalforwarder'
       node.set['splunk']['package']['file_suffix'] = '.txt'
@@ -26,8 +27,8 @@ describe 'cerner_splunk::_install' do
     }
   end
 
-  let(:platform) { nil }
-  let(:platform_version) { nil }
+  let(:platform) { 'redhat' }
+  let(:platform_version) { '7.1' }
 
   let(:initd_exists) { nil }
   let(:ui_login_exists) { nil }
@@ -68,126 +69,68 @@ describe 'cerner_splunk::_install' do
     expect(subject).to include_recipe('cerner_splunk::_cleanup_aeon')
   end
 
-  it 'includes cerner_splunk::_restart_marker recipe' do
-    expect(subject).to include_recipe('cerner_splunk::_restart_marker')
+  it 'includes cerner_splunk::_restart_prep recipe' do
+    expect(subject).to include_recipe('cerner_splunk::_restart_prep')
   end
 
-  it 'does nothing with the splunk service and notifies the deletion of the splunk file marker immediately' do
-    splunk_service = subject.service('splunk')
-    expect(splunk_service).to do_nothing
-    expect(splunk_service).to notify('file[splunk-marker]').to(:delete).immediately
+  it 'runs ruby block read splunk.secret' do
+    expect(subject).to run_ruby_block('read splunk.secret')
   end
 
-  it 'does nothing with the splunk-restart service and notifies the deletion of the splunk file marker immediately' do
-    splunk_restart_service = subject.service('splunk-restart')
-    expect(splunk_restart_service).to do_nothing
-    expect(splunk_restart_service).to notify('file[splunk-marker]').to(:delete).immediately
+  let(:expected_properties) do
+    {
+      package: :universal_forwarder,
+      version: '6.3.7',
+      build: '8bf976cd6a7c',
+      user: 'splunk',
+      base_url: 'https://download.splunk.com/products'
+    }
   end
 
-  it 'runs ruby block splunk-delayed-restart' do
-    expect(subject).to run_ruby_block('splunk-delayed-restart')
-    expect(subject.ruby_block('splunk-delayed-restart')).to notify('service[splunk-restart]').to(:restart)
+  it 'installs splunk' do
+    expect(subject).to install_splunk('splunk').with(expected_properties)
   end
 
-  context 'when remote file has missing manifest' do
-    let(:glob) { [] }
-
-    it 'downloads the remote file' do
-      expect(subject).to create_remote_file(splunk_filepath)
-    end
-
-    it 'does not delete the downloaded splunk package' do
-      expect(subject).to_not delete_file(splunk_filepath)
-    end
-
-    context 'when platform is windows' do
-      let(:platform) { 'windows' }
-      let(:platform_version) { '2012R2' }
-      let(:windows) { true }
-
-      before do
-        ENV['PROGRAMW6432'] = 'test'
-      end
-
-      it 'installs downloaded splunk package' do
-        expected_attrs = {
-          source: splunk_filepath,
-          provider: Chef::Provider::Package::Windows,
-          options: %(AGREETOLICENSE=Yes SERVICESTARTTYPE=auto LAUNCHSPLUNK=0 INSTALLDIR="test\\splunkforwarder")
-        }
-        if Chef::VERSION.slice(0..1) == '11'
-          expect(subject).to install_windows_package('splunkforwarder').with(expected_attrs)
-        else
-          expect(subject).to install_package('splunkforwarder').with(expected_attrs)
-        end
-      end
-    end
-
-    context 'when platform is rhel' do
-      let(:platform) { 'centos' }
-      let(:platform_version) { '6.6' }
-
-      it 'installs downloaded splunk package and notifies splunk-first-run' do
-        expected_attrs = {
-          source: splunk_filepath,
-          provider: Chef::Provider::Package::Rpm
-        }
-        expect(subject).to install_package('splunkforwarder').with(expected_attrs)
-      end
-    end
-
-    context 'when platform is debian' do
-      let(:platform) { 'ubuntu' }
-      let(:platform_version) { '14.04' }
-
-      it 'installs downloaded splunk package and notifies splunk-first-run' do
-        expected_attrs = {
-          source: splunk_filepath,
-          provider: Chef::Provider::Package::Dpkg
-        }
-        expect(subject).to install_package('splunkforwarder').with(expected_attrs)
-      end
-    end
+  it 'initializes the splunk service' do
+    expect(subject).to init_splunk_service('splunk service').with(
+      package: expected_properties[:package],
+      user: expected_properties[:user],
+      ulimit: 8192
+    )
   end
 
-  context 'when remote file has manifest' do
-    let(:glob) { [1] }
-
-    it 'does not download the remote file' do
-      expect(subject).to_not create_remote_file(splunk_filepath)
+  context 'when platform is windows' do
+    let(:platform) { 'windows' }
+    let(:platform_version) { '2012R2' }
+    let(:windows) { true }
+    let(:expected_properties) do
+      {
+        package: :universal_forwarder,
+        version: '6.3.7',
+        build: '8bf976cd6a7c',
+        user: 'SYSTEM',
+        base_url: 'https://download.splunk.com/products'
+      }
     end
 
-    it 'does not install downloaded splunk package' do
-      expect(subject).to_not install_package('splunkforwarder')
+    before do
+      ENV['PROGRAMW6432'] = 'test'
     end
 
-    it 'deletes the downloaded splunk package' do
-      expect(subject).to delete_file(splunk_filepath)
+    it 'installs splunk' do
+      expect(subject).to install_splunk('splunk').with(expected_properties)
+    end
+
+    it 'initializes the splunk service' do
+      expect(subject).to init_splunk_service('splunk service').with(
+        package: expected_properties[:package],
+        user: expected_properties[:user]
+      )
     end
   end
 
   it 'includes cerner_splunk::_configure_secret recipe' do
     expect(subject).to include_recipe('cerner_splunk::_configure_secret')
-  end
-
-  context 'when ftr file exists' do
-    let(:ftr_exists) { true }
-
-    it 'executes splunk-first-run' do
-      expect(subject).to run_execute('splunk-first-run')
-    end
-  end
-
-  context 'when ftr file does not exist' do
-    let(:ftr_exists) { false }
-
-    it 'does not execute splunk-first-run' do
-      expect(subject).not_to run_execute('splunk-first-run')
-    end
-  end
-
-  it 'runs ruby block read splunk.secret' do
-    expect(subject).to run_ruby_block('read splunk.secret')
   end
 
   it 'creates external config directory' do

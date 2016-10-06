@@ -8,9 +8,16 @@
 require 'fileutils'
 
 opposite_package_name = CernerSplunk.opposite_package_name(node['splunk']['package']['base_name'])
+old_package =
+  case opposite_package_name
+  when 'splunk'
+    :splunk
+  when 'splunkforwarder'
+    :universal_forwarder
+  end
 
-service 'splunk' do
-  service_name CernerSplunk.splunk_service_name(node['platform_family'], opposite_package_name)
+splunk_service 'stop old service' do
+  package old_package
   action :stop
 end
 
@@ -23,12 +30,17 @@ ruby_block 'backup-splunk-artifacts' do
   end
 end
 
-package opposite_package_name do
-  package_name CernerSplunk.installed_package_name(node['platform_family'], opposite_package_name)
-  action :remove
+splunk_install 'uninstall old splunk' do
+  package old_package
+  action :uninstall
 end
 
-directory CernerSplunk.splunk_home(node['platform_family'], node['kernel']['machine'], opposite_package_name) do
-  action :delete
-  recursive true
-end
+# package opposite_package_name do
+#   package_name CernerSplunk.installed_package_name(node['platform_family'], opposite_package_name)
+#   action :remove
+# end
+
+# directory CernerSplunk.splunk_home(node['platform_family'], node['kernel']['machine'], opposite_package_name) do
+#   action :delete
+#   recursive true
+# end

@@ -5,10 +5,11 @@ require_relative '../spec_helper'
 describe 'cerner_splunk::_configure_indexes' do
   subject do
     runner = ChefSpec::SoloRunner.new do |node|
+      node.set['splunk']['package']['type'] = :splunk
       node.set['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
     end
-    # Have to include marker recipe so that we can send notifications to its resources
-    runner.converge('cerner_splunk::_restart_marker', described_recipe)
+
+    runner.converge('cerner_splunk::_restart_prep', described_recipe)
   end
 
   let(:cluster_config) do
@@ -52,7 +53,7 @@ describe 'cerner_splunk::_configure_indexes' do
 
     it 'writes the indexes.conf file with the proper paths' do
       expected_attributes = {
-        stanzas: {
+        config: {
           'volume:test' => index_config['config']['volume:test'],
           'index_a' => {
             'coldPath' => '$SPLUNK_DB/foo/colddb',
@@ -68,7 +69,7 @@ describe 'cerner_splunk::_configure_indexes' do
         }
       }
 
-      expect(subject).to create_splunk_template('system/indexes.conf').with(expected_attributes)
+      expect(subject).to configure_splunk('system/indexes.conf').with(expected_attributes)
     end
   end
 
@@ -111,7 +112,7 @@ describe 'cerner_splunk::_configure_indexes' do
 
     it 'writes the indexes.conf file with calculated maxTotalDataSizeMB' do
       expected_attributes = {
-        stanzas: {
+        config: {
           'default' => {
             'frozenTimePeriodInSecs' => 2_592_000,
             'maxTotalDataSizeMB' => 2200
@@ -133,7 +134,7 @@ describe 'cerner_splunk::_configure_indexes' do
         }
       }
 
-      expect(subject).to create_splunk_template('system/indexes.conf').with(expected_attributes)
+      expect(subject).to configure_splunk('system/indexes.conf').with(expected_attributes)
     end
   end
 end

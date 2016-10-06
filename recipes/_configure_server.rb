@@ -216,5 +216,5 @@ end
 splunk_conf 'system/server.conf' do
   config server_stanzas
   action :configure
-  notifies :restart, "splunk_service[#{node['splunk']['package']['base_name']}]"
+  notifies :ensure, 'splunk_restart[splunk restart]', :immediately
 end

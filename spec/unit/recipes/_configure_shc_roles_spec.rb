@@ -55,20 +55,20 @@ describe 'cerner_splunk::_configure_shc_roles' do
 
   it 'writes the authorize.conf file with the appropriate access and capabilities' do
     expected_attributes = {
-      stanzas: {
+      config: {
         'default' => {
           'schedule_rtsearch' => 'disabled'
         }
       }
     }
 
-    expect(subject).to create_splunk_template('shcluster/_shcluster/authorize.conf').with(expected_attributes)
-    expect(subject.splunk_template('shcluster/_shcluster/authorize.conf')).to notify('execute[apply-shcluster-bundle]').to(:run)
+    expect(subject).to configure_splunk('shcluster/apps/_shcluster/authorize.conf').with(expected_attributes)
+    expect(subject.splunk_conf('shcluster/apps/_shcluster/authorize.conf')).to notify('execute[apply-shcluster-bundle]').to(:run)
   end
 
   it 'writes the user-prefs.conf file with the appropriate user preferences' do
     expected_attributes = {
-      stanzas: {
+      config: {
         'general_default' => {
           'default_namespace' => 'launcher',
           'tz' => 'America/Chicago',
@@ -77,7 +77,7 @@ describe 'cerner_splunk::_configure_shc_roles' do
       }
     }
 
-    expect(subject).to create_splunk_template('shcluster/_shcluster/user-prefs.conf').with(expected_attributes)
-    expect(subject.splunk_template('shcluster/_shcluster/user-prefs.conf')).to notify('execute[apply-shcluster-bundle]').to(:run)
+    expect(subject).to configure_splunk('shcluster/apps/_shcluster/user-prefs.conf').with(expected_attributes)
+    expect(subject.splunk_conf('shcluster/apps/_shcluster/user-prefs.conf')).to notify('execute[apply-shcluster-bundle]').to(:run)
   end
 end

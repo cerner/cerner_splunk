@@ -5,6 +5,7 @@ require_relative '../spec_helper'
 describe 'cerner_splunk::_configure_shc_authentication' do
   subject do
     runner = ChefSpec::SoloRunner.new do |node|
+      node.set['splunk']['package']['type'] = :splunk
       node.set['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
       node.set['splunk']['config']['authentication'] = 'cerner_splunk/authentication'
     end
@@ -76,7 +77,7 @@ describe 'cerner_splunk::_configure_shc_authentication' do
 
   it 'writes the authentication.conf file with the appropriate strategy and role Map' do
     expected_attributes = {
-      stanzas: {
+      config: {
         'ADDomain' => {
           'host' => 'ad.example.com',
           'SSLEnabled' => 1,
@@ -103,7 +104,7 @@ describe 'cerner_splunk::_configure_shc_authentication' do
       }
     }
 
-    expect(subject).to create_splunk_template('shcluster/_shcluster/authentication.conf').with(expected_attributes)
-    expect(subject.splunk_template('shcluster/_shcluster/authentication.conf')).to notify('execute[apply-shcluster-bundle]').to(:run)
+    expect(subject).to configure_splunk('shcluster/apps/_shcluster/authentication.conf').with(expected_attributes)
+    expect(subject.splunk_conf('shcluster/apps/_shcluster/authentication.conf')).to notify('execute[apply-shcluster-bundle]').to(:run)
   end
 end

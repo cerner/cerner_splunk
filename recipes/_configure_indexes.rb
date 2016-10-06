@@ -84,5 +84,5 @@ splunk_conf path do
   config index_stanzas
   notifies :run, 'execute[apply-cluster-bundle]' if is_master
   action :configure
-  notifies :restart, "splunk_service[#{node['splunk']['package']['base_name']}]"
+  notifies :ensure, 'splunk_restart[splunk restart]', :immediately
 end

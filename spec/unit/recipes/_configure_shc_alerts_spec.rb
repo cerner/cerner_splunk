@@ -60,7 +60,7 @@ describe 'cerner_splunk::_configure_shc_alerts' do
 
   it 'writes the alert_actions.conf file with the appropriate alert configs' do
     expected_attributes = {
-      stanzas: {
+      config: {
         'email' => {
           'mailserver' => 'smtprr.example.com',
           'from' => 'splunk@example.com',
@@ -69,7 +69,7 @@ describe 'cerner_splunk::_configure_shc_alerts' do
       }
     }
 
-    expect(subject).to create_splunk_template('shcluster/_shcluster/alert_actions.conf').with(expected_attributes)
-    expect(subject.splunk_template('shcluster/_shcluster/alert_actions.conf')).to notify('execute[apply-shcluster-bundle]').to(:run)
+    expect(subject).to configure_splunk('shcluster/apps/_shcluster/alert_actions.conf').with(expected_attributes)
+    expect(subject.splunk_conf('shcluster/apps/_shcluster/alert_actions.conf')).to notify('execute[apply-shcluster-bundle]').to(:run)
   end
 end

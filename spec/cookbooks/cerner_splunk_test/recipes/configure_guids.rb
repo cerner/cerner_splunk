@@ -24,5 +24,5 @@ guid =
 template path do
   source 'instance.cfg.erb'
   variables guid: guid
-  notifies :touch, 'file[splunk-marker]', :immediately
+  notifies :ensure, 'splunk_restart[splunk restart]', :immediately
 end

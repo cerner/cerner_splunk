@@ -1,9 +1,5 @@
 if defined?(ChefSpec)
   ChefSpec.define_matcher :splunk_app
-  ChefSpec.define_matcher :splunk_template
-  def create_splunk_template(resource)
-    ChefSpec::Matchers::ResourceMatcher.new(:splunk_template, :create, resource)
-  end
 
   def create_splunk_app(resource)
     ChefSpec::Matchers::ResourceMatcher.new(:splunk_app, :create, resource)

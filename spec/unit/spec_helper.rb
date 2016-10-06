@@ -10,6 +10,9 @@ RSpec.configure do |config|
   config.order = 'random'
   config.file_cache_path = '/var/chef/cache'
   config.expect_with(:rspec) { |c| c.syntax = :expect }
+
+  config.platform = 'redhat'
+  config.version = '7.1'
 end
 
 module CernerSplunk

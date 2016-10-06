@@ -3,6 +3,7 @@
 # Cookbook Name:: cerner_splunk
 # File Name:: splunk_template.rb
 # HWR for configuring Splunk.
+# TODO: REMOVE
 
 require 'chef/resource/template'
 require 'chef/provider/template'

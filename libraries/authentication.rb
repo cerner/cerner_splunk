@@ -20,7 +20,7 @@ module CernerSplunk
     def self.configure_authentication(node, hash) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity, MethodLength
       hash = hash.clone
       auth_stanzas = { 'authentication' => hash }
-      fail 'authSettings is managed by chef. Don\'t set it yourself!' if hash.key?('authSettings')
+      fail "authSettings is managed by chef. Don't set it yourself!" if hash.key?('authSettings')
 
       unless hash['authType']
         guesses = ASSUMPTIONS.inject([]) do |result, (key, type)|
@@ -89,7 +89,7 @@ module CernerSplunk
             else
               fail "Unexpected type for LDAP Strategy #{strategy.class}"
             end
-          fail 'Unexpected property \'bag\'' if hash.delete('bag')
+          fail "Unexpected property 'bag'" if hash.delete('bag')
 
           %w(userBaseDN groupBaseDN).each do |x|
             hash[x] = hash[x].join(';') if hash[x].is_a?(Array)

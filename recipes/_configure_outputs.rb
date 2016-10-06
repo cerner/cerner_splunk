@@ -10,5 +10,5 @@ splunk_conf 'system/outputs.conf' do
   config output_stanzas
   not_if { output_stanzas.empty? }
   action :configure
-  notifies :restart, "splunk_service[#{node['splunk']['package']['base_name']}]"
+  notifies :ensure, 'splunk_restart[splunk restart]', :immediately
 end

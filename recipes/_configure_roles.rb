@@ -17,8 +17,8 @@ authorize, user_prefs = CernerSplunk::Roles.configure_roles(hash)
 
 splunk_conf 'system/authorize.conf' do
   config authorize
-  action :configure #Only configure option for now
-  notifies :restart, "splunk_service[#{node['splunk']['package']['base_name']}]"
+  action :configure # Only configure option for now
+  notifies :ensure, 'splunk_restart[splunk restart]', :immediately
 end
 
 directory "#{node['splunk']['home']}/etc/apps/user-prefs/local" do
@@ -30,5 +30,5 @@ end
 splunk_conf 'apps/user-prefs/user-prefs.conf' do
   config user_prefs
   action :configure # Only configure option for now
-  notifies :restart, "splunk_service[#{node['splunk']['package']['base_name']}]"
+  notifies :ensure, 'splunk_restart[splunk restart]', :immediately
 end
