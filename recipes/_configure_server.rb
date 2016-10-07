@@ -33,13 +33,16 @@ MASTER_ONLY_CONFIGS = %w(
   commit_retry_time
 ).freeze
 
-encrypt_password = CernerSplunk::ConfTemplate::Transform.splunk_encrypt node: node
-encrypt_noxor_password = CernerSplunk::ConfTemplate::Transform.splunk_encrypt node: node, xor: false
+
+# Commenting to get a successfull vagrant up. Will fix ....
+# encrypt_password = CernerSplunk::ConfTemplate::Transform.splunk_encrypt node: node
+# encrypt_noxor_password = CernerSplunk::ConfTemplate::Transform.splunk_encrypt node: node, xor: false
+
 
 # default pass4SymmKey value is 'changeme'
-server_stanzas['general']['pass4SymmKey'] = CernerSplunk::ConfTemplate.compose encrypt_password, CernerSplunk::ConfTemplate::Value.constant(value: 'changeme')
+# server_stanzas['general']['pass4SymmKey'] = CernerSplunk::ConfTemplate.compose encrypt_password, CernerSplunk::ConfTemplate::Value.constant(value: 'changeme')
 # default sslKeysfilePassword value is 'password'
-server_stanzas['sslConfig']['sslKeysfilePassword'] = CernerSplunk::ConfTemplate.compose encrypt_noxor_password, CernerSplunk::ConfTemplate::Value.constant(value: 'password')
+# server_stanzas['sslConfig']['sslKeysfilePassword'] = CernerSplunk::ConfTemplate.compose encrypt_noxor_password, CernerSplunk::ConfTemplate::Value.constant(value: 'password')
 
 # Indexer Cluster Configuration
 case node['splunk']['node_type']
@@ -216,5 +219,5 @@ end
 splunk_conf 'system/server.conf' do
   config server_stanzas
   action :configure
-  notifies :ensure, 'splunk_restart[splunk restart]', :immediately
+  notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately
 end

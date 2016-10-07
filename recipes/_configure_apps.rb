@@ -30,6 +30,6 @@ apps.each do |app_name, app_data|
     files app_data['files']
     lookups app_data['lookups']
     permissions app_data['permissions']
-  notifies :ensure, 'splunk_restart[splunk restart]', :immediately
+  notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately
   end
 end

@@ -37,7 +37,7 @@ fail 'Non-unique hostnames' if @network.collect { |_, v| v[:hostname] }.uniq!
 fail 'Non-unique ports' if @network.collect { |_, v| v[:ports].keys }.flat_map { |v| v }.uniq!
 
 def default_omnibus(config)
-  config.omnibus.chef_version = :latest
+  config.omnibus.chef_version = '12.13.37' # https://github.com/chef-cookbooks/chef-client/issues/425
 end
 
 def network(config, name, splunk_password = true)

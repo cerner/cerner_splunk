@@ -11,17 +11,12 @@ provides :cerner_splunk_forwarder_monitors if respond_to?(:provides)
 action :install do # ~FC017
   input_stanzas = CernerSplunk::LWRP.convert_monitors(node, new_resource.monitors, new_resource.index)
 
-  file new_resource.app do
-    action :nothing
-    path CernerSplunk.restart_marker_file
-  end
-
   splunk_app new_resource.app do
     apps_dir "#{node['splunk']['home']}/etc/apps"
     action :create
     local true
     files 'inputs.conf' => input_stanzas
-    notifies :touch, "file[#{new_resource.app}]", :immediately
+    notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately
   end
 end
 
@@ -34,6 +29,6 @@ action :delete do  # ~FC017
   splunk_app new_resource.app do
     apps_dir "#{node['splunk']['home']}/etc/apps"
     action :remove
-    notifies :touch, "file[#{new_resource.app}]", :immediately
+    notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately
   end
 end

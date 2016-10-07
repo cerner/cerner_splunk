@@ -8,7 +8,7 @@
 
 ruby_block 'start-splunk' do
   block { true }
-  notifies :start, 'splunk_service[splunk service]', :immediately
+  notifies :start, "splunk_service[#{node['splunk']['package']['type']}]", :immediately
 end
 
 include_recipe 'cerner_splunk::_generate_password'

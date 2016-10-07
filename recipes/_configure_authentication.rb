@@ -18,5 +18,5 @@ splunk_conf 'system/authentication.conf' do
   config auth_stanzas
   sensitive auth_stanzas.any? { |_, v| v.key? 'bindDNpassword' }
   action :configure
-  notifies :ensure, 'splunk_restart[splunk restart]', :immediately
+  notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately
 end
