@@ -18,5 +18,5 @@ end
 
 ruby_block 'splunk-stop' do
   block { true }
-  notifies :stop, 'splunk_service[splunk service]', :immediately
+  notifies :stop, "splunk_service[#{node['splunk']['package']['type']}]", :immediately
 end

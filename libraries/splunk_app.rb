@@ -323,47 +323,41 @@ class Chef
 
       def insert_procs(filename, contents)
         return contents unless contents.is_a? Hash
-        contents.inject({}) do |retval, (stanza, attributes)|
-          retval[stanza] = attributes.inject({}) do |stanzavals, (key, value)|
-            stanzavals[key] =
-              if value.is_a? Hash
-                value_proc = hash_to_proc CernerSplunk::ConfTemplate::Value, value['value'], filename: filename, node: node
-                transform_proc = hash_to_proc CernerSplunk::ConfTemplate::Transform, value['transform'], filename: filename, node: node if value['transform']
-                transform_proc ||= CernerSplunk::ConfTemplate::Transform.id
+        contents.each do |stanza, pairs|
+          pairs.each do |key, value|
+            next unless value.is_a? Hash
 
-                CernerSplunk::ConfTemplate.compose transform_proc, value_proc
-              else
-                value
-              end
-            stanzavals
+            value_proc = hash_to_proc CernerSplunk::ConfigProcs::Value, value['value'], filename: filename, node: node
+            transform_proc = hash_to_proc CernerSplunk::ConfigProcs::Transform, value['transform'], filename: filename, node: node if value['transform']
+            transform_proc ||= CernerSplunk::ConfigProcs::Transform.id
+
+            contents[stanza][key] = CernerSplunk::ConfigProcs.compose transform_proc, value_proc
           end
-          retval
         end
       end
 
-      # function for dropping either a splunk template generated from a hash
-      # or a simple file if the contents are a string. If the content of the file
-      # is empty, then the file will be removed
-      def manage_file(path, contents) # rubocop:disable Metrics/PerceivedComplexity
+      # Writes to a config file if provided a hash, otherwise writes to a simple file.
+      # If the provided content is empty, then the file will be removed instead.
+      def manage_file(path, contents)
         if contents.is_a?(Hash) && !contents.empty?
-          file = Chef::Resource::Template.new(path, run_context)
-          file.cookbook('cerner_splunk')
-          file.source('generic.conf.erb')
-          file.variables(stanzas: contents)
+          Chef::Resource::CernerSplunkIngredientSplunkConf::SplunkConf.new(path, run_context).tap do |resource|
+            resource.config contents
+            resource.user node['splunk']['user']
+            resource.group node['splunk']['group']
+          end
         else
           file = Chef::Resource::File.new(path, run_context)
-          file.content(contents) unless contents.empty?
+          if contents.empty?
+            file.run_action(:delete)
+          else
+            file.content(contents)
+            file.owner(node['splunk']['user'])
+            file.group(node['splunk']['group'])
+            file.mode('0600')
+            file.run_action(:create)
+          end
+          new_resource.updated_by_last_action(true) if file.updated_by_last_action?
         end
-        file.path(path)
-        file.owner(node['splunk']['user'])
-        file.group(node['splunk']['group'])
-        file.mode('0600')
-        if contents.empty?
-          file.run_action(:delete)
-        else
-          file.run_action(:create)
-        end
-        new_resource.updated_by_last_action(true) if file.updated_by_last_action?
       end
     end
   end

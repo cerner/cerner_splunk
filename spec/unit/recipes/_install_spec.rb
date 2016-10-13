@@ -5,7 +5,7 @@ describe 'cerner_splunk::_install' do
     runner = ChefSpec::SoloRunner.new(platform: platform, version: platform_version) do |node|
       node.set['splunk']['cmd'] = 'splunk'
       # node.set['splunk']['user'] = 'splunk
-      node.set['splunk']['package']['type'] = :universal_forwarder
+      node.set['splunk']['package']['type'] = 'universal_forwarder'
       node.set['splunk']['package']['base_name'] = 'splunkforwarder'
       node.set['splunk']['package']['download_group'] = 'universalforwarder'
       node.set['splunk']['package']['file_suffix'] = '.txt'
@@ -73,10 +73,6 @@ describe 'cerner_splunk::_install' do
     expect(subject).to include_recipe('cerner_splunk::_restart_prep')
   end
 
-  it 'runs ruby block read splunk.secret' do
-    expect(subject).to run_ruby_block('read splunk.secret')
-  end
-
   let(:expected_properties) do
     {
       package: :universal_forwarder,
@@ -92,11 +88,15 @@ describe 'cerner_splunk::_install' do
   end
 
   it 'initializes the splunk service' do
-    expect(subject).to init_splunk_service('splunk service').with(
+    expect(subject).to init_splunk_service('universal_forwarder').with(
       package: expected_properties[:package],
       user: expected_properties[:user],
       ulimit: 8192
     )
+  end
+
+  it 'notifies the ruby block "read splunk.secret"' do
+    expect(subject.splunk_service('universal_forwarder')).to notify('ruby_block[read splunk.secret]').to(:run).immediately
   end
 
   context 'when platform is windows' do
@@ -122,7 +122,7 @@ describe 'cerner_splunk::_install' do
     end
 
     it 'initializes the splunk service' do
-      expect(subject).to init_splunk_service('splunk service').with(
+      expect(subject).to init_splunk_service('universal_forwarder').with(
         package: expected_properties[:package],
         user: expected_properties[:user]
       )

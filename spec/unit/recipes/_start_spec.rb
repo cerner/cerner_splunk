@@ -5,7 +5,7 @@ require_relative '../spec_helper'
 describe 'cerner_splunk::_start' do
   subject do
     runner = ChefSpec::SoloRunner.new(platform: platform, version: platform_version) do |node|
-      node.set['splunk']['package']['type'] = :splunk
+      node.set['splunk']['package']['type'] = 'splunk'
       node.set['splunk']['cmd'] = 'splunk'
       node.set['splunk']['user'] = 'splunk'
       node.set['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
@@ -41,6 +41,6 @@ describe 'cerner_splunk::_start' do
 
   it 'notifies the start splunk resource' do
     expect(subject).to run_ruby_block('start-splunk')
-    expect(subject.ruby_block('start-splunk')).to notify('splunk_service[splunk service]').to(:start).immediately
+    expect(subject.ruby_block('start-splunk')).to notify('splunk_service[splunk]').to(:start).immediately
   end
 end

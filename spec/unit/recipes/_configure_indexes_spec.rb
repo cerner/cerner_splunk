@@ -5,7 +5,7 @@ require_relative '../spec_helper'
 describe 'cerner_splunk::_configure_indexes' do
   subject do
     runner = ChefSpec::SoloRunner.new do |node|
-      node.set['splunk']['package']['type'] = :splunk
+      node.set['splunk']['package']['type'] = 'splunk'
       node.set['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
     end
 

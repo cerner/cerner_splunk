@@ -101,9 +101,9 @@ module CernerSplunk
           end
 
           if hash['bindDNpassword']
-            vault_password = CernerSplunk::ConfTemplate::Value.vault coordinate: hash['bindDNpassword'], default_coords: default_coords
-            encrypt = CernerSplunk::ConfTemplate::Transform.splunk_encrypt node: node
-            hash['bindDNpassword'] = CernerSplunk::ConfTemplate.compose encrypt, vault_password
+            vault_password = CernerSplunk::ConfigProcs::Value.vault coordinate: hash['bindDNpassword'], default_coords: default_coords
+            encrypt = CernerSplunk::ConfigProcs::Transform.splunk_encrypt node: node
+            hash['bindDNpassword'] = CernerSplunk::ConfigProcs.compose encrypt, vault_password
           end
 
           # Verify Attributes
