@@ -5,9 +5,9 @@ require_relative '../spec_helper'
 describe 'cerner_splunk::_configure_secret' do
   subject do
     runner = ChefSpec::SoloRunner.new(platform: platform, version: platform_version) do |node|
-      node.set['splunk']['node_type'] = node_type
-      node.set['splunk']['home'] = '/opt/splunk'
-      node.set['splunk']['config']['secrets'] = node_config_secrets
+      node.override['splunk']['node_type'] = node_type
+      node.override['splunk']['home'] = '/opt/splunk'
+      node.override['splunk']['config']['secrets'] = node_config_secrets
     end
     runner.converge(described_recipe)
   end

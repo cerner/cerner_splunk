@@ -24,12 +24,14 @@ module CernerSplunk
         label = "Stanza #{stanza}"
         stanza_value = CernerSplunk::ConfTemplate.collapse_proc stanza_value, label: label, arguments: { stanza: stanza }
         fail "Unexpected value (#{stanza_value.class} '#{stanza_value}') for #{label}" unless stanza_value.nil? || stanza_value.is_a?(Hash)
-        file_data[stanza] = stanza_value.inject({}) do |result, (attribute, value)|
-          label = "Attribute #{attribute}, Stanza #{stanza}"
-          value = CernerSplunk::ConfTemplate.collapse_proc value, label: label, arguments: { stanza: stanza, attribute: attribute }
-          result[attribute] = value unless value.nil?
-          result
-        end if stanza_value.is_a? Hash
+        if stanza_value.is_a? Hash
+          file_data[stanza] = stanza_value.inject({}) do |result, (attribute, value)|
+            label = "Attribute #{attribute}, Stanza #{stanza}"
+            value = CernerSplunk::ConfTemplate.collapse_proc value, label: label, arguments: { stanza: stanza, attribute: attribute }
+            result[attribute] = value unless value.nil?
+            result
+          end
+        end
         file_data
       end
     end
