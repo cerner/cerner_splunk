@@ -10,7 +10,7 @@ source_url       'https://github.com/cerner/cerner_splunk'
 issues_url       'https://github.com/cerner/cerner_splunk/issues'
 
 depends          'chef-vault', '~> 1.3'
-depends          'ulimit', '~> 0.3.2'
+depends          'ulimit', '>= 0.3.2', '< 1.0'
 depends          'xml', '~> 1.2'
 
 supports         'redhat', '>= 5.5'
