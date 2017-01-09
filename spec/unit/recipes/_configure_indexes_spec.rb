@@ -4,8 +4,8 @@ require_relative '../spec_helper'
 
 describe 'cerner_splunk::_configure_indexes' do
   subject do
-    runner = ChefSpec::SoloRunner.new do |node|
-      node.set['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
+    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.8') do |node|
+      node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
     end
     # Have to include marker recipe so that we can send notifications to its resources
     runner.converge('cerner_splunk::_restart_marker', described_recipe)
