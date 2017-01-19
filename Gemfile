@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 # Going forward, these should be updated to the latest versions immediately post release
 chefspec_version = '= 5.3.0'
 foodcritic_version = '= 8.1.0'
-rubocop_version = '= 0.46.0'
+rubocop_version = '= 0.47.1'
 
 case RUBY_VERSION
 when '2.1.6'
