@@ -3,12 +3,12 @@ require_relative '../spec_helper'
 describe 'cerner_splunk::_install' do
   subject do
     runner = ChefSpec::SoloRunner.new(platform: platform, version: platform_version) do |node|
-      node.set['splunk']['cmd'] = 'splunk'
-      node.set['splunk']['user'] = 'splunk'
-      node.set['splunk']['package']['base_name'] = 'splunkforwarder'
-      node.set['splunk']['package']['download_group'] = 'universalforwarder'
-      node.set['splunk']['package']['file_suffix'] = '.txt'
-      node.set['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
+      node.override['splunk']['cmd'] = 'splunk'
+      node.override['splunk']['user'] = 'splunk'
+      node.override['splunk']['package']['base_name'] = 'splunkforwarder'
+      node.override['splunk']['package']['download_group'] = 'universalforwarder'
+      node.override['splunk']['package']['file_suffix'] = '.txt'
+      node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
     end
     runner.converge(described_recipe)
   end
@@ -26,8 +26,8 @@ describe 'cerner_splunk::_install' do
     }
   end
 
-  let(:platform) { nil }
-  let(:platform_version) { nil }
+  let(:platform) { 'centos' }
+  let(:platform_version) { '6.8' }
 
   let(:initd_exists) { nil }
   let(:ui_login_exists) { nil }
@@ -36,7 +36,7 @@ describe 'cerner_splunk::_install' do
 
   let(:windows) { nil }
 
-  let(:splunk_file) { 'splunkforwarder-6.3.4-cae2458f4aef' }
+  let(:splunk_file) { 'splunkforwarder-6.3.8-1e8d95973e45' }
   let(:splunk_filepath) { "/var/chef/cache/#{splunk_file}.txt" }
 
   before do
@@ -50,7 +50,7 @@ describe 'cerner_splunk::_install' do
     allow(File).to receive(:exist?).with('/opt/splunkforwarder/ftr').and_return(ftr_exists)
 
     allow(Dir).to receive(:glob).and_call_original
-    allow(Dir).to receive(:glob).with('/opt/splunkforwarder/splunkforwarder-6.3.4-cae2458f4aef-*').and_return(glob)
+    allow(Dir).to receive(:glob).with('/opt/splunkforwarder/splunkforwarder-6.3.8-1e8d95973e45-*').and_return(glob)
 
     # Stub alt separator for windows in Ruby 1.9.3
     stub_const('::File::ALT_SEPARATOR', '/')

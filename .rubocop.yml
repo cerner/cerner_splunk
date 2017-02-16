@@ -1,7 +1,16 @@
+AllCops:
+  TargetRubyVersion: 2.1
+
+BlockLength:
+  Enabled: false
+
 LineLength:
   Enabled: false
 
 EachWithObject:
+  Enabled: false
+
+EmptyWhen:
   Enabled: false
 
 MethodLength:
@@ -20,4 +29,7 @@ Style/NumericPredicate:
   EnforcedStyle: comparison
 
 Style/TernaryParentheses:
+  Enabled: false
+
+Style/VariableNumber:
   Enabled: false

@@ -10,7 +10,7 @@ return if platform_family?('windows')
 
 # user should be created by the package install
 user node['splunk']['user'] do
-  supports manage_home: true
+  manage_home true
   action [:create, :lock]
 end
 

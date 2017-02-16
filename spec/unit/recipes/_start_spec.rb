@@ -5,9 +5,9 @@ require_relative '../spec_helper'
 describe 'cerner_splunk::_start' do
   subject do
     runner = ChefSpec::SoloRunner.new(platform: platform, version: platform_version) do |node|
-      node.set['splunk']['cmd'] = 'splunk'
-      node.set['splunk']['user'] = 'splunk'
-      node.set['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
+      node.override['splunk']['cmd'] = 'splunk'
+      node.override['splunk']['user'] = 'splunk'
+      node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
     end
     # Have to include forwarder recipe so that _start recipe can send notifications to services
     runner.converge('cerner_splunk::forwarder', described_recipe)
@@ -26,8 +26,8 @@ describe 'cerner_splunk::_start' do
     }
   end
 
-  let(:platform) { nil }
-  let(:platform_version) { nil }
+  let(:platform) { 'centos' }
+  let(:platform_version) { '6.8' }
 
   let(:lines) { [] }
   let(:exists) { nil }

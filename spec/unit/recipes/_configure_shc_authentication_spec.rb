@@ -4,9 +4,9 @@ require_relative '../spec_helper'
 
 describe 'cerner_splunk::_configure_shc_authentication' do
   subject do
-    runner = ChefSpec::SoloRunner.new do |node|
-      node.set['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
-      node.set['splunk']['config']['authentication'] = 'cerner_splunk/authentication'
+    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.8') do |node|
+      node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
+      node.override['splunk']['config']['authentication'] = 'cerner_splunk/authentication'
     end
     runner.converge('cerner_splunk::shc_deployer', described_recipe)
   end

@@ -4,7 +4,7 @@ require_relative '../spec_helper'
 
 describe 'cerner_splunk::_restart_marker' do
   subject do
-    runner = ChefSpec::SoloRunner.new
+    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.8')
     runner.converge(described_recipe)
   end
 

@@ -160,7 +160,8 @@ class Chef
             file_path = "#{file_path}/#{subdir}"
             create_splunk_directory(file_path)
           end
-          manage_file("#{file_path}/#{file_name}", contents)
+          filename = "#{file_path}/#{file_name}"
+          manage_file(filename, insert_procs(filename, contents))
         end
       end
 
@@ -260,11 +261,13 @@ class Chef
 
         # Restore all potential user defined content
         create_app_directories
-        ::Dir.chdir old_dir_path do
-          ::Dir['local/*', 'lookups/*', 'metadata/local.meta'].each do |f|
-            ::File.rename "#{old_dir_path}/#{f}", "#{new_resource.root_dir}/#{f}"
+        if ::File.exist? old_dir_path
+          ::Dir.chdir old_dir_path do
+            ::Dir['local/*', 'lookups/*', 'metadata/local.meta'].each do |f|
+              ::File.rename "#{old_dir_path}/#{f}", "#{new_resource.root_dir}/#{f}"
+            end
           end
-        end if ::File.exist? old_dir_path
+        end
         # Remove old app
         old_dir.run_action :delete
 
@@ -307,6 +310,37 @@ class Chef
       def delete_file(file_path)
         download = Chef::Resource::File.new(file_path, run_context)
         download.run_action(:delete)
+      end
+
+      def symbolize_keys(hash)
+        Hash[hash.map { |k, v| [k.to_sym, v] }]
+      end
+
+      def hash_to_proc(source_module, data, context = {})
+        proc_sym = data['proc'].to_sym
+        data = symbolize_keys(data).reject { |k, _| k == :proc }
+        arguments = context.merge data
+        source_module.send proc_sym, arguments
+      end
+
+      def insert_procs(filename, contents)
+        return contents unless contents.is_a? Hash
+        contents.inject({}) do |retval, (stanza, attributes)|
+          retval[stanza] = attributes.inject({}) do |stanzavals, (key, value)|
+            stanzavals[key] =
+              if value.is_a? Hash
+                value_proc = hash_to_proc CernerSplunk::ConfTemplate::Value, value['value'], filename: filename, node: node
+                transform_proc = hash_to_proc CernerSplunk::ConfTemplate::Transform, value['transform'], filename: filename, node: node if value['transform']
+                transform_proc ||= CernerSplunk::ConfTemplate::Transform.id
+
+                CernerSplunk::ConfTemplate.compose transform_proc, value_proc
+              else
+                value
+              end
+            stanzavals
+          end
+          retval
+        end
       end
 
       # function for dropping either a splunk template generated from a hash
