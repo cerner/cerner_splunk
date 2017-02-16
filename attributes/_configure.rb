@@ -30,3 +30,6 @@ default['splunk']['apps'] = {}
 default['splunk']['flags']['index_checks_fail'] = true
 
 default['splunk']['config']['assumed_index'] = 'main'
+
+# Attribute used to point a heavy forwarder to license master
+default['splunk']['heavy_forwarder']['use_license_uri'] = false

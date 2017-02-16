@@ -135,13 +135,19 @@ end
 # License Configuration
 license_uri =
   case node['splunk']['node_type']
-  when :forwarder, :license_server
+  when :license_server
     'self'
   when :cluster_master, :cluster_slave, :server, :search_head, :shc_search_head, :shc_captain, :shc_deployer
     if node['splunk']['free_license']
       'self'
     else
       CernerSplunk.my_cluster_data(node)['license_uri'] || 'self'
+    end
+  when :forwarder
+    if node['splunk']['package']['base_name'] == 'splunk' && node['splunk']['heavy_forwarder']['use_license_uri']
+      CernerSplunk.my_cluster_data(node)['license_uri'] || 'self'
+    else
+      'self'
     end
   end
 
@@ -166,12 +172,10 @@ license_group =
   when :server
     if node['splunk']['free_license']
       'Free'
+    elsif license_uri == 'self'
+      'Trial'
     else
-      if license_uri == 'self'
-        'Trial'
-      else
-        'Enterprise'
-      end
+      'Enterprise'
     end
   end
 
