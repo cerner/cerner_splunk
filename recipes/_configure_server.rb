@@ -168,14 +168,16 @@ license_group =
     end
   end
 
-%w(forwarder free enterprise download-trial).each do |group|
-  server_stanzas["lmpool:auto_generated_pool_#{group}"] = {
-    'description' => "auto_generated_pool_#{group}",
-    'quota' => 'MAX',
-    'slaves' => '*',
-    'stack_id' => group
-  }
-end if license_uri == 'self'
+if license_uri == 'self'
+  %w(forwarder free enterprise download-trial).each do |group|
+    server_stanzas["lmpool:auto_generated_pool_#{group}"] = {
+      'description' => "auto_generated_pool_#{group}",
+      'quota' => 'MAX',
+      'slaves' => '*',
+      'stack_id' => group
+    }
+  end
+end
 
 license_pools = CernerSplunk::DataBag.load(node['splunk']['config']['license-pool'])
 

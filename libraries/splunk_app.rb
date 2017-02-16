@@ -261,11 +261,13 @@ class Chef
 
         # Restore all potential user defined content
         create_app_directories
-        ::Dir.chdir old_dir_path do
-          ::Dir['local/*', 'lookups/*', 'metadata/local.meta'].each do |f|
-            ::File.rename "#{old_dir_path}/#{f}", "#{new_resource.root_dir}/#{f}"
+        if ::File.exist? old_dir_path
+          ::Dir.chdir old_dir_path do
+            ::Dir['local/*', 'lookups/*', 'metadata/local.meta'].each do |f|
+              ::File.rename "#{old_dir_path}/#{f}", "#{new_resource.root_dir}/#{f}"
+            end
           end
-        end if ::File.exist? old_dir_path
+        end
         # Remove old app
         old_dir.run_action :delete
 

@@ -5,10 +5,12 @@
 #
 # Drop in replacement for the existing splunk_forwarder_monitors
 
+use_inline_resources
+
 provides :splunk_forwarder_monitors if respond_to?(:provides)
 provides :cerner_splunk_forwarder_monitors if respond_to?(:provides)
 
-action :install do # ~FC017
+action :install do
   input_stanzas = CernerSplunk::LWRP.convert_monitors(node, new_resource.monitors, new_resource.index)
 
   splunk_app new_resource.app do
@@ -20,7 +22,7 @@ action :install do # ~FC017
   end
 end
 
-action :delete do  # ~FC017
+action :delete do
   file new_resource.app do
     action :nothing
     path CernerSplunk.restart_marker_file

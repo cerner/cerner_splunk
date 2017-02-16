@@ -5,12 +5,12 @@ require_relative '../spec_helper'
 describe 'cerner_splunk::_migrate_forwarder' do
   subject do
     runner = ChefSpec::SoloRunner.new(platform: platform, version: platform_version) do |node|
-      node.set['splunk']['package']['base_name'] = 'splunk'
+      node.override['splunk']['package']['base_name'] = 'splunk'
     end
     runner.converge(described_recipe)
   end
 
-  let(:platform) { 'redhat' }
+  let(:platform) { 'centos' }
   let(:platform_version) { '7.2' }
 
   it 'stops splunk service' do

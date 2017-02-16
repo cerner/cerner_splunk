@@ -4,8 +4,8 @@ require_relative '../spec_helper'
 
 describe 'cerner_splunk::shc_captain' do
   subject do
-    runner = ChefSpec::SoloRunner.new do |node|
-      node.set['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
+    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.8') do |node|
+      node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
     end
     runner.converge(described_recipe)
   end

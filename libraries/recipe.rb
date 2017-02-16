@@ -116,9 +116,8 @@ module CernerSplunk
   # Validates that the splunk.secret file either does not exist or has the same value that's currently configured.
   # Fails the chef run if those constraints are not met.
   def self.validate_secret_file(secret_file_path, configured_secret)
-    if ::File.exist?(secret_file_path)
-      existing_secret = ::File.open(secret_file_path, 'r') { |file| file.readline.chomp }
-      fail 'The splunk.secret file already exists with a different value. Modification of that file is not currently supported.' if existing_secret != configured_secret
-    end
+    return unless ::File.exist?(secret_file_path)
+    existing_secret = ::File.open(secret_file_path, 'r') { |file| file.readline.chomp }
+    fail 'The splunk.secret file already exists with a different value. Modification of that file is not currently supported.' if existing_secret != configured_secret
   end
 end
