@@ -5,7 +5,7 @@ license          'Apache 2.0'
 description      'Tests the cerner_splunk cookbook'
 version          '0.0.1'
 
-depends          'cerner_splunk', '>= 1.2.0'
+depends          'cerner_splunk', '>= 2.9.0'
 
 supports         'redhat', '>= 5.5'
 supports         'ubuntu', '>= 12.04'
