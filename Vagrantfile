@@ -37,6 +37,8 @@ fail 'Non-unique hostnames' if @network.collect { |_, v| v[:hostname] }.uniq!
 fail 'Non-unique ports' if @network.collect { |_, v| v[:ports].keys }.flat_map { |v| v }.uniq!
 
 def default_omnibus(config)
+  # https://github.com/cerner/cerner_splunk/issues/141
+  # config.omnibus.chef_version = :latest
   config.omnibus.chef_version = '12.17.44'
 end
 
