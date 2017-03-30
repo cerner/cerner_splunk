@@ -1,4 +1,6 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: cerner_splunk
 # Recipe:: cluster_master
@@ -14,7 +16,7 @@ instance_exec :cluster_master, &CernerSplunk::NODE_TYPE
 include_recipe 'cerner_splunk::_install_server'
 
 execute 'apply-cluster-bundle' do # ~FC009
-  command lazy { "#{node['splunk']['cmd']} apply cluster-bundle --answer-yes -auth admin:#{node.run_state['cerner_splunk']['admin-password']}" }
+  command(lazy { "#{node['splunk']['cmd']} apply cluster-bundle --answer-yes -auth admin:#{node.run_state['cerner_splunk']['admin-password']}" })
   environment 'HOME' => node['splunk']['home']
   sensitive true
   action :nothing

@@ -1,4 +1,6 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: cerner_splunk
 # Recipe:: _configure_server
@@ -33,11 +35,9 @@ MASTER_ONLY_CONFIGS = %w(
   commit_retry_time
 ).freeze
 
-
 # Commenting to get a successfull vagrant up. Will fix ....
 # encrypt_password = CernerSplunk::ConfigProcs::Transform.splunk_encrypt node: node
 # encrypt_noxor_password = CernerSplunk::ConfigProcs::Transform.splunk_encrypt node: node, xor: false
-
 
 # default pass4SymmKey value is 'changeme'
 # server_stanzas['general']['pass4SymmKey'] = CernerSplunk::ConfigProcs.compose encrypt_password, CernerSplunk::ConfigProcs::Value.constant(value: 'changeme')
@@ -103,7 +103,7 @@ when :cluster_slave
 end
 
 # Search Head Cluster configuration
-if [:shc_search_head, :shc_captain].include? node['splunk']['node_type']
+if %i(shc_search_head shc_captain).include? node['splunk']['node_type']
   cluster, bag = CernerSplunk.my_cluster(node)
   deployer_uri = bag['deployer_uri'] || ''
   replication_ports = bag['shc_replication_ports'] || bag['replication_ports'] || {}
@@ -218,6 +218,19 @@ server_stanzas['license'] = {
   'master_uri' => license_uri,
   'active_group' => license_group
 }
+
+# # For now the old technique of reading passwords from local/server.conf
+
+# old_stanzas = CernerSplunk::Conf::Reader.new("#{node['splunk']['home']}/etc/system/local/server.conf").read
+
+# old_stanzas.each do |key, value|
+#   case key
+#   when 'general'
+#     server_stanzas['general']['pass4SymmKey'] = value['pass4SymmKey'] if value['pass4SymmKey']
+#   when 'sslConfig'
+#     server_stanzas['sslConfig']['sslKeysfilePassword'] = value['sslKeysfilePassword']
+#   end
+# end
 
 splunk_conf 'system/server.conf' do
   config server_stanzas

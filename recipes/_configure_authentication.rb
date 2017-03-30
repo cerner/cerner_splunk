@@ -1,4 +1,6 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: cerner_splunk
 # Recipe:: _configure_authentication
@@ -16,7 +18,7 @@ auth_stanzas = CernerSplunk::Authentication.configure_authentication(node, hash)
 
 splunk_conf 'system/authentication.conf' do
   config auth_stanzas
-  sensitive auth_stanzas.any? { |_, v| v.key? 'bindDNpassword' }
+  sensitive(auth_stanzas.any? { |_, v| v.key? 'bindDNpassword' })
   action :configure
   notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately
 end

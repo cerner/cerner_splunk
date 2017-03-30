@@ -1,4 +1,6 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
+
 default['splunk']['config']['host'] = node['ec2'] ? node['ec2']['instance_id'] : (node['fqdn'] || node['machinename'] || node['hostname'])
 
 default['splunk']['config']['licenses'] = nil

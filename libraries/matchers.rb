@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 if defined?(ChefSpec)
   def initialize_sh_cluster(resource)
     ChefSpec::Matchers::ResourceMatcher.new(:cerner_splunk_sh_cluster, :initialize, resource)

@@ -1,25 +1,25 @@
-Resources
-=========
+# Resources
+
 These are Resources / Providers / Definitions supplied by the Cerner Splunk cookbook
 
-`cerner_splunk_forwarder_monitors`
-----------------------------------
-The purpose of this resource is to setup inputs from a recipe and notify the splunk service to restart upon changes. It is equivalent to the monitors LWRP in the splunk_forwarder cookbook.
+## `cerner_splunk_forwarder_monitors`
+
+The purpose of this resource is to setup inputs from a recipe and notify the splunk service to restart upon changes. It is equivalent to the monitors LWRP in the splunk\_forwarder cookbook.
 
 ### Actions
 
-| Action     | Description
-| :--------  | :----------
-| `:install` | Default. Use to setup/reconfigure the listed inputs in the named app.
-| `:delete`  | Removes the named app / and inputs.
+| Action     | Description                                                           |
+| :--------- | :-------------------------------------------------------------------- |
+| `:install` | Default. Use to setup/reconfigure the listed inputs in the named app. |
+| `:delete`  | Removes the named app / and inputs.                                   |
 
 ### Attributes
 
-| Attribute     | Description
-| :-----------  | :----------
-| `app`         | This is the name of the grouping of inputs (i.e. Splunk app) to configure. It defaults to the name of the resource.
-| `index`       | The index to write the configured inputs to by default. Defaults to the value of node[:splunk][:main_project_index]
-| `monitors`    | An array of inputs to configure (similar to how you'd configure node[:splunk][:monitors])
+| Attribute  | Description                                                                                                         |
+| :--------- | :------------------------------------------------------------------------------------------------------------------ |
+| `app`      | This is the name of the grouping of inputs (i.e. Splunk app) to configure. It defaults to the name of the resource. |
+| `index`    | The index to write the configured inputs to by default. Defaults to the value of node[:splunk][:main_project_index] |
+| `monitors` | An array of inputs to configure (similar to how you'd configure node[:splunk][:monitors])                           |
 
 ### Examples
 

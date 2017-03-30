@@ -1,4 +1,6 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: cerner_splunk
 # Recipe:: _configure_shc_roles
@@ -14,7 +16,6 @@ unless hash
 end
 
 authorize, user_prefs = CernerSplunk::Roles.configure_roles(hash)
-
 
 splunk_conf 'shcluster/apps/_shcluster/authorize.conf' do
   config authorize

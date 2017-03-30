@@ -1,4 +1,5 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
 
 default['splunk']['node_type'] = nil
 default['splunk']['cleanup'] = true

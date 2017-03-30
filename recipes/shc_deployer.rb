@@ -1,4 +1,6 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: cerner_splunk
 # Recipe:: shc_deployer
@@ -16,7 +18,7 @@ instance_exec :shc_deployer, &CernerSplunk::NODE_TYPE
 include_recipe 'cerner_splunk::_install_server'
 
 execute 'apply-shcluster-bundle' do # ~FC009
-  command lazy { "#{node['splunk']['cmd']} apply shcluster-bundle -target '#{search_heads.first}' --answer-yes -auth admin:#{node.run_state['cerner_splunk']['admin-password']}" }
+  command(lazy { "#{node['splunk']['cmd']} apply shcluster-bundle -target '#{search_heads.first}' --answer-yes -auth admin:#{node.run_state['cerner_splunk']['admin-password']}" })
   environment 'HOME' => node['splunk']['home']
   action :nothing
   sensitive true
