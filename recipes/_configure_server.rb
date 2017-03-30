@@ -35,6 +35,7 @@ MASTER_ONLY_CONFIGS = %w(
   commit_retry_time
 ).freeze
 
+# TODO: ???
 # Commenting to get a successfull vagrant up. Will fix ....
 # encrypt_password = CernerSplunk::ConfigProcs::Transform.splunk_encrypt node: node
 # encrypt_noxor_password = CernerSplunk::ConfigProcs::Transform.splunk_encrypt node: node, xor: false
@@ -50,10 +51,9 @@ when :search_head, :shc_search_head, :shc_captain, :server
   clusters = CernerSplunk.all_clusters(node).collect do |(cluster, bag)|
     stanza = "clustermaster:#{cluster}"
     master_uri = bag['master_uri'] || ''
-    settings = bag['settings'] || {}
-    pass = settings['pass4SymmKey'] || ''
-
     next if master_uri.empty?
+    
+    pass = settings['pass4SymmKey'] || ''
 
     server_stanzas[stanza] = {}
     server_stanzas[stanza]['master_uri'] = master_uri
@@ -63,13 +63,10 @@ when :search_head, :shc_search_head, :shc_captain, :server
     stanza
   end
 
+  # TODO: This isn't possible
   clusters.reject!(&:nil?)
+  server_stanzas['clustering'] = { 'mode' => 'searchhead', 'master_uri' = clusters.join(',') } if clusters.any?
 
-  if clusters.any?
-    server_stanzas['clustering'] = {}
-    server_stanzas['clustering']['mode'] = 'searchhead'
-    server_stanzas['clustering']['master_uri'] = clusters.join(',')
-  end
 when :cluster_master
   bag = CernerSplunk.my_cluster_data(node)
   settings = (bag['settings'] || {}).reject do |k, _|
@@ -136,16 +133,13 @@ if %i(shc_search_head shc_captain).include? node['splunk']['node_type']
 end
 
 # License Configuration
+# TODO: Can this ever not be license uri or self?
 license_uri =
   case node['splunk']['node_type']
   when :license_server
     'self'
   when :cluster_master, :cluster_slave, :server, :search_head, :shc_search_head, :shc_captain, :shc_deployer
-    if node['splunk']['free_license']
-      'self'
-    else
-      CernerSplunk.my_cluster_data(node)['license_uri'] || 'self'
-    end
+    'self' || !node['splunk']['free_license'] && CernerSplunk.my_cluster_data(node)['license_uri']
   when :forwarder
     if node['splunk']['package']['base_name'] == 'splunk' && node['splunk']['heavy_forwarder']['use_license_uri']
       CernerSplunk.my_cluster_data(node)['license_uri'] || 'self'
@@ -219,6 +213,7 @@ server_stanzas['license'] = {
   'active_group' => license_group
 }
 
+# TODO: What
 # # For now the old technique of reading passwords from local/server.conf
 
 # old_stanzas = CernerSplunk::Conf::Reader.new("#{node['splunk']['home']}/etc/system/local/server.conf").read

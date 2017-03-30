@@ -7,8 +7,7 @@
 #
 # Configures the indexes.conf file.
 
-indexbag = CernerSplunk.my_cluster_data(node)['indexes']
-bag = CernerSplunk::DataBag.load(indexbag)
+bag = CernerSplunk::DataBag.load(CernerSplunk.my_cluster_data(node)['indexes'])
 
 unless bag
   Chef::Log.info 'No indexes data bag configured.'
@@ -26,18 +25,14 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
 
   stanza_type =
     case stanza
-    when 'default'
-      :default
-    when /^volume:.*/
-      :volume
-    when /^provider-family:.*/
-      :provider_family
-    when /^.*:.*/
-      :unknown
-    else
-      :index
+    when 'default' then :default
+    when /^volume:.*/ then :volume
+    when /^provider-family:.*/ then :provider_family
+    when /^.*:.*/ then :unknown
+    else :index
     end
 
+  # TODO: This can DEFINITELY be simplified.
   daily_mb = hash.delete('_maxDailyDataSizeMB')
   padding = hash.delete('_dataSizePaddingPercent')
   if %i(index default).include?(stanza_type) && daily_mb && !hash.key?('maxTotalDataSizeMB')
@@ -84,7 +79,7 @@ path = is_master ? 'master-apps/_cluster/indexes.conf' : 'system/indexes.conf'
 
 splunk_conf path do
   config index_stanzas
-  notifies :run, 'execute[apply-cluster-bundle]' if is_master
   action :configure
+  notifies :run, 'execute[apply-cluster-bundle]' if is_master
   notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately
 end

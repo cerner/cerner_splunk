@@ -21,4 +21,5 @@ service 'splunk' do
   supports status: true, restart: true
   only_if { ::File.exist? CernerSplunk.restart_marker_file }
   notifies :delete, 'file[splunk-marker]', :immediately
+  # TODO: Replace with splunk_restart
 end

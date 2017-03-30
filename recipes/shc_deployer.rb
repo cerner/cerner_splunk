@@ -54,8 +54,7 @@ app_configs = {
 { '_shcluster' => app_configs }.merge(apps).each do |app_name, app_data|
   download_data = app_data['download'] || {}
 
-  # !!! TODO: cerner_splunk_ingredient cluster support
-  fail 'No cluster support yet...'
+  # TODO: Replace usage
   splunk_app app_name do
     apps_dir "#{node['splunk']['home']}/etc/shcluster/apps"
     action app_data['remove'] ? :remove : :create

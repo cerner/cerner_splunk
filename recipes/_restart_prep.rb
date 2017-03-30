@@ -5,6 +5,7 @@
 #
 # Prepares the restart resource for notifications
 
+# TODO: Unused?
 puts node['splunk']['package']['type']
 splunk_restart node['splunk']['package']['type'] do
   package node['splunk']['package']['type'].to_sym

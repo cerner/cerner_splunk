@@ -5,6 +5,8 @@
 # Cookbook Name:: odw_cron
 # Resource:: sh_cluster
 #
+
+# TODO: What is this
 provides :sh_cluster
 
 actions :initialize, :add, :remove

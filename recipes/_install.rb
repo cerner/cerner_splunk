@@ -22,10 +22,8 @@ node.default['splunk']['cmd'] = CernerSplunk.splunk_command(node)
 
 node.default['splunk']['package']['type'] =
   case nsp['base_name']
-  when 'splunk'
-    'splunk'
-  when 'splunkforwarder'
-    'universal_forwarder'
+  when 'splunk' then 'splunk'
+  when 'splunkforwarder' then 'universal_forwarder'
   end
 
 include_recipe 'cerner_splunk::_restart_prep'
@@ -68,6 +66,7 @@ directory node['splunk']['external_config_directory'] do
   mode '0700'
 end
 
+# TODO: Is this fixed?
 # SPL-89640 On upgrades, the permissions of this directory is too restrictive
 # preventing proper operation of Platform Instrumentation features.
 directory "#{node['splunk']['home']}/var/log/introspection" do

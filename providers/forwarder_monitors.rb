@@ -15,6 +15,7 @@ provides :cerner_splunk_forwarder_monitors if respond_to?(:provides)
 action :install do
   input_stanzas = CernerSplunk::LWRP.convert_monitors(node, new_resource.monitors, new_resource.index)
 
+  # TODO: Replace with splunk_restart
   file new_resource.app do
     action :nothing
     path CernerSplunk.restart_marker_file
@@ -30,6 +31,7 @@ action :install do
 end
 
 action :delete do
+  # TODO: Replace with splunk_restart
   file new_resource.app do
     action :nothing
     path CernerSplunk.restart_marker_file

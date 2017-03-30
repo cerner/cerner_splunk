@@ -7,19 +7,19 @@
 #
 # Configures the roles available on the system
 
-hash = CernerSplunk::DataBag.load node['splunk']['config']['roles'],
-                                  pick_context: CernerSplunk.keys(node)
+hash = CernerSplunk::DataBag.load node['splunk']['config']['roles'], pick_context: CernerSplunk.keys(node)
 
 unless hash
   Chef::Log.info 'Roles not configured for this node.'
   return
 end
 
+# TODO: Let's avoid this pattern
 authorize, user_prefs = CernerSplunk::Roles.configure_roles(hash)
 
 splunk_conf 'system/authorize.conf' do
   config authorize
-  action :configure # Only configure option for now
+  action :configure # Only configure option for now # TODO: What does this mean
   notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately
 end
 

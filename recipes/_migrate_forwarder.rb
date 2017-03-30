@@ -11,11 +11,9 @@ require 'fileutils'
 
 opposite_package_name = CernerSplunk.opposite_package_name(node['splunk']['package']['base_name'])
 old_package =
-  case opposite_package_name
-  when 'splunk'
-    :splunk
-  when 'splunkforwarder'
-    :universal_forwarder
+  case opposite_package_name # TODO: Let's DRY up this bit
+  when 'splunk' then :splunk
+  when 'splunkforwarder' then :universal_forwarder
   end
 
 splunk_service 'stop old service' do
@@ -36,6 +34,8 @@ splunk_install 'uninstall old splunk' do
   package old_package
   action :uninstall
 end
+
+# TODO: What is this
 
 # package opposite_package_name do
 #   package_name CernerSplunk.installed_package_name(node['platform_family'], opposite_package_name)
