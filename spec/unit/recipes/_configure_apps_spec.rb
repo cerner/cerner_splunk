@@ -45,7 +45,7 @@ describe 'cerner_splunk::_configure_apps' do
         }
       }
     }
-    expect(subject).to create_splunk_app('test_app').with(expected_attributes)
+    expect(subject).to install_splunk_app('test_app').with(expected_attributes)
   end
 
   context 'when remove is set to true' do
@@ -58,7 +58,7 @@ describe 'cerner_splunk::_configure_apps' do
     end
 
     it 'removes the app' do
-      expect(subject).to remove_splunk_app('test_app')
+      expect(subject).to uninstall_splunk_app('test_app')
     end
   end
 end

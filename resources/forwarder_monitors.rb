@@ -3,24 +3,33 @@
 # Cookbook Name:: cerner_splunk
 # Resource:: forwarder_monitors
 #
-# Drop in replacement for the existing splunk_forwarder_monitors
+resource_name :splunk_forwarder_monitors
+provides :cerner_splunk_forwarder_monitors
 
-actions :install, :delete
-
-attribute :app,      kind_of: String, name_attribute: true, regex: [/^[A-Za-z0-9_-]/]
-attribute :index,    kind_of: String, required: false
-attribute :monitors, kind_of: Array, default: []
-
-provides :splunk_forwarder_monitors if respond_to?(:provides)
-provides :cerner_splunk_forwarder_monitors if respond_to?(:provides)
-
-def initialize(name, run_context = nil)
-  super
-  @index = node['splunk']['main_project_index']
-  @action = :install
-end
+property :app, String, name_property: true, regex: [/^[A-Za-z0-9_-]/]
+property :index, String, default: lazy { node['splunk']['main_project_index'] }
+property :monitors, Array, default: []
 
 def after_created
-  super
-  Chef::Application.fatal!("node['splunk']['home'] is not defined, ensure your run list is configured to run the cerner_splunk recipe before this point!") unless node['splunk']['home']
+  return if node['splunk']['home']
+  Chef::Application.fatal!("node['splunk']['home'] is not defined, ensure your run list is configured to run the cerner_splunk recipe before this point!") 
+end
+
+action :install do
+  input_stanzas = CernerSplunk::LWRP.convert_monitors(node, new_resource.monitors, new_resource.index)
+
+  splunk_app_custom new_resource.app do
+    configs(proc do
+      splunk_conf 'inputs.conf' do
+        config input_stanzas
+      end
+    end)
+    notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately
+  end
+end
+
+action :delete do
+  splunk_app new_resource.app do
+    action :uninstall
+  end
 end

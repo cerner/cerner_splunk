@@ -29,6 +29,8 @@ apps = CernerSplunk::SplunkApp.merge_hashes(bag_bag, cluster_bag)
 apps.each do |app_name, app_data|
   download_data = app_data['download'] || {}
 
+  # !!! TODO: cerner_splunk_ingredient cluster support
+  fail 'No cluster support yet...'
   splunk_app app_name do
     apps_dir "#{node['splunk']['home']}/etc/master-apps"
     action app_data['remove'] ? :remove : :create
