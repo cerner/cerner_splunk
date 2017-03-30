@@ -13,7 +13,7 @@
    1. Manually, not using the github button so that the fix version of metadata.rb can be incremented in the merge ([reference](https://github.com/cerner/cerner_splunk/issues/41#issuecomment-70569000))
    2. The merge commit text should reference the Issue and the Pull Request so that both are closed when the merge is pushed.
 
-# Release Process:
+# Release Process
 
 1. A pull request of the release commit will be made to stable
    1. The release commit should contain an update of metadata.rb's version to the milestone version.

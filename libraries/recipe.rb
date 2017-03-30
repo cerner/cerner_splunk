@@ -45,7 +45,7 @@ module CernerSplunk
   def self.all_clusters_data(node)
     unless @all_cluster_data
       _head, *others = node['splunk']['config']['clusters']
-      @all_cluster_data = [my_cluster_data(node)] + others.collect { |x| CernerSplunk::DataBag.load(x) }
+      @all_cluster_data = [my_cluster_data(node)] + (others.collect { |x| CernerSplunk::DataBag.load(x) })
     end
     @all_cluster_data
   end

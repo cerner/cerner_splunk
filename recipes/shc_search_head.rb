@@ -20,7 +20,7 @@ include_recipe 'cerner_splunk::_start'
 
 cerner_splunk_sh_cluster 'add SH to SHC' do
   search_heads search_heads
-  admin_password lazy { node.run_state['cerner_splunk']['admin-password'] }
+  admin_password(lazy { node.run_state['cerner_splunk']['admin-password'] })
   not_if { node['splunk']['bootstrap_shc_member'] }
   sensitive true
 end

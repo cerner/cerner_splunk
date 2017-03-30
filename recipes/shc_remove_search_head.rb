@@ -13,7 +13,7 @@ node.default['splunk']['bootstrap_shc_member'] = true
 include_recipe 'cerner_splunk::shc_search_head'
 
 cerner_splunk_sh_cluster 'remove SH from SHC' do
-  admin_password lazy { node.run_state['cerner_splunk']['admin-password'] }
+  admin_password(lazy { node.run_state['cerner_splunk']['admin-password'] })
   action :remove
   sensitive true
 end
