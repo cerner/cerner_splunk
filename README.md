@@ -96,6 +96,8 @@ Possibly Asked Questions
 * Do I have to specify an index?
     * At Cerner: Yes. We use indexes to define ownership and access to data. Data sent to the default index will be rejected.
     * In general: No. Without specifying an index, you wind up in the 'main' index.
+* Can I use this cookbook to configure a Universal Forwarder for a host image?
+    * Yes, add `recipe[cerner_splunk::image_prep]` to the end of your run list.
 * What if I have a question that's not anwsered here?
     * Cerner Associates may be able to reference the [Splunk User Guide](https://wiki.ucern.com/display/OPSINFRA/Splunk+User+Guide)
     * Could also ask in IRC or the other Splunk communities [as listed here](docs/contributing.md)
