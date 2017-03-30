@@ -23,6 +23,11 @@ class Chef
 
       def initialize(name, run_context = nil)
         super
+
+        # If there's no run_context, there's nothing we can do here
+        # assuming this is a sensitive resource: https://github.com/chef/chef/pull/5668
+        return if run_context.nil?
+
         @variables = nil
         @fail_unknown = true
         backup false

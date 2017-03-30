@@ -12,6 +12,10 @@ Installs the Splunk Universal Forwarder on your system. Most people will only wa
 
 Installs the Enterprise Splunk artifact on your system to be configured as a heavy forwarder.
 
+### `cerner_splunk::image_prep`
+
+Makes a Universal Forwarder part of a host image.
+
 Server Installation Recipes
 ---------------------------
 These are installations of Full Splunk. Unless you are a Splunk Administrator, these are not the droids you are looking for.

@@ -18,8 +18,8 @@ Configurable (with defaults)
   * `node['splunk']['monitors'][]['type']` - Type of stanza (`monitor`). See [inputs.conf][] for stanzas.
   * `node['splunk']['monitors'][][???]` - Other attributes for an inputs.conf stanza. See [inputs.conf][]
 * `node['splunk']['cleanup']` - Determines whether the recipe should attempt to clean up the old forwarder install (`true`)
-* `node['splunk']['package']['version']` - Major version to install (`6.3.8`)
-* `node['splunk']['package']['build']` - Corresponding build number (`1e8d95973e45`)
+* `node['splunk']['package']['version']` - Major version to install (`6.5.2`)
+* `node['splunk']['package']['build']` - Corresponding build number (`67571ef4b87d`)
 * `node['splunk']['package']['base_url']` - Base download path (`https://download.splunk.com/products`)
 * `node['splunk']['package']['base_name']` - Name of the package to install (`splunkforwarder`/`splunk`)
 * `node['splunk']['package']['name']` - Name of the package being installed (`"#{node['splunk']['package']['base_name']}-#{node['splunk']['package']['version']}-#{node['splunk']['package']['build']}"`)
@@ -40,6 +40,7 @@ Configurable (with defaults)
 * `node['splunk']['config']['assumed_index']` - Name of the index to which data is forwarded to by default, when the index is not configured for the input.(`main`)
 * `node['splunk']['bootstrap_shc_member']` - Set this attribute to `true` to bootstrap a member to the Search Head Cluster (SHC). (`false`)
 * `node['splunk']['mgmt_host']` - The host other SHC members use when connecting to the current node. You probably want a wrapper cookbook to override this. (`node['ipaddress']`)
+* `node['splunk']['heavy_forwarder']['use_license_uri']` - Set this attribute to `true` to point the Heavy Forwarder to the license master. (`false`)
 * `node['splunk']['flags']['index_checks_fail']` - If `true` raises an exception failing the chef run, when monitors are configured to be sent to non-existent indexes. If `false` logs a warning, but does not fail the chef run for the same condition.(`true`)
 * `node['splunk']['apps']` - An [apps hash](databags.md#apps-hash) of apps to configure locally. (Does not support downloading apps ... yet...)
 

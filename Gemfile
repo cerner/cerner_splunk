@@ -14,7 +14,7 @@ when '2.1.6'
   foodcritic_version = '< 8.0'
   # This is our target chef for this ruby version
   # Omnibus Definition: https://github.com/chef/omnibus-chef/blob/chef-12.4.3/config/projects/chef.rb#L36
-  gem 'chef', '= 12.4.3'
+  chef_version = '= 12.4.3'
   # Later versions require Ruby 2.2
   gem 'fauxhai', '< 3.10'
   # Later versions require Ruby 2.2
@@ -24,9 +24,13 @@ when '2.1.6'
   # Later versions (and thus berkshelf) won't load on chef < 12.5
   # See: https://github.com/berkshelf/ridley/issues/336
   gem 'ridley', '< 4.4.2'
+else
+  # https://github.com/cerner/cerner_splunk/issues/142
+  chef_version = '= 12.18.31'
 end
 
 gem 'berkshelf'
+gem 'chef', chef_version
 gem 'chef-vault'
 gem 'chefspec', chefspec_version
 gem 'foodcritic', foodcritic_version
