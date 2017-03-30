@@ -1,4 +1,5 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
 
 # Do not override these
 if node['platform_family'] == 'windows'

@@ -1,4 +1,6 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: cerner_splunk
 # Recipe:: _configure_shc_authentication
@@ -13,7 +15,6 @@ unless hash
 end
 
 auth_stanzas = CernerSplunk::Authentication.configure_authentication(node, hash)
-
 
 splunk_conf 'shcluster/apps/_shcluster/authentication.conf' do
   config CernerSplunk::Alerts.configure_alerts(node, hash)

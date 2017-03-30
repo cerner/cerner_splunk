@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 if defined?(ChefSpec)
   ChefSpec.define_matcher :splunk_app
   ChefSpec.define_matcher :splunk_template

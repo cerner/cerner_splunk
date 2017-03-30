@@ -1,4 +1,6 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: cerner_splunk
 # Recipe:: _configure_roles
@@ -17,7 +19,7 @@ authorize, user_prefs = CernerSplunk::Roles.configure_roles(hash)
 
 splunk_conf 'system/authorize.conf' do
   config authorize
-  action :configure #Only configure option for now
+  action :configure # Only configure option for now
   notifies :restart, "splunk_service[#{node['splunk']['package']['base_name']}]"
 end
 

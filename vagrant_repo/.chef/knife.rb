@@ -1,4 +1,4 @@
-# coding: UTF-8
+
 
 alternate_node = ENV['node']
 

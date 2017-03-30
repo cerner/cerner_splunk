@@ -1,4 +1,6 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: cerner_splunk
 # File Name:: splunk_app.rb
@@ -55,7 +57,7 @@ class Chef
         super
         @resource_name = :splunk_app
         @action = :create
-        @allowed_actions = [:create, :remove]
+        @allowed_actions = %i(create remove)
         @local = false
         @permissions = {}
         @lookups = {}
@@ -217,7 +219,7 @@ class Chef
 
         install_from_tar filename, expected_version, installed_version
       ensure
-        download.run_action(:delete) if download
+        download&.run_action(:delete)
       end
 
       def validate_downloaded(tarfile)
@@ -273,7 +275,7 @@ class Chef
 
         new_resource.updated_by_last_action true
       ensure
-        tarfile.close if tarfile
+        tarfile&.close
       end
 
       def manage_lookups

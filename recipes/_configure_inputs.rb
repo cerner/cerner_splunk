@@ -1,4 +1,6 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: cerner_splunk
 # Recipe:: _configure_inputs
@@ -10,7 +12,7 @@ base_hash = { 'default' => { 'host' => node['splunk']['config']['host'] } }
 
 input_stanzas = CernerSplunk::LWRP.convert_monitors node, node['splunk']['monitors'], node['splunk']['main_project_index'], base_hash
 
-if [:server, :cluster_slave].include? node['splunk']['node_type']
+if %i(server cluster_slave).include? node['splunk']['node_type']
   bag = CernerSplunk.my_cluster_data(node)
   port = bag['receiver_settings']
   port = port['splunktcp'] if port

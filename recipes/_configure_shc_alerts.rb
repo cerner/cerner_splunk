@@ -1,4 +1,6 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: cerner_splunk
 # Recipe:: _configure_shc_alerts
@@ -17,4 +19,3 @@ splunk_conf 'shcluster/apps/_shcluster/alert_actions.conf' do
   action :configure
   notifies :run, 'execute[apply-shcluster-bundle]'
 end
-

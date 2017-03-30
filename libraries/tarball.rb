@@ -1,4 +1,6 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: cerner_splunk
 # File Name:: tarball.rb
@@ -173,7 +175,7 @@ module CernerSplunk
 
       def call(*)
         return if @pid != $PID
-        @data.drop(1).reverse_each { |io| io.close if io }
+        @data.drop(1).reverse_each { |io| io&.close }
       end
     end
   end

@@ -1,4 +1,6 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: cerner_splunk
 # File Name:: conf.rb
@@ -48,7 +50,7 @@ module CernerSplunk
         file = File.open(@filename, 'r:UTF-8')
         CernerSplunk::Conf.parse file
       ensure
-        file.close if file
+        file&.close
       end
     end
   end
