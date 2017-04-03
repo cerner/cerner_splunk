@@ -59,7 +59,7 @@ module CernerSplunk
     private
 
     # The initial state which is then modified by the key-scheduling algorithm
-    INITIAL_STATE = (0..255).to_a
+    INITIAL_STATE = (0..255).to_a unless defined? INITIAL_STATE
 
     # Performs the key-scheduling algorithm to initialize the state.
     def initialize_state(key)

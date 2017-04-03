@@ -30,7 +30,8 @@ declare_resource(app_type, app_name) do
   source_url download_data['url'] if download_data['url']
   version download_data['version'] if download_data['version']
 
+  # TODO: I don't think these exist yet...
   files CernerSplunk::SplunkApp.proc_files(app_path, files: app_data['files'], lookups: app_data['lookups'])
-  metadata CernerSplunk::Splunkapp.proc_metadata(app_data['permissions'])
+  metadata CernerSplunk::SplunkApp.proc_metadata(app_data['permissions'])
   notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately
 end

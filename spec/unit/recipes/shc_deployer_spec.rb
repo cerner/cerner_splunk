@@ -81,7 +81,7 @@ describe 'cerner_splunk::shc_deployer' do
   end
 
   it 'creates the _shcluster app and notifies the execute[apply-shcluster-bundle] resource to run' do
-    expect(subject).to create_splunk_app('_shcluster')
+    expect(subject).to install_splunk_app('_shcluster')
     expect(subject.splunk_app('_shcluster')).to notify('execute[apply-shcluster-bundle]').to(:run)
   end
 
@@ -100,7 +100,7 @@ describe 'cerner_splunk::shc_deployer' do
           }
         }
       }
-      expect(subject).to create_splunk_app('test_app').with(expected_attributes)
+      expect(subject).to install_splunk_app('test_app').with(expected_attributes)
       expect(subject.splunk_app('test_app')).to notify('execute[apply-shcluster-bundle]').to(:run)
     end
   end
@@ -117,7 +117,7 @@ describe 'cerner_splunk::shc_deployer' do
     end
 
     it 'removes the app and notifies the execute[apply-shcluster-bundle] resource to run' do
-      expect(subject).to remove_splunk_app('test_app')
+      expect(subject).to install_splunk_app('test_app')
       expect(subject.splunk_app('test_app')).to notify('execute[apply-shcluster-bundle]').to(:run)
     end
   end

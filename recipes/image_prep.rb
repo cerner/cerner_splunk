@@ -16,6 +16,5 @@ execute 'clone-prep-clear-config' do
   user node['splunk']['user']
   group node['splunk']['group']
   notifies :stop, 'service[splunk]', :before
-  notifies :delete, 'file[splunk-marker]', :before
-  # TODO: Replace with splunk_restart
+  notifies :clear, "splunk_restart[#{node['splunk']['package']['type']}]", :before
 end

@@ -35,15 +35,13 @@ MASTER_ONLY_CONFIGS = %w(
   commit_retry_time
 ).freeze
 
-# TODO: ???
-# Commenting to get a successfull vagrant up. Will fix ....
-# encrypt_password = CernerSplunk::ConfigProcs::Transform.splunk_encrypt node: node
-# encrypt_noxor_password = CernerSplunk::ConfigProcs::Transform.splunk_encrypt node: node, xor: false
+encrypt_password = CernerSplunk::ConfigProcs::Transform.splunk_encrypt node: node
+encrypt_noxor_password = CernerSplunk::ConfigProcs::Transform.splunk_encrypt node: node, xor: false
 
 # default pass4SymmKey value is 'changeme'
-# server_stanzas['general']['pass4SymmKey'] = CernerSplunk::ConfigProcs.compose encrypt_password, CernerSplunk::ConfigProcs::Value.constant(value: 'changeme')
+server_stanzas['general']['pass4SymmKey'] = CernerSplunk::ConfigProcs.compose encrypt_password, CernerSplunk::ConfigProcs::Value.constant(value: 'changeme')
 # default sslKeysfilePassword value is 'password'
-# server_stanzas['sslConfig']['sslKeysfilePassword'] = CernerSplunk::ConfigProcs.compose encrypt_noxor_password, CernerSplunk::ConfigProcs::Value.constant(value: 'password')
+server_stanzas['sslConfig']['sslKeysfilePassword'] = CernerSplunk::ConfigProcs.compose encrypt_noxor_password, CernerSplunk::ConfigProcs::Value.constant(value: 'password')
 
 # Indexer Cluster Configuration
 case node['splunk']['node_type']
@@ -212,20 +210,6 @@ server_stanzas['license'] = {
   'master_uri' => license_uri,
   'active_group' => license_group
 }
-
-# TODO: What
-# # For now the old technique of reading passwords from local/server.conf
-
-# old_stanzas = CernerSplunk::Conf::Reader.new("#{node['splunk']['home']}/etc/system/local/server.conf").read
-
-# old_stanzas.each do |key, value|
-#   case key
-#   when 'general'
-#     server_stanzas['general']['pass4SymmKey'] = value['pass4SymmKey'] if value['pass4SymmKey']
-#   when 'sslConfig'
-#     server_stanzas['sslConfig']['sslKeysfilePassword'] = value['sslKeysfilePassword']
-#   end
-# end
 
 splunk_conf 'system/server.conf' do
   config server_stanzas

@@ -54,16 +54,15 @@ app_configs = {
 { '_shcluster' => app_configs }.merge(apps).each do |app_name, app_data|
   download_data = app_data['download'] || {}
 
-  # TODO: Replace usage
-  splunk_app app_name do
-    apps_dir "#{node['splunk']['home']}/etc/shcluster/apps"
-    action app_data['remove'] ? :remove : :create
-    url download_data['url']
+  splunk_app_package app_name do
+    action app_data['remove'] ? :uninstall : :install
+    source_url download_data['url']
     version download_data['version']
-    local app_data['local']
-    files app_data['files']
-    lookups app_data['lookups']
-    permissions app_data['permissions']
+    app_root :shcluster
+
+    # TODO: I don't think these exist yet...
+    files CernerSplunk::SplunkApp.proc_files(app_path, files: app_data['files'], lookups: app_data['lookups'])
+    metadata CernerSplunk::SplunkApp.proc_metadata(app_data['permissions'])
     notifies :run, 'execute[apply-shcluster-bundle]'
   end
 end

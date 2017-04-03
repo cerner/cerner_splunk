@@ -6,8 +6,8 @@ require_relative '../spec_helper'
 describe 'cerner_splunk::_configure_apps' do
   subject do
     runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '7.2') do |node|
-      node.set['splunk']['package']['type'] = 'splunk'
-      node.set['splunk']['apps'] = apps
+      node.normal['splunk']['package']['type'] = 'splunk'
+      node.normal['splunk']['apps'] = apps
     end
     runner.converge('cerner_splunk::_restart_prep', described_recipe)
   end

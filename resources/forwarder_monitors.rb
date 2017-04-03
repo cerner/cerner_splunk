@@ -6,8 +6,6 @@
 # Resource:: forwarder_monitors
 #
 
-# TODO: Does this need to be a resource?
-
 resource_name :splunk_forwarder_monitors
 provides :cerner_splunk_forwarder_monitors
 

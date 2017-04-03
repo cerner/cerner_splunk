@@ -34,15 +34,3 @@ splunk_install 'uninstall old splunk' do
   package old_package
   action :uninstall
 end
-
-# TODO: What is this
-
-# package opposite_package_name do
-#   package_name CernerSplunk.installed_package_name(node['platform_family'], opposite_package_name)
-#   action :remove
-# end
-
-# directory CernerSplunk.splunk_home(node['platform_family'], node['kernel']['machine'], opposite_package_name) do
-#   action :delete
-#   recursive true
-# end

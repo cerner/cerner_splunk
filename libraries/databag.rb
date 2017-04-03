@@ -12,6 +12,7 @@ module CernerSplunk #:nodoc:
   module DataBag
     # Converts a string of the form "(data_bag/)bag_item(:key)" to an array of [data_bag,bag_item,key]
     # If provided nil, will return nil
+    # TODO: Refactor?
     def self.to_a(string, options = {})
       opts = {
         default: nil,

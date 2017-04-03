@@ -5,13 +5,13 @@ require_relative '../spec_helper'
 describe 'cerner_splunk::_install' do
   subject do
     runner = ChefSpec::SoloRunner.new(platform: platform, version: platform_version) do |node|
-      node.set['splunk']['cmd'] = 'splunk'
-      # node.set['splunk']['user'] = 'splunk
-      node.set['splunk']['package']['type'] = 'universal_forwarder'
-      node.set['splunk']['package']['base_name'] = 'splunkforwarder'
-      node.set['splunk']['package']['download_group'] = 'universalforwarder'
-      node.set['splunk']['package']['file_suffix'] = '.txt'
-      node.set['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
+      node.normal['splunk']['cmd'] = 'splunk'
+      # node.normal['splunk']['user'] = 'splunk
+      node.normal['splunk']['package']['type'] = 'universal_forwarder'
+      node.normal['splunk']['package']['base_name'] = 'splunkforwarder'
+      node.normal['splunk']['package']['download_group'] = 'universalforwarder'
+      node.normal['splunk']['package']['file_suffix'] = '.txt'
+      node.normal['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
     end
     runner.converge(described_recipe)
   end
@@ -65,10 +65,6 @@ describe 'cerner_splunk::_install' do
 
   it 'includes default chef-vault recipe' do
     expect(subject).to include_recipe('chef-vault::default')
-  end
-
-  it 'includes cerner_splunk::_cleanup_aeon recipe' do
-    expect(subject).to include_recipe('cerner_splunk::_cleanup_aeon')
   end
 
   it 'includes cerner_splunk::_restart_prep recipe' do

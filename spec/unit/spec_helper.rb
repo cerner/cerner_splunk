@@ -8,7 +8,9 @@ require 'chefspec/berkshelf'
 require 'chef-vault'
 
 RSpec.configure do |config|
-  config.order = 'random'
+  config.color = true
+  config.formatter = 'documentation'
+  config.order = 'rand'
   config.file_cache_path = '/var/chef/cache'
   config.expect_with(:rspec) { |c| c.syntax = :expect }
 

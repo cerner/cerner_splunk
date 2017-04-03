@@ -10,6 +10,8 @@
 #
 # extend CernerSplunk::LWRP::(module) unless defined? (method name)
 
+# TODO: This seems very bad
+
 require_relative 'databag'
 require_relative 'recipe'
 
@@ -35,39 +37,6 @@ module CernerSplunk
         stanzas
       end
       validate_indexes(node, all_stanzas)
-    end
-
-    # RESOURCE: extend CernerSplunk::LWRP::DelayableAttribute unless defined? delayable_attribute
-    #
-    # Extension of the Resource DSL, defines an attribute that can be set upfront or can be calculated at convergence time.
-    module DelayableAttribute
-      def delayable_attribute(attr_name, validation = {}) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
-        class_eval(<<-SHIM, __FILE__, __LINE__)
-          def #{attr_name}(arg=nil,&block)
-            _set_or_return_#{attr_name}(arg,block)
-          end
-        SHIM
-
-        define_method("_set_or_return_#{attr_name}".to_sym) do |arg, block|
-          fail "Specify only the arg or block, not both for #{attr_name}!" if arg && block
-
-          iv_symbol = "@#{attr_name}".to_sym
-
-          if block
-            instance_variable_set(iv_symbol, block)
-          elsif arg || !instance_variable_defined?(iv_symbol)
-            opts = validate({ attr_name => arg }, { attr_name => validation })
-            instance_variable_set(iv_symbol, opts[attr_name])
-          else
-            val = instance_variable_get(iv_symbol)
-            if val.is_a? Proc
-              validate({ attr_name => val.call }, { attr_name => validation })[attr_name]
-            else
-              val
-            end
-          end
-        end
-      end
     end
 
     # Validate the indexes to which data is being forwarded to

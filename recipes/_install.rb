@@ -9,8 +9,6 @@
 
 include_recipe 'chef-vault::default'
 
-include_recipe 'cerner_splunk::_cleanup_aeon'
-
 # Interpolation Alias
 def nsp
   node['splunk']['package']
@@ -40,7 +38,6 @@ include_recipe 'cerner_splunk::_configure_secret'
 
 splunk_service node['splunk']['package']['type'] do # renamed because splunk_restart resource name has to match with that of splunk_match
   package node['splunk']['package']['type'].to_sym
-  user node['splunk']['user']
   ulimit node['splunk']['limits']['open_files'].to_i unless node['platform_family'] == 'windows'
   action :init
   notifies :run, 'ruby_block[read splunk.secret]', :immediately

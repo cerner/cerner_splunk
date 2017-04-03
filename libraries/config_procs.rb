@@ -20,6 +20,14 @@ module CernerSplunk
       def self.vault(coordinate:, default_coords: nil, pick_context: nil, **_)
         proc { CernerSplunk::DataBag.load coordinate, type: :vault, default: default_coords, pick_context: pick_context }
       end
+
+      def self.existing(filename:, **_)
+        config_file = CernerSplunk::ConfHelpers.read_config(filename)
+        proc do |context, config|
+          config_file ||= config
+          context.key ? (config_file[context.section] || {})[context.key] : config_file[context.section]
+        end
+      end
     end
 
     # Methods to generate procs for how to transform the value prior to writing.
