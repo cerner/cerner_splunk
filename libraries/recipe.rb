@@ -1,5 +1,5 @@
 # coding: UTF-8
-#
+
 # Cookbook Name:: cerner_splunk
 # File Name:: recipe.rb
 #
@@ -15,7 +15,7 @@ module CernerSplunk
     throw 'Symbol should not be nil' unless symbol
     throw "Cannot set type '#{symbol}', already set '#{node.default['splunk']['node_type']}'" if node.default['splunk']['node_type']
     if node['splunk']['free_license']
-      throw "Cannot use the Splunk #{symbol} recipe with the free license" unless [:forwarder, :server].include? symbol
+      throw "Cannot use the Splunk #{symbol} recipe with the free license" unless %i[forwarder server].include? symbol
     end
     node.default['splunk']['node_type'] = symbol.to_sym
   end

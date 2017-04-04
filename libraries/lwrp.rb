@@ -1,5 +1,5 @@
 # coding: UTF-8
-#
+
 # Cookbook Name:: cerner_splunk
 # File Name:: lwrp.rb
 #
@@ -91,11 +91,11 @@ module CernerSplunk
             next
           end
 
-          index_states = %w(isReadOnly disabled deleted)
+          index_states = %w[isReadOnly disabled deleted]
 
           index_states.each do |state|
             value = bag['config'][index][state]
-            if value && %w(1 true).include?(value.to_s)
+            if value && %w[1 true].include?(value.to_s)
               index_error << "Cannot forward data to index '#{index}' in the cluster '#{cluster}', because the index is marked as '#{state}'"
             end
           end

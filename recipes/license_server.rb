@@ -1,5 +1,5 @@
 # coding: UTF-8
-#
+
 # Cookbook Name:: cerner_splunk
 # Recipe:: license_server
 #
@@ -26,7 +26,7 @@ data_bag_item = bag.to_hash
 total_available_license_quota = 0
 
 license_groups = data_bag_item.inject('enterprise' => {}) do |hash, (key, value)|
-  unless %w(id chef_type data_bag).include? key
+  unless %w[id chef_type data_bag].include? key
     doc = Nokogiri::XML value
     type = doc.at_xpath('/license/payload/type/text()').to_s
     quota = doc.at_xpath('/license/payload/quota/text()').to_s.to_i

@@ -1,5 +1,5 @@
 # coding: UTF-8
-#
+
 # Cookbook Name:: cerner_splunk_test
 # Recipe:: default
 #
@@ -11,7 +11,7 @@ directory '/testlogs' do
   mode '0750'
 end
 
-%w(one two three four).each do |dir|
+%w[one two three four].each do |dir|
   directory "/testlogs/#{dir}" do
     owner 'vagrant'
     group 'vagrant'
