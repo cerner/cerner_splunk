@@ -14,16 +14,16 @@ server_stanzas = {
   'sslConfig' => {}
 }
 
-SLAVE_ONLY_CONFIGS = %w(
+SLAVE_ONLY_CONFIGS = %w[
   max_replication_errors
   register_replication_address
   register_forwarder_address
   register_search_address
   heartbeat_period
   enableS2SHeartbeat
-).freeze
+].freeze
 
-MASTER_ONLY_CONFIGS = %w(
+MASTER_ONLY_CONFIGS = %w[
   replication_factor
   search_factor
   heartbeat_timeout
@@ -33,7 +33,7 @@ MASTER_ONLY_CONFIGS = %w(
   searchable_targets
   target_wait_time
   commit_retry_time
-).freeze
+].freeze
 
 encrypt_password = CernerSplunk::ConfigProcs::Transform.splunk_encrypt node: node
 encrypt_noxor_password = CernerSplunk::ConfigProcs::Transform.splunk_encrypt node: node, xor: false
@@ -50,7 +50,7 @@ when :search_head, :shc_search_head, :shc_captain, :server
     stanza = "clustermaster:#{cluster}"
     master_uri = bag['master_uri'] || ''
     next if master_uri.empty?
-    
+
     pass = settings['pass4SymmKey'] || ''
 
     server_stanzas[stanza] = {}
@@ -63,7 +63,7 @@ when :search_head, :shc_search_head, :shc_captain, :server
 
   # TODO: This isn't possible
   clusters.reject!(&:nil?)
-  server_stanzas['clustering'] = { 'mode' => 'searchhead', 'master_uri' = clusters.join(',') } if clusters.any?
+  server_stanzas['clustering'] = { 'mode' => 'searchhead', 'master_uri' => clusters.join(',') } if clusters.any?
 
 when :cluster_master
   bag = CernerSplunk.my_cluster_data(node)
@@ -98,7 +98,7 @@ when :cluster_slave
 end
 
 # Search Head Cluster configuration
-if %i(shc_search_head shc_captain).include? node['splunk']['node_type']
+if %i[shc_search_head shc_captain].include? node['splunk']['node_type']
   cluster, bag = CernerSplunk.my_cluster(node)
   deployer_uri = bag['deployer_uri'] || ''
   replication_ports = bag['shc_replication_ports'] || bag['replication_ports'] || {}
@@ -107,8 +107,8 @@ if %i(shc_search_head shc_captain).include? node['splunk']['node_type']
   end
   pass = settings.delete('pass4SymmKey')
 
-  fail "Missing deployer URI for #{cluster}" if deployer_uri.empty?
-  fail "Missing replication port configuration for cluster '#{cluster}'" if replication_ports.empty?
+  raise "Missing deployer URI for #{cluster}" if deployer_uri.empty?
+  raise "Missing replication port configuration for cluster '#{cluster}'" if replication_ports.empty?
 
   replication_ports.each do |port, port_settings|
     ssl = port_settings['_cerner_splunk_ssl'] == true
@@ -175,7 +175,7 @@ license_group =
   end
 
 if license_uri == 'self'
-  %w(forwarder free enterprise download-trial).each do |group|
+  %w[forwarder free enterprise download-trial].each do |group|
     server_stanzas["lmpool:auto_generated_pool_#{group}"] = {
       'description' => "auto_generated_pool_#{group}",
       'quota' => 'MAX',

@@ -13,15 +13,15 @@ return if platform_family?('windows')
 # user should be created by the package install
 user node['splunk']['user'] do
   manage_home true
-  action %i(create lock)
+  action %i[create lock]
 end
 
 conflicts = node['splunk']['groups'].find_all do |group_to_add|
   node['splunk']['exclude_groups'].include?(group_to_add)
 end
 
-fail "You're asking us to both add and remove the #{node['splunk']['user']} user from: #{conflicts.join(',')} groups. Check your node['splunk']['groups'] attribute!" unless conflicts.empty?
-fail "You cannot exclude the #{node['splunk']['user']} user from the #{node['splunk']['group']} group." if node['splunk']['exclude_groups'].include?(node['splunk']['group'])
+raise "You're asking us to both add and remove the #{node['splunk']['user']} user from: #{conflicts.join(',')} groups. Check your node['splunk']['groups'] attribute!" unless conflicts.empty?
+raise "You cannot exclude the #{node['splunk']['user']} user from the #{node['splunk']['group']} group." if node['splunk']['exclude_groups'].include?(node['splunk']['group'])
 
 groups_to_add = [node['splunk']['group']] + node['splunk']['groups']
 

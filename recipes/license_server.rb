@@ -7,7 +7,7 @@
 #
 # Configures a License Server
 
-fail 'License Server installation not currently supported on windows' if platform_family?('windows')
+raise 'License Server installation not currently supported on windows' if platform_family?('windows')
 
 include_recipe 'xml::ruby'
 require 'nokogiri'
@@ -27,22 +27,20 @@ end
 data_bag_item = bag.to_hash
 total_available_license_quota = 0
 
-license_groups = data_bag_item.inject('enterprise' => {}) do |hash, (key, value)|
-  unless %w(id chef_type data_bag).include? key
-    doc = Nokogiri::XML value
-    type = doc.at_xpath('/license/payload/type/text()').to_s
-    quota = doc.at_xpath('/license/payload/quota/text()').to_s.to_i
-    expiration_time = doc.at_xpath('/license/payload/expiration_time/text()').to_s.to_i
-    total_available_license_quota += quota if type == 'enterprise' && expiration_time > Time.now.to_i
-    hash[type] ||= {}
-    hash[type][key] = value
-  end
-  hash
+license_groups = data_bag_item.each_with_object('enterprise' => {}) do |(key, value), hash|
+  next if %w[id chef_type data_bag].include? key
+  doc = Nokogiri::XML value
+  type = doc.at_xpath('/license/payload/type/text()').to_s
+  quota = doc.at_xpath('/license/payload/quota/text()').to_s.to_i
+  expiration_time = doc.at_xpath('/license/payload/expiration_time/text()').to_s.to_i
+  total_available_license_quota += quota if type == 'enterprise' && expiration_time > Time.now.to_i
+  hash[type] ||= {}
+  hash[type][key] = value
 end
 
 unless node.run_state['cerner_splunk']['total_allotted_pool_size'].nil?
   total_allotted_pool_size = node.run_state['cerner_splunk']['total_allotted_pool_size']
-  fail "Sum of pool sizes is #{CernerSplunk.human_readable_size total_allotted_pool_size}. Exceeds total available pool size of #{CernerSplunk.human_readable_size total_available_license_quota}." if total_allotted_pool_size > total_available_license_quota
+  raise "Sum of pool sizes is #{CernerSplunk.human_readable_size total_allotted_pool_size}. Exceeds total available pool size of #{CernerSplunk.human_readable_size total_available_license_quota}." if total_allotted_pool_size > total_available_license_quota
 end
 
 license_groups.each do |type, keys|

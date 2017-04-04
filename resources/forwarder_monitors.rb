@@ -15,7 +15,7 @@ property :monitors, Array, default: []
 
 def after_created
   return if node['splunk']['home']
-  Chef::Application.fatal!("node['splunk']['home'] is not defined, ensure your run list is configured to run the cerner_splunk recipe before this point!") 
+  Chef::Application.fatal!("node['splunk']['home'] is not defined, ensure your run list is configured to run the cerner_splunk recipe before this point!")
 end
 
 action :install do

@@ -7,7 +7,7 @@
 #
 # Install a Splunk Cluster Master.
 
-fail 'Cluster Master installation not currently supported on windows' if platform_family?('windows')
+raise 'Cluster Master installation not currently supported on windows' if platform_family?('windows')
 
 ## Attributes
 instance_exec :cluster_master, &CernerSplunk::NODE_TYPE

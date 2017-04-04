@@ -47,7 +47,7 @@ module CernerSplunk
       data = []
       target_path = @prefix.nil? ? name : "#{@prefix}/#{name}"
       iterate file: proc { |path, entry| data << entry.read if path == target_path }, other: proc {}
-      fail "Multiple entries for #{target_path} found in #{@file_name}" if data.size > 1
+      raise "Multiple entries for #{target_path} found in #{@file_name}" if data.size > 1
       data.first
     end
 
@@ -145,7 +145,7 @@ module CernerSplunk
           callback ||= callbacks[:other]
 
           if @prefix.nil? || path.start_with?("#{@prefix}/")
-            fail "Unsupported typeflag #{entry.header.typeflag} for path #{path}" unless callback
+            raise "Unsupported typeflag #{entry.header.typeflag} for path #{path}" unless callback
 
             callback.call path, entry, linkname: linkname
           end

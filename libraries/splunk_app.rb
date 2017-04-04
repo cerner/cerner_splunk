@@ -132,7 +132,6 @@ end
 # class Chef
 #   class Provider
 #     # Chef Provider for managing Splunk apps
-#     class SplunkApp < Chef::Provider # rubocop:disable ClassLength
 #       provides :splunk_app if respond_to?(:provides)
 
 #       def whyrun_supported?
@@ -226,8 +225,6 @@ end
 #         fail "Downloaded tarball from '#{new_resource.url}' does not contain an app named '#{new_resource.app}'" if tarfile.num_files == 0
 #         fail "Downloaded tarball for '#{new_resource.app}' has local entries" unless tarfile.count { |p, _| p.match %r{^[^/]+/local/.+} } == 0
 #       end
-
-#       def should_install?(expected_version, installed_version, tar_version) # rubocop:disable PerceivedComplexity, CyclomaticComplexity
 #         fail "Downloaded tarball for #{new_resource.app} does not contain a version in app.conf!" unless tar_version.version
 #         # If we specify an expected version (see warning in should download), the tar version must match exactly OR the expected version is the base version of the (prerelease) tar version
 #         if expected_version.version && tar_version != expected_version

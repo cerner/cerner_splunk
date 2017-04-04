@@ -46,7 +46,7 @@ module CernerSplunk #:nodoc:
         key = process(data[:key], default[2], opts[:strip_key], opts[:default_empty_key])
         [bag, item, key]
       else
-        fail "Unexpected argument of type #{string.class}: #{string}"
+        raise "Unexpected argument of type #{string.class}: #{string}"
       end
     end
 
@@ -58,7 +58,7 @@ module CernerSplunk #:nodoc:
       when nil
         nil
       when Array
-        fail "Array '#{array}' can only contain Strings or nil" unless array.all? { |i| i.nil? || i.is_a?(String) }
+        raise "Array '#{array}' can only contain Strings or nil" unless array.all? { |i| i.nil? || i.is_a?(String) }
         data_bag, bag_item, key = array
         Chef::DataBag.validate_name!(data_bag) if data_bag
         Chef::DataBagItem.validate_id!(bag_item) if bag_item
@@ -68,7 +68,7 @@ module CernerSplunk #:nodoc:
         str = "#{str}:#{key}" if key
         str
       else
-        fail "Unexpected argument of type #{array.class}: #{array}"
+        raise "Unexpected argument of type #{array.class}: #{array}"
       end
     end
 
@@ -88,7 +88,7 @@ module CernerSplunk #:nodoc:
           require 'chef-vault'
           ChefVault::Item
         else
-          fail "Unexpected type of DataBag #{opts[:type]}"
+          raise "Unexpected type of DataBag #{opts[:type]}"
         end
 
       data_bag, bag_item, key = to_a(string, options)
@@ -129,7 +129,7 @@ module CernerSplunk #:nodoc:
       value = data_bag_item[key]
       while value.is_a? String
         if attempts.include? value
-          fail "Circular reference resolving key (#{attempts.join(';')})!"
+          raise "Circular reference resolving key (#{attempts.join(';')})!"
         end
         attempts << value
         value = data_bag_item[value]

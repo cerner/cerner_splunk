@@ -19,7 +19,7 @@ flags = bag['flags'] || {}
 
 is_master = node['splunk']['node_type'] == :cluster_master
 
-index_stanzas = config.inject({}) do |result, (stanza, index_config)|
+index_stanzas = config.each_with_object({}) do |(stanza, index_config), result|
   index_flags = flags[stanza] || {}
   hash = {}.merge! index_config
 
@@ -35,7 +35,7 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
   # TODO: This can DEFINITELY be simplified.
   daily_mb = hash.delete('_maxDailyDataSizeMB')
   padding = hash.delete('_dataSizePaddingPercent')
-  if %i(index default).include?(stanza_type) && daily_mb && !hash.key?('maxTotalDataSizeMB')
+  if %i[index default].include?(stanza_type) && daily_mb && !hash.key?('maxTotalDataSizeMB')
     settings = CernerSplunk.my_cluster_data(node).fetch('settings', {})
     replication_factor = settings['replication_factor'] || 1
     indexer_count = settings['_cerner_splunk_indexer_count'] || 1
@@ -68,7 +68,6 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
   end
 
   result[stanza] = hash
-  result
 end
 
 if is_master && index_stanzas['_introspection'].nil?

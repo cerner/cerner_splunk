@@ -20,21 +20,19 @@ module CernerSplunk
   module LWRP
     # Change a list of monitors to a hash of stanzas for writing to a config file
     def self.convert_monitors(node, monitors, default_index = nil, base = {})
-      all_stanzas = monitors.inject(base) do |stanzas, element|
+      all_stanzas = monitors.each_with_object(base) do |element, stanzas|
         type = element['type'] || element[:type] || 'monitor'
         path = element['path'] || element[:path]
 
         base_hash = default_index ? { 'index' => default_index } : {}
-        stanzas["#{type}://#{path}"] = element.inject(base_hash) do |hash, (key, value)|
+        stanzas["#{type}://#{path}"] = element.each_with_object(base_hash) do |(key, value), hash|
           case key
           when 'type', 'path', :type, :path
             # skip-these
           else
             hash[key.to_s] = value
           end
-          hash
         end
-        stanzas
       end
       validate_indexes(node, all_stanzas)
     end
@@ -62,11 +60,11 @@ module CernerSplunk
             next
           end
 
-          index_states = %w(isReadOnly disabled deleted)
+          index_states = %w[isReadOnly disabled deleted]
 
           index_states.each do |state|
             value = bag['config'][index][state]
-            if value && %w(1 true).include?(value.to_s)
+            if value && %w[1 true].include?(value.to_s)
               index_error << "Cannot forward data to index '#{index}' in the cluster '#{cluster}', because the index is marked as '#{state}'"
             end
           end
@@ -75,7 +73,7 @@ module CernerSplunk
 
       unless index_error.empty?
         index_error_msg = "Data cannot be forwarded to respective index(es) due to the following reason(s):\n#{index_error.join("\n")}"
-        fail index_error_msg if node['splunk']['flags']['index_checks_fail']
+        raise index_error_msg if node['splunk']['flags']['index_checks_fail']
         Chef::Log.warn index_error_msg
       end
 

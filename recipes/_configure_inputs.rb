@@ -12,7 +12,7 @@ base_hash = { 'default' => { 'host' => node['splunk']['config']['host'] } }
 
 input_stanzas = CernerSplunk::LWRP.convert_monitors node, node['splunk']['monitors'], node['splunk']['main_project_index'], base_hash
 
-if %i(server cluster_slave).include? node['splunk']['node_type']
+if %i[server cluster_slave].include? node['splunk']['node_type']
   bag = CernerSplunk.my_cluster_data(node)
   # TODO: This is stupid
   port = bag['receiver_settings']
@@ -20,7 +20,7 @@ if %i(server cluster_slave).include? node['splunk']['node_type']
   port = port['port'] if port
 
   if port
-    input_stanzas["splunktcp://:#{port}"] = { 'disabled' = 0, 'connection_host' = 'none' }
+    input_stanzas["splunktcp://:#{port}"] = { 'disabled' => 0, 'connection_host' => 'none' }
   else
     Chef::Log.warn "Receiver settings missing in configured cluster data bag: #{cluster}"
   end

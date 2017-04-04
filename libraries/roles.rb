@@ -10,12 +10,12 @@ require_relative 'databag'
 module CernerSplunk
   # Module contains functions to configure roles in a Splunk system
   module Roles
-    def self.configure_roles(hash) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity, MethodLength
+    def self.configure_roles(hash) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
       user_prefs = {}
       authorize = {}
 
       hash.each do |stanza, values|
-        pref_entries, auth_entries = values.inject([{}, {}]) do |result, (key, value)|
+        pref_entries, auth_entries = values.each_with_object([{}, {}]) do |(key, value), result|
           prefs = result[0]
           auth = result[1]
 
@@ -41,7 +41,6 @@ module CernerSplunk
                 value
               end
           end
-          result
         end
 
         unless pref_entries.empty?

@@ -5,8 +5,8 @@
 
 Vagrant.require_version '>= 1.4.1'
 
-%w(vagrant-ohai vagrant-omnibus).each do |plugin|
-  fail "Missing #{plugin}. Please install it!" unless Vagrant.has_plugin? plugin
+%w[vagrant-ohai vagrant-omnibus].each do |plugin|
+  raise "Missing #{plugin}. Please install it!" unless Vagrant.has_plugin? plugin
 end
 
 @network = {
@@ -32,11 +32,11 @@ end
 @chefip = @network[:chef][:ip]
 
 # Network sanity checks.
-fail 'Non-unique ips' if @network.collect { |_, v| v[:ip] }.uniq!
+raise 'Non-unique ips' if @network.collect { |_, v| v[:ip] }.uniq!
 
-fail 'Non-unique hostnames' if @network.collect { |_, v| v[:hostname] }.uniq!
+raise 'Non-unique hostnames' if @network.collect { |_, v| v[:hostname] }.uniq!
 
-fail 'Non-unique ports' if @network.collect { |_, v| v[:ports].keys }.flat_map { |v| v }.uniq!
+raise 'Non-unique ports' if @network.collect { |_, v| v[:ports].keys }.flat_map { |v| v }.uniq!
 
 def default_omnibus(config)
   config.omnibus.chef_version = '12.13.37' # https://github.com/chef-cookbooks/chef-client/issues/425

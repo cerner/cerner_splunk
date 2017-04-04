@@ -24,13 +24,13 @@ module CernerSplunk
           hash
         end
 
-      fail 'Unexpected property \'bag\'' if alert_stanzas.delete('bag')
+      raise 'Unexpected property \'bag\'' if alert_stanzas.delete('bag')
 
       email_settings = alert_stanzas['email'] || {}
 
       if email_settings['auth_password']
         password = CernerSplunk::DataBag.load email_settings['auth_password'], default: default_coords, type: :vault
-        fail 'Password must be a String' unless password.is_a?(String)
+        raise 'Password must be a String' unless password.is_a?(String)
         email_settings['auth_password'] = password
       end
       alert_stanzas

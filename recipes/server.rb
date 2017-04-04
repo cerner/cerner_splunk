@@ -7,7 +7,7 @@
 #
 # Configures Splunk as a Standalone server (Indexer, Receiver, Search Head, Slave)
 
-fail 'Server installation not currently supported on windows' if platform_family?('windows')
+raise 'Server installation not currently supported on windows' if platform_family?('windows')
 
 ## Attributes
 instance_exec :server, &CernerSplunk::NODE_TYPE

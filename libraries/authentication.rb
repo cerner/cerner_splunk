@@ -22,12 +22,11 @@ module CernerSplunk
     def self.configure_authentication(node, hash) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity, MethodLength
       hash = hash.clone
       auth_stanzas = { 'authentication' => hash }
-      fail "authSettings is managed by chef. Don't set it yourself!" if hash.key?('authSettings')
+      raise "authSettings is managed by chef. Don't set it yourself!" if hash.key?('authSettings')
 
       unless hash['authType']
-        guesses = ASSUMPTIONS.inject([]) do |result, (key, type)|
+        guesses = ASSUMPTIONS.each_with_object([]) do |(key, type), result|
           result << type if hash.key?(key) && !result.include?(type)
-          result
         end
 
         hash['authType'] =
@@ -37,13 +36,13 @@ module CernerSplunk
           when 1
             guesses.first
           else
-            fail "Unable to determine authType! Guesses include #{guesses.join(',')}"
+            raise "Unable to determine authType! Guesses include #{guesses.join(',')}"
           end
       end
 
       ASSUMPTIONS.each do |key, type|
         if hash['authType'] != type && hash.key?(key)
-          fail "#{key} is only supported with #{type}. authType = #{hash['authType']}"
+          raise "#{key} is only supported with #{type}. authType = #{hash['authType']}"
         end
       end
 
@@ -56,19 +55,19 @@ module CernerSplunk
         script = {
           'scriptPath' => hash.delete('scriptPath')
         }
-        fail 'scriptPath required for Scripted authentication' unless script['scriptPath']
+        raise 'scriptPath required for Scripted authentication' unless script['scriptPath']
         search_filters = hash.delete('scriptSearchFilters')
         script['scriptSearchFilters'] = search_filters if search_filters
         hash['authSettings'] = 'script'
         auth_stanzas['script'] = script
         cache_timing = hash.delete('cacheTiming')
         if cache_timing
-          fail "Unknown type for cacheTiming: #{cacheTiming.class}" unless cache_timing.is_a?(Hash)
+          raise "Unknown type for cacheTiming: #{cacheTiming.class}" unless cache_timing.is_a?(Hash)
           auth_stanzas['cacheTiming'] = cache_timing
         end
       when 'LDAP'
         strategies = hash.delete('LDAP_strategies')
-        fail 'LDAP_strategies required for LDAP authentication' unless strategies
+        raise 'LDAP_strategies required for LDAP authentication' unless strategies
         strategies = [strategies] unless strategies.is_a? Array
         strategies = strategies.collect do |strategy|
           hash =
@@ -86,20 +85,19 @@ module CernerSplunk
                 # ew. Hm... I wonder if we can have the library guarantee a Hash...
                 bag.clone.merge temp
               else
-                fail "Unexpected type for LDAP Strategy #{bag.class} at #{bag_coords}"
+                raise "Unexpected type for LDAP Strategy #{bag.class} at #{bag_coords}"
               end
             else
-              fail "Unexpected type for LDAP Strategy #{strategy.class}"
+              raise "Unexpected type for LDAP Strategy #{strategy.class}"
             end
-          fail "Unexpected property 'bag'" if hash.delete('bag')
+          raise "Unexpected property 'bag'" if hash.delete('bag')
 
-          %w(userBaseDN groupBaseDN).each do |x|
+          %w[userBaseDN groupBaseDN].each do |x|
             hash[x] = hash[x].join(';') if hash[x].is_a?(Array)
           end
 
-          hash['roleMap'] = (hash['roleMap'] || {}).inject({}) do |h, (k, v)|
+          hash['roleMap'] = (hash['roleMap'] || {}).each_with_object({}) do |(k, v), h|
             h[k] = v.is_a?(Array) ? v.join(';') : v.to_s
-            h
           end
 
           if hash['bindDNpassword']
@@ -109,28 +107,28 @@ module CernerSplunk
           end
 
           # Verify Attributes
-          %w(host userBaseDN userNameAttribute realNameAttribute groupBaseDN groupNameAttribute groupMemberAttribute).each do |x|
-            fail "#{x} is required to be set on an LDAP Strategy" if hash[x].nil? || hash[x].strip.empty?
+          %w[host userBaseDN userNameAttribute realNameAttribute groupBaseDN groupNameAttribute groupMemberAttribute].each do |x|
+            raise "#{x} is required to be set on an LDAP Strategy" if hash[x].nil? || hash[x].strip.empty?
           end
           hash
         end
 
-        fail 'LDAP_strategies required for LDAP authentication' if strategies.empty?
+        raise 'LDAP_strategies required for LDAP authentication' if strategies.empty?
 
         auth_stanzas['authentication']['authSettings'] = strategies.collect do |strategy|
           strategy_name = strategy.delete('strategy_name')
           strategy_name ||= "#{strategy['host']}:#{strategy['port'] || 389}"
 
-          fail "Duplicate Strategy declaration of #{strategy_name}" if auth_stanzas[strategy_name]
+          raise "Duplicate Strategy declaration of #{strategy_name}" if auth_stanzas[strategy_name]
 
           auth_stanzas[strategy_name] = strategy
           auth_stanzas["roleMap_#{strategy_name}"] = strategy.delete('roleMap')
 
-          fail "Resolved Role Map for Strategy Name #{strategy_name} is empty!!!" if auth_stanzas["roleMap_#{strategy_name}"].empty?
+          raise "Resolved Role Map for Strategy Name #{strategy_name} is empty!!!" if auth_stanzas["roleMap_#{strategy_name}"].empty?
           strategy_name
         end.join(',')
       else
-        fail "Unsupported Auth type '#{hash['authType']}'"
+        raise "Unsupported Auth type '#{hash['authType']}'"
       end
       auth_stanzas
     end

@@ -31,7 +31,7 @@ describe 'cerner_splunk::_start' do
   after do
     CernerSplunk.reset
   end
-  
+
   let(:platform) { 'redhat' }
   let(:platform_version) { '7.2' }
 

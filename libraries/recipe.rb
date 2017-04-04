@@ -19,7 +19,7 @@ module CernerSplunk
     throw 'Symbol should not be nil' unless symbol
     throw "Cannot set type '#{symbol}', already set '#{node.default['splunk']['node_type']}'" if node.default['splunk']['node_type']
     if node['splunk']['free_license']
-      throw "Cannot use the Splunk #{symbol} recipe with the free license" unless %i(forwarder server).include? symbol
+      throw "Cannot use the Splunk #{symbol} recipe with the free license" unless %i[forwarder server].include? symbol
     end
     node.default['splunk']['node_type'] = symbol.to_sym
   end
@@ -122,6 +122,6 @@ module CernerSplunk
   def self.validate_secret_file(secret_file_path, configured_secret)
     return unless ::File.exist?(secret_file_path)
     existing_secret = ::File.open(secret_file_path, 'r') { |file| file.readline.chomp }
-    fail 'The splunk.secret file already exists with a different value. Modification of that file is not currently supported.' if existing_secret != configured_secret
+    raise 'The splunk.secret file already exists with a different value. Modification of that file is not currently supported.' if existing_secret != configured_secret
   end
 end

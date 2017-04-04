@@ -7,11 +7,11 @@
 #
 # Configures the Deployer in a Search Head Cluster
 
-fail 'Deployer installation not currently supported on windows' if platform_family?('windows')
+raise 'Deployer installation not currently supported on windows' if platform_family?('windows')
 
 search_heads = CernerSplunk.my_cluster_data(node)['shc_members']
 
-fail 'Search Heads are not configured for sh clustering in the cluster databag' if search_heads.nil? || search_heads.empty?
+raise 'Search Heads are not configured for sh clustering in the cluster databag' if search_heads.nil? || search_heads.empty?
 
 instance_exec :shc_deployer, &CernerSplunk::NODE_TYPE
 
