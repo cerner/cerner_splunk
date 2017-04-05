@@ -5,7 +5,7 @@ require_relative '../spec_helper'
 
 describe 'cerner_splunk::shc_remove_search_head' do
   subject do
-    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.8') do |node|
+    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '7.2') do |node|
       node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
     end
     runner.converge(described_recipe)

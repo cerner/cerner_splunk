@@ -30,7 +30,7 @@ cluster_bag = CernerSplunk::DataBag.load(cluster_data['apps'], pick_context: ['d
 
 global_apps_bag = CernerSplunk::DataBag.load(cluster_bag['bag']) || {}
 
-apps = CernerSplunk::SplunkApp.merge_hashes(global_apps_bag, cluster_bag)
+apps = CernerSplunk::AppHelpers.merge_hashes(global_apps_bag, cluster_bag)
 
 # Basic configs for the _shcluster app
 app_configs = {
@@ -54,15 +54,17 @@ app_configs = {
 { '_shcluster' => app_configs }.merge(apps).each do |app_name, app_data|
   download_data = app_data['download'] || {}
 
-  splunk_app_package app_name do
+  app_type = download_data['url'] ? :splunk_app_package : :splunk_app_custom
+
+  declare_resource(app_type, app_name) do
     action app_data['remove'] ? :uninstall : :install
-    source_url download_data['url']
-    version download_data['version']
+    source_url download_data['url'] if download_data['url']
+    version download_data['version'] if download_data['version']
     app_root :shcluster
 
-    # TODO: I don't think these exist yet...
-    files CernerSplunk::SplunkApp.proc_files(app_path, files: app_data['files'], lookups: app_data['lookups'])
-    metadata CernerSplunk::SplunkApp.proc_metadata(app_data['permissions'])
+    config CernerSplunk::AppHelpers.proc_conf(app_data['files'])
+    files CernerSplunk::AppHelpers.proc_files(files: app_data['files'], lookups: app_data['lookups'])
+    metadata app_data['permissions']
     notifies :run, 'execute[apply-shcluster-bundle]'
   end
 end

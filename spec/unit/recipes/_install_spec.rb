@@ -9,8 +9,6 @@ describe 'cerner_splunk::_install' do
       # node.normal['splunk']['user'] = 'splunk
       node.normal['splunk']['package']['type'] = 'universal_forwarder'
       node.normal['splunk']['package']['base_name'] = 'splunkforwarder'
-      node.normal['splunk']['package']['download_group'] = 'universalforwarder'
-      node.normal['splunk']['package']['file_suffix'] = '.txt'
       node.normal['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
     end
     runner.converge(described_recipe)

@@ -14,7 +14,7 @@ unless hash
   return
 end
 
-# TODO: Let's avoid this pattern
+# TODO: Let's avoid this pattern in the future
 authorize, user_prefs = CernerSplunk::Roles.configure_roles(hash)
 
 splunk_conf 'system/authorize.conf' do

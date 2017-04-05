@@ -2,13 +2,13 @@
 # frozen_string_literal: true
 
 require_relative '../spec_helper'
-require 'splunk_app'
+require 'apphelpers'
 
-describe 'CernerSplunk::SplunkApp.merge_hashes' do
+describe 'CernerSplunk::AppHelpers.merge_hashes' do
   let(:one) { {} }
   let(:two) { {} }
   let(:three) { {} }
-  subject { CernerSplunk::SplunkApp.merge_hashes(one, two, three) }
+  subject { CernerSplunk::AppHelpers.merge_hashes(one, two, three) }
 
   context 'when given empty hashes' do
     it { is_expected.to eq({}) }

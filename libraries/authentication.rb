@@ -25,80 +25,65 @@ module CernerSplunk
       raise "authSettings is managed by chef. Don't set it yourself!" if hash.key?('authSettings')
 
       unless hash['authType']
-        guesses = ASSUMPTIONS.each_with_object([]) do |(key, type), result|
-          result << type if hash.key?(key) && !result.include?(type)
-        end
+        guesses = ASSUMPTIONS.map do |key, type|
+          type if hash.key? key
+        end.uniq
 
         hash['authType'] =
           case guesses.length
-          when 0
-            'Splunk'
-          when 1
-            guesses.first
-          else
-            raise "Unable to determine authType! Guesses include #{guesses.join(',')}"
+          when 0 then 'Splunk'
+          when 1 then guesses.first
+          else raise "Unable to determine authType! Guesses include #{guesses.join(',')}"
           end
       end
 
       ASSUMPTIONS.each do |key, type|
-        if hash['authType'] != type && hash.key?(key)
-          raise "#{key} is only supported with #{type}. authType = #{hash['authType']}"
-        end
+        raise "#{key} is only supported with #{type}. authType = #{hash['authType']}" if hash['authType'] != type && hash.key?(key)
       end
 
       default_coords = CernerSplunk::DataBag.to_a node['splunk']['config']['authentication']
 
       case hash['authType']
-      when 'Splunk'
-      # Nothing special to do here.
+      when 'Splunk' then nil # Nothing special to do here.
       when 'Scripted'
-        script = {
-          'scriptPath' => hash.delete('scriptPath')
-        }
-        raise 'scriptPath required for Scripted authentication' unless script['scriptPath']
-        search_filters = hash.delete('scriptSearchFilters')
-        script['scriptSearchFilters'] = search_filters if search_filters
-        hash['authSettings'] = 'script'
+        raise 'scriptPath required for Scripted authentication' unless hash['scriptPath']
+        script = { 'scriptPath' => hash.delete('scriptPath') }
+        script['scriptSearchFilters'] = hash.delete 'scriptSearchFilters' if hash.key? 'scriptSearchFilters'
         auth_stanzas['script'] = script
-        cache_timing = hash.delete('cacheTiming')
-        if cache_timing
-          raise "Unknown type for cacheTiming: #{cacheTiming.class}" unless cache_timing.is_a?(Hash)
-          auth_stanzas['cacheTiming'] = cache_timing
+        hash['authSettings'] = 'script'
+
+        if hash.key? 'cacheTiming'
+          raise "Unknown type for cacheTiming: #{cacheTiming.class}" unless hash['cacheTiming'].is_a?(Hash)
+          auth_stanzas['cacheTiming'] = hash.delete('cacheTiming')
         end
+
       when 'LDAP'
-        strategies = hash.delete('LDAP_strategies')
-        raise 'LDAP_strategies required for LDAP authentication' unless strategies
-        strategies = [strategies] unless strategies.is_a? Array
+        raise 'LDAP_strategies required for LDAP authentication' unless hash['LDAP_strategies']
+        strategies = [hash.delete('LDAP_strategies')] unless hash['LDAP_strategies'].is_a? Array
         strategies = strategies.collect do |strategy|
           hash =
             case strategy
-            when String
-              CernerSplunk::DataBag.load strategy, default: default_coords
+            when String then CernerSplunk::DataBag.load strategy, default: default_coords
             when Hash
               temp = strategy.clone
               bag_coords = temp.delete('bag')
               bag = CernerSplunk::DataBag.load bag_coords, default: default_coords
               case bag
-              when nil
-                temp
-              when Hash, Chef::DataBagItem
-                # ew. Hm... I wonder if we can have the library guarantee a Hash...
-                bag.clone.merge temp
-              else
-                raise "Unexpected type for LDAP Strategy #{bag.class} at #{bag_coords}"
+              when nil then temp
+              # ew. Hm... I wonder if we can have the library guarantee a Hash...
+              when Hash, Chef::DataBagItem then bag.clone.merge temp
+              else raise "Unexpected type for LDAP Strategy #{bag.class} at #{bag_coords}"
               end
-            else
-              raise "Unexpected type for LDAP Strategy #{strategy.class}"
+            else raise "Unexpected type for LDAP Strategy #{strategy.class}"
             end
+
           raise "Unexpected property 'bag'" if hash.delete('bag')
 
           %w[userBaseDN groupBaseDN].each do |x|
             hash[x] = hash[x].join(';') if hash[x].is_a?(Array)
           end
 
-          hash['roleMap'] = (hash['roleMap'] || {}).each_with_object({}) do |(k, v), h|
-            h[k] = v.is_a?(Array) ? v.join(';') : v.to_s
-          end
+          hash['roleMap'] = (hash['roleMap'] || {}).collect { |k, v| [k, v.is_a?(Array) ? v.join(';') : v.to_s] }.to_h
 
           if hash['bindDNpassword']
             vault_password = CernerSplunk::ConfigProcs::Value.vault coordinate: hash['bindDNpassword'], default_coords: default_coords
@@ -116,19 +101,17 @@ module CernerSplunk
         raise 'LDAP_strategies required for LDAP authentication' if strategies.empty?
 
         auth_stanzas['authentication']['authSettings'] = strategies.collect do |strategy|
-          strategy_name = strategy.delete('strategy_name')
-          strategy_name ||= "#{strategy['host']}:#{strategy['port'] || 389}"
+          strategy_name = strategy.delete('strategy_name') || "#{strategy['host']}:#{strategy['port'] || 389}"
 
           raise "Duplicate Strategy declaration of #{strategy_name}" if auth_stanzas[strategy_name]
+          raise "Resolved Role Map for Strategy Name #{strategy_name} is empty!!!" if strategy['roleMap'].empty?
 
           auth_stanzas[strategy_name] = strategy
           auth_stanzas["roleMap_#{strategy_name}"] = strategy.delete('roleMap')
 
-          raise "Resolved Role Map for Strategy Name #{strategy_name} is empty!!!" if auth_stanzas["roleMap_#{strategy_name}"].empty?
           strategy_name
         end.join(',')
-      else
-        raise "Unsupported Auth type '#{hash['authType']}'"
+      else raise "Unsupported Auth type '#{hash['authType']}'"
       end
       auth_stanzas
     end

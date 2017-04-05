@@ -11,7 +11,6 @@
 instance_exec :forwarder, &CernerSplunk::NODE_TYPE
 
 node.default['splunk']['package']['base_name'] = 'splunk'
-node.default['splunk']['package']['download_group'] = 'splunk'
 
 node.run_state['cerner_splunk'] ||= {}
 

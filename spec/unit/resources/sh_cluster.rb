@@ -9,7 +9,6 @@ describe 'cerner_splunk::shc_search_head' do
       node.normal['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
       node.normal['splunk']['cmd'] = '/opt/splunk/bin/splunk'
       node.normal['splunk']['package']['base_name'] = 'base_name'
-      node.normal['splunk']['package']['download_group'] = 'download_group'
     end
     runner.converge('cerner_splunk::_install', described_recipe)
   end
@@ -64,7 +63,6 @@ describe 'cerner_splunk::shc_remove_search_head' do
       node.normal['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
       node.normal['splunk']['cmd'] = '/opt/splunk/bin/splunk'
       node.normal['splunk']['package']['base_name'] = 'base_name'
-      node.normal['splunk']['package']['download_group'] = 'download_group'
     end
     runner.converge('cerner_splunk::_install', described_recipe)
   end
@@ -121,7 +119,6 @@ describe 'cerner_splunk::shc_captain' do
       node.normal['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
       node.normal['splunk']['cmd'] = '/opt/splunk/bin/splunk'
       node.normal['splunk']['package']['base_name'] = 'base_name'
-      node.normal['splunk']['package']['download_group'] = 'download_group'
     end
     runner.converge('cerner_splunk::_install', described_recipe)
   end

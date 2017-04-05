@@ -14,7 +14,7 @@ module CernerSplunk
   # This lambda is used to ensure that only one of a set of recipes is on the run_list
   # Call it on each recipe with 'instance_exec :whatever_type, &CernerSplunk::NODE_TYPE'
 
-  # TODO: Refactor cluster stuffs
+  # TODO: Rename these methods
   NODE_TYPE ||= lambda do |symbol|
     throw 'Symbol should not be nil' unless symbol
     throw "Cannot set type '#{symbol}', already set '#{node.default['splunk']['node_type']}'" if node.default['splunk']['node_type']

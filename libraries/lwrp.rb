@@ -10,8 +10,6 @@
 #
 # extend CernerSplunk::LWRP::(module) unless defined? (method name)
 
-# TODO: This seems very bad
-
 require_relative 'databag'
 require_relative 'recipe'
 
@@ -20,25 +18,20 @@ module CernerSplunk
   module LWRP
     # Change a list of monitors to a hash of stanzas for writing to a config file
     def self.convert_monitors(node, monitors, default_index = nil, base = {})
-      all_stanzas = monitors.each_with_object(base) do |element, stanzas|
-        type = element['type'] || element[:type] || 'monitor'
-        path = element['path'] || element[:path]
+      all_stanzas = base.merge monitors.map do |monitor|
+        monitor.each_key(&:to_s)
+        type = monitor.delete('type') || 'monitor'
+        path = monitor.delete('path')
 
         base_hash = default_index ? { 'index' => default_index } : {}
-        stanzas["#{type}://#{path}"] = element.each_with_object(base_hash) do |(key, value), hash|
-          case key
-          when 'type', 'path', :type, :path
-            # skip-these
-          else
-            hash[key.to_s] = value
-          end
-        end
-      end
+        ["#{type}://#{path}", base_hash.merge(monitor)]
+      end.to_h
+
       validate_indexes(node, all_stanzas)
     end
 
     # Validate the indexes to which data is being forwarded to
-    def self.validate_indexes(node, monitors) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
+    def self.validate_indexes(node, monitors) # rubocop:disable CyclomaticComplexity
       index_error = []
       input_regex = /^(?:monitor|tcp|batch|udp|fifo|script|fschange)/
 
@@ -60,11 +53,8 @@ module CernerSplunk
             next
           end
 
-          index_states = %w[isReadOnly disabled deleted]
-
-          index_states.each do |state|
-            value = bag['config'][index][state]
-            if value && %w[1 true].include?(value.to_s)
+          %w[isReadOnly disabled deleted].each do |state|
+            if %w[1 true].include?(bag['config'][index][state].to_s)
               index_error << "Cannot forward data to index '#{index}' in the cluster '#{cluster}', because the index is marked as '#{state}'"
             end
           end
