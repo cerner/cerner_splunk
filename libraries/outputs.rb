@@ -1,5 +1,5 @@
 # coding: UTF-8
-#
+
 # Cookbook Name:: cerner_splunk
 # File Name:: outputs.rb
 
@@ -11,7 +11,7 @@ module CernerSplunk
     def self.configure_outputs(node) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
       output_stanzas = {}
 
-      if [:search_head, :forwarder, :cluster_master, :shc_deployer].include? node['splunk']['node_type']
+      if %i[search_head forwarder cluster_master shc_deployer].include? node['splunk']['node_type']
         output_stanzas['tcpout'] = {
           'forwardedindex.0.whitelist' => '.*',
           'forwardedindex.1.blacklist' => '_thefishbucket',

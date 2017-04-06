@@ -1,5 +1,5 @@
 # coding: UTF-8
-#
+
 # Cookbook Name:: cerner_splunk
 # File Name:: authentication.rb
 
@@ -91,7 +91,7 @@ module CernerSplunk
             end
           fail 'Unexpected property \'bag\'' if hash.delete('bag')
 
-          %w(userBaseDN groupBaseDN).each do |x|
+          %w[userBaseDN groupBaseDN].each do |x|
             hash[x] = hash[x].join(';') if hash[x].is_a?(Array)
           end
 
@@ -107,7 +107,7 @@ module CernerSplunk
           end
 
           # Verify Attributes
-          %w(host userBaseDN userNameAttribute realNameAttribute groupBaseDN groupNameAttribute groupMemberAttribute).each do |x|
+          %w[host userBaseDN userNameAttribute realNameAttribute groupBaseDN groupNameAttribute groupMemberAttribute].each do |x|
             fail "#{x} is required to be set on an LDAP Strategy" if hash[x].nil? || hash[x].strip.empty?
           end
           hash

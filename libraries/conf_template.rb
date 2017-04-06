@@ -1,5 +1,5 @@
 # coding: UTF-8
-#
+
 # Cookbook Name:: cerner_splunk
 # File Name:: conf_template.rb
 

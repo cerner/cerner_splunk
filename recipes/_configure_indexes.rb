@@ -1,5 +1,5 @@
 # coding: UTF-8
-#
+
 # Cookbook Name:: cerner_splunk
 # Recipe:: _configure_indexes
 #
@@ -38,7 +38,7 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
 
   daily_mb = hash.delete('_maxDailyDataSizeMB')
   padding = hash.delete('_dataSizePaddingPercent')
-  if [:index, :default].include?(stanza_type) && daily_mb && !hash.key?('maxTotalDataSizeMB')
+  if %i[index default].include?(stanza_type) && daily_mb && !hash.key?('maxTotalDataSizeMB')
     settings = CernerSplunk.my_cluster_data(node).fetch('settings', {})
     replication_factor = settings['replication_factor'] || 1
     indexer_count = settings['_cerner_splunk_indexer_count'] || 1

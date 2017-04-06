@@ -3,7 +3,7 @@
 
 Vagrant.require_version '>= 1.4.1'
 
-%w(vagrant-ohai vagrant-omnibus).each do |plugin|
+%w[vagrant-ohai vagrant-omnibus].each do |plugin|
   fail "Missing #{plugin}. Please install it!" unless Vagrant.has_plugin? plugin
 end
 

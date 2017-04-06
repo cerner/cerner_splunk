@@ -1,5 +1,5 @@
 # coding: UTF-8
-#
+
 # Cookbook Name:: cerner_splunk
 # Recipe:: _configure_shc_authentication
 #
@@ -15,7 +15,7 @@ end
 auth_stanzas = CernerSplunk::Authentication.configure_authentication(node, hash)
 
 splunk_template 'shcluster/_shcluster/authentication.conf' do
-  sensitive auth_stanzas.any? { |_, v| v.key? 'bindDNpassword' }
+  sensitive(auth_stanzas.any? { |_, v| v.key? 'bindDNpassword' })
   stanzas auth_stanzas
   notifies :run, 'execute[apply-shcluster-bundle]'
 end

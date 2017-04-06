@@ -1,5 +1,5 @@
 # coding: UTF-8
-#
+
 # Cookbook Name:: cerner_splunk
 # File Name:: splunk_app.rb
 #
@@ -55,7 +55,7 @@ class Chef
         super
         @resource_name = :splunk_app
         @action = :create
-        @allowed_actions = [:create, :remove]
+        @allowed_actions = %i[create remove]
         @local = false
         @permissions = {}
         @lookups = {}
@@ -98,7 +98,7 @@ class Chef
 
       # Calculated attributes
       def required_directories
-        %w(local default metadata lookups).collect { |d| "#{root_dir}/#{d}" }.unshift(root_dir)
+        %w[local default metadata lookups].collect { |d| "#{root_dir}/#{d}" }.unshift(root_dir)
       end
 
       def root_dir

@@ -1,5 +1,5 @@
 # encoding: UTF-8
-#
+
 # Cookbook Name:: odw_cron
 # Resource:: sh_cluster
 #

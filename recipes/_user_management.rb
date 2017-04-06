@@ -1,5 +1,5 @@
 # coding: UTF-8
-#
+
 # Cookbook Name:: cerner_splunk
 # Recipe:: _user_management
 #
@@ -11,7 +11,7 @@ return if platform_family?('windows')
 # user should be created by the package install
 user node['splunk']['user'] do
   manage_home true
-  action [:create, :lock]
+  action %i[create lock]
 end
 
 conflicts = node['splunk']['groups'].find_all do |group_to_add|
