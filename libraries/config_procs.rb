@@ -7,32 +7,6 @@
 module CernerSplunk
   # Module for dynamically generating configuration values via Procs
   module ConfigProcs
-    self.proc_modules = {
-      value: CernerSplunk::ConfTemplate::Value,
-      transform: CernerSplunk::ConfTemplate::Transform
-    }.freeze
-
-    def self.compose(g, f)
-      proc { |*a| g[*f[*a]] }
-    end
-
-    def self.generate_proc(proc_type, data, context = {})
-      return CernerSplunk::ConfTemplate::Transform.id if proc_type == :transform && !data.key?('transform')
-      proc_modules[proc_type].send(data[proc_type.to_s].delete('proc').to_sym, context.merge(data[proc_type.to_s]))
-    end
-
-    def self.generate_and_compose_proc(data, context = {})
-      compose(generate_proc(:transform, data, context), generate_proc(:value, data, context))
-    end
-
-    def self.parse(hash, **additional)
-      return hash unless hash.is_a? Hash
-
-      hash.map do |stanza, props|
-        [stanza, props.map { |k, v| [k, v.is_a?(Hash) ? generate_and_compose_proc(v, additional) : v] }.to_h]
-      end.to_h
-    end
-
     # Methods to generate procs for determining the value to be written to a conf file
     module Value
       def self.constant(value:, **_)
@@ -61,6 +35,34 @@ module CernerSplunk
       def self.splunk_encrypt(node:, xor: true, **_)
         proc { |x| CernerSplunk.splunk_encrypt_password(x, node.run_state['cerner_splunk']['splunk.secret'], xor) if x }
       end
+    end
+
+    def self.proc_modules
+      {
+        value: Value,
+        transform: Transform
+      }
+    end
+
+    def self.compose(g, f)
+      proc { |*a| g[*f[*a]] }
+    end
+
+    def self.generate_proc(proc_type, data, context = {})
+      return Transform.id if proc_type == :transform && !data.key?('transform')
+      proc_modules[proc_type].send(data[proc_type.to_s].delete('proc').to_sym, context.merge(data[proc_type.to_s]))
+    end
+
+    def self.generate_and_compose_proc(data, context = {})
+      compose(generate_proc(:transform, data, context), generate_proc(:value, data, context))
+    end
+
+    def self.parse(hash, **additional)
+      return hash unless hash.is_a? Hash
+
+      hash.map do |stanza, props|
+        [stanza, props.map { |k, v| [k, v.is_a?(Hash) ? generate_and_compose_proc(v, additional) : v] }.to_h]
+      end.to_h
     end
   end
 end

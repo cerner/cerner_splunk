@@ -30,6 +30,7 @@ apps = CernerSplunk::AppHelpers.merge_hashes(bag_bag, cluster_bag)
 
 apps.each do |app_name, app_data|
   download_data = app_data['download'] || {}
+  app_data['files'] ||= {}
 
   app_type = download_data['url'] ? :splunk_app_package : :splunk_app_custom
 
@@ -39,7 +40,7 @@ apps.each do |app_name, app_data|
     version download_data['version'] if download_data['version']
     app_root :master_apps
 
-    config CernerSplunk::AppHelpers.proc_conf(app_data['files'])
+    configs CernerSplunk::AppHelpers.proc_conf(app_data['files'])
     files CernerSplunk::AppHelpers.proc_files(files: app_data['files'])
     metadata app_data['permissions']
     notifies :run, 'execute[apply-cluster-bundle]'

@@ -18,7 +18,8 @@ module CernerSplunk
   module LWRP
     # Change a list of monitors to a hash of stanzas for writing to a config file
     def self.convert_monitors(node, monitors, default_index = nil, base = {})
-      all_stanzas = base.merge monitors.map do |monitor|
+      monitors ||= []
+      monitor_stanzas = monitors.map do |monitor|
         monitor.each_key(&:to_s)
         type = monitor.delete('type') || 'monitor'
         path = monitor.delete('path')
@@ -27,7 +28,7 @@ module CernerSplunk
         ["#{type}://#{path}", base_hash.merge(monitor)]
       end.to_h
 
-      validate_indexes(node, all_stanzas)
+      validate_indexes(node, base.merge(monitor_stanzas))
     end
 
     # Validate the indexes to which data is being forwarded to

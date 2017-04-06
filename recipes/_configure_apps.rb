@@ -22,6 +22,8 @@ apps = CernerSplunk::AppHelpers.merge_hashes(bag_bag, cluster_bag, attributes_ba
 
 apps.each do |app_name, app_data|
   download_data = app_data['download'] || {}
+  app_data['files'] ||= {}
+  app_data['lookups'] ||= {}
 
   app_type = download_data['url'] ? :splunk_app_package : :splunk_app_custom
 
@@ -30,7 +32,7 @@ apps.each do |app_name, app_data|
     source_url download_data['url'] if download_data['url']
     version download_data['version'] if download_data['version']
 
-    config CernerSplunk::AppHelpers.proc_conf(app_data['files'])
+    configs CernerSplunk::AppHelpers.proc_conf(app_data['files'])
     files CernerSplunk::AppHelpers.proc_files(files: app_data['files'], lookups: app_data['lookups'])
     metadata app_data['permissions']
     notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately

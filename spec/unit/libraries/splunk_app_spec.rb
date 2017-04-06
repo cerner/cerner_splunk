@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 require_relative '../spec_helper'
-require 'apphelpers'
+require 'app_helpers'
 
 describe 'CernerSplunk::AppHelpers.merge_hashes' do
   let(:one) { {} }

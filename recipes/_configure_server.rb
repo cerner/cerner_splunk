@@ -119,7 +119,7 @@ if %i[shc_search_head shc_captain].include? node['splunk']['node_type']
   end
 
   path = "#{node['splunk']['home']}/etc/system/local/server.conf"
-  old_stanzas = CernerSplunk::Conf::Reader.new(path).read
+  old_stanzas = CernerSplunk::ConfHelpers.read_config(path)
   old_id = (old_stanzas['shclustering'] || {})['id']
 
   server_stanzas['shclustering'] = settings
