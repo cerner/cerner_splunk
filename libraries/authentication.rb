@@ -8,38 +8,29 @@
 require_relative 'databag'
 
 module CernerSplunk
-  ASSUMPTIONS =
-    {
-      'LDAP_strategies' => 'LDAP',
-      'cacheTiming' => 'Scripted',
-      'scriptPath' => 'Scripted',
-      'scriptSearchFilters' => 'Scripted',
-      'passwordHashAlgorithm' => 'Splunk'
-    }.freeze
-
   # Module contains functions to configure authentication in a Splunk system
   module Authentication
+    def self.determine_auth_type(settings)
+      config_mapping = {
+        'LDAP_strategies' => 'LDAP',
+        'cacheTiming' => 'Scripted',
+        'scriptPath' => 'Scripted',
+        'scriptSearchFilters' => 'Scripted',
+        'passwordHashAlgorithm' => 'Splunk'
+      }.freeze
+
+      probable_types = config_mapping.values_at(*settings.keys)
+      raise "Conflicting authentication types were derived from the config: #{probable_types.join(',')}" if probable_types.length > 1
+
+      settings['authType'] || probable_types.first || 'Splunk'
+    end
+
     def self.configure_authentication(node, hash) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity, MethodLength
       hash = hash.clone
       auth_stanzas = { 'authentication' => hash }
-      raise "authSettings is managed by chef. Don't set it yourself!" if hash.key?('authSettings')
+      raise "authSettings is managed by Chef. Don't set it yourself!" if hash.key?('authSettings')
 
-      unless hash['authType']
-        guesses = ASSUMPTIONS.map do |key, type|
-          type if hash.key? key
-        end.uniq
-
-        hash['authType'] =
-          case guesses.length
-          when 0 then 'Splunk'
-          when 1 then guesses.first
-          else raise "Unable to determine authType! Guesses include #{guesses.join(',')}"
-          end
-      end
-
-      ASSUMPTIONS.each do |key, type|
-        raise "#{key} is only supported with #{type}. authType = #{hash['authType']}" if hash['authType'] != type && hash.key?(key)
-      end
+      hash['authType'] = determine_auth_type(hash)
 
       default_coords = CernerSplunk::DataBag.to_a node['splunk']['config']['authentication']
 

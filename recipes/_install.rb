@@ -51,11 +51,11 @@ ruby_block 'read splunk.secret' do
   action :nothing
 end
 
-splunk_restart node['splunk']['package']['type'] do
-  package node['splunk']['package']['type'].to_sym # I think Chefspec is not playing nice with symbols
-  supports ensure: true, check: true, clear: true
-  action :nothing
-end
+# splunk_restart node['splunk']['package']['type'] do
+#   package node['splunk']['package']['type'].to_sym # I think Chefspec is not playing nice with symbols
+#   supports ensure: true, check: true, clear: true
+#   action :nothing
+# end
 
 directory node['splunk']['external_config_directory'] do
   owner node['splunk']['user']
@@ -63,9 +63,9 @@ directory node['splunk']['external_config_directory'] do
   mode '0700'
 end
 
-# TODO: Is this fixed?
 # SPL-89640 On upgrades, the permissions of this directory is too restrictive
 # preventing proper operation of Platform Instrumentation features.
+# Check to make sure this is still an issue: http://docs.splunk.com/Documentation/Splunk/latest/Releasenotes/Knownissues
 directory "#{node['splunk']['home']}/var/log/introspection" do
   owner node['splunk']['user']
   group node['splunk']['group']

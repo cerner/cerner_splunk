@@ -2,15 +2,17 @@
 # frozen_string_literal: true
 
 require_relative '../spec_helper'
+require_relative '../../../libraries/app_helpers'
 
 describe 'cerner_splunk::shc_deployer' do
   subject do
-    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '7.2') do |node|
+    ChefSpec::SoloRunner.new(platform: 'redhat', version: '7.2') do |node|
+      chef_run_stubs
       node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
-    end
-    runner.converge(described_recipe)
+    end.converge(described_recipe)
   end
 
+  let(:app_config) {}
   let(:cluster_config) do
     {
       'receivers' => ['33.33.33.20'],
@@ -29,65 +31,78 @@ describe 'cerner_splunk::shc_deployer' do
     }
   end
 
-  let(:apps) do
+  let(:expected_cluster_app_config) do
     {
-      'deployer-apps' => {
-        'test_app' => {
-          'files' => {
-            'app.conf' => {
-              'ui' => {
-                'is_visible' => '1',
-                'label' => 'Test App'
-              }
-            }
-          },
-          'lookups' => {
-            'index-owners.csv' => 'http://33.33.33.33:5000/lookups/index-owners.csv'
+      lookups: {},
+      files: {
+        'app.conf' => {
+          'ui' => {
+            'is_visible' => '0',
+            'label' => 'Deployer Configs App'
+          }
+        },
+        'ui-prefs.conf' => {
+          'default' => {
+            'dispatch.earliest_time' => '@d',
+            'dispatch.latest_time' => 'now',
+            'display.prefs.enableMetaData' => 0,
+            'display.prefs.showDataSummary' => 0
           }
         }
       }
     }
   end
 
-  before do
+  let(:chef_run_stubs) do
+    shared_stubs
+    action_stubs
+  end
+
+  let(:shared_stubs) do
     allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'cluster').and_return(cluster_config)
     allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'indexes').and_return({})
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'apps').and_return(apps)
+    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'apps').and_return(app_config)
+  end
+
+  let(:action_stubs) do
+    expect(CernerSplunk::AppHelpers).to receive(:proc_conf).with(expected_cluster_app_config[:files])
+    expect(CernerSplunk::AppHelpers).to receive(:proc_files).with(expected_cluster_app_config)
   end
 
   after do
     CernerSplunk.reset
   end
 
-  context 'when the search heads are not specified for sh clustering in the cluster databag' do
-    let(:cluster_config) do
+  it { is_expected.to include_recipe('cerner_splunk::_install_server') }
+  it { is_expected.not_to run_execute('apply-shcluster-bundle') }
+  it { is_expected.to install_splunk_app_custom('_shcluster') }
+
+  it 'should notify the execute[apply-shcluster-bundle] resource to run' do
+    expect(subject.splunk_app_custom('_shcluster')).to notify('execute[apply-shcluster-bundle]').to(:run)
+  end
+
+  context 'when installing cluster apps' do
+    let(:app_config) do
       {
-        'sh_cluster' => []
+        'deployer-apps' => {
+          'test_app' => {
+            'files' => {
+              'app.conf' => {
+                'ui' => {
+                  'is_visible' => '1',
+                  'label' => 'Test App'
+                }
+              }
+            },
+            'lookups' => {
+              'index-owners.csv' => 'http://33.33.33.33:5000/lookups/index-owners.csv'
+            }
+          }
+        }
       }
     end
-
-    it 'raises an error' do
-      message = 'Search Heads are not configured for sh clustering in the cluster databag'
-      expect { subject }.to raise_error(RuntimeError, message)
-    end
-  end
-
-  it 'includes cerner_splunk::_install_server recipe' do
-    expect(subject).to include_recipe('cerner_splunk::_install_server')
-  end
-
-  it 'does not run apply-shcluster-bundle' do
-    expect(subject).not_to run_execute('apply-shcluster-bundle')
-  end
-
-  it 'creates the _shcluster app and notifies the execute[apply-shcluster-bundle] resource to run' do
-    expect(subject).to install_splunk_app('_shcluster')
-    expect(subject.splunk_app('_shcluster')).to notify('execute[apply-shcluster-bundle]').to(:run)
-  end
-
-  context 'when apps needs to be created on the deployer' do
-    it 'installs the app with expected attributes and notifies the execute[apply-shcluster-bundle] resource to run' do
-      expected_attributes = {
+    let(:expected_attributes) do
+      {
         lookups: {
           'index-owners.csv' => 'http://33.33.33.33:5000/lookups/index-owners.csv'
         },
@@ -100,13 +115,24 @@ describe 'cerner_splunk::shc_deployer' do
           }
         }
       }
-      expect(subject).to install_splunk_app('test_app').with(expected_attributes)
-      expect(subject.splunk_app('test_app')).to notify('execute[apply-shcluster-bundle]').to(:run)
+    end
+
+    let(:action_stubs) do
+      expect(CernerSplunk::AppHelpers).to receive(:proc_conf).with(expected_cluster_app_config[:files])
+      expect(CernerSplunk::AppHelpers).to receive(:proc_files).with(expected_cluster_app_config)
+      expect(CernerSplunk::AppHelpers).to receive(:proc_conf).with(expected_attributes[:files])
+      expect(CernerSplunk::AppHelpers).to receive(:proc_files).with(expected_attributes)
+    end
+
+    it { is_expected.to install_splunk_app_custom('test_app') }
+
+    it 'should notify the execute[apply-shcluster-bundle] resource to run' do
+      expect(subject.splunk_app_custom('test_app')).to notify('execute[apply-shcluster-bundle]').to(:run)
     end
   end
 
-  context 'when apps need to be removed' do
-    let(:apps) do
+  context 'when uninstalling cluster apps' do
+    let(:app_config) do
       {
         'deployer-apps' => {
           'test_app' => {
@@ -116,29 +142,30 @@ describe 'cerner_splunk::shc_deployer' do
       }
     end
 
-    it 'removes the app and notifies the execute[apply-shcluster-bundle] resource to run' do
-      expect(subject).to install_splunk_app('test_app')
-      expect(subject.splunk_app('test_app')).to notify('execute[apply-shcluster-bundle]').to(:run)
+    it { is_expected.to uninstall_splunk_app_custom('test_app') }
+
+    it 'should notify the execute[apply-shcluster-bundle] resource to run' do
+      expect(subject.splunk_app_custom('test_app')).to notify('execute[apply-shcluster-bundle]').to(:run)
     end
   end
 
-  it 'includes cerner_splunk::_configure_shc_roles recipe' do
-    expect(subject).to include_recipe('cerner_splunk::_configure_shc_roles')
-  end
+  it { is_expected.to include_recipe('cerner_splunk::_configure_shc_roles') }
+  it { is_expected.to include_recipe('cerner_splunk::_configure_shc_authentication') }
+  it { is_expected.to include_recipe('cerner_splunk::_configure_shc_outputs') }
+  it { is_expected.to include_recipe('cerner_splunk::_configure_shc_alerts') }
+  it { is_expected.to include_recipe('cerner_splunk::_start') }
 
-  it 'includes cerner_splunk::_configure_shc_authentication recipe' do
-    expect(subject).to include_recipe('cerner_splunk::_configure_shc_authentication')
-  end
+  context 'when the search heads are not specified for sh clustering in the cluster databag' do
+    let(:action_stubs) {}
+    let(:cluster_config) do
+      {
+        'sh_cluster' => []
+      }
+    end
 
-  it 'includes cerner_splunk::_configure_shc_outputs recipe' do
-    expect(subject).to include_recipe('cerner_splunk::_configure_shc_outputs')
-  end
-
-  it 'includes cerner_splunk::_configure_shc_alerts recipe' do
-    expect(subject).to include_recipe('cerner_splunk::_configure_shc_alerts')
-  end
-
-  it 'includes cerner_splunk::_start recipe' do
-    expect(subject).to include_recipe('cerner_splunk::_start')
+    it 'should raise an error' do
+      message = 'Search Heads are not configured for sh clustering in the cluster databag'
+      expect { subject }.to raise_error(message)
+    end
   end
 end

@@ -14,10 +14,10 @@ input_stanzas = CernerSplunk::LWRP.convert_monitors node, node['splunk']['monito
 
 if %i[server cluster_slave].include? node['splunk']['node_type']
   bag = CernerSplunk.my_cluster_data(node)
-  # TODO: This is stupid
-  port = bag['receiver_settings']
-  port = port['splunktcp'] if port
-  port = port['port'] if port
+
+  port = bag.dig('receiver_settings', 'splunktcp', 'port')
+  port ||= bag.dig('receiver_settings', 'splunktcp')
+  port ||= bag['receiver_settings']
 
   if port
     input_stanzas["splunktcp://:#{port}"] = { 'disabled' => 0, 'connection_host' => 'none' }

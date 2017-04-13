@@ -72,8 +72,8 @@ describe 'cerner_splunk::_install' do
   let(:expected_properties) do
     {
       package: :universal_forwarder,
-      version: '6.3.7',
-      build: '8bf976cd6a7c',
+      version: '6.5.2',
+      build: '67571ef4b87d',
       user: 'splunk',
       base_url: 'https://download.splunk.com/products'
     }
@@ -86,7 +86,6 @@ describe 'cerner_splunk::_install' do
   it 'initializes the splunk service' do
     expect(subject).to init_splunk_service('universal_forwarder').with(
       package: expected_properties[:package],
-      user: expected_properties[:user],
       ulimit: 8192
     )
   end
@@ -95,6 +94,8 @@ describe 'cerner_splunk::_install' do
     expect(subject.splunk_service('universal_forwarder')).to notify('ruby_block[read splunk.secret]').to(:run).immediately
   end
 
+  # TODO: We test for windows but cerner_splunk does not, what happened?
+
   context 'when platform is windows' do
     let(:platform) { 'windows' }
     let(:platform_version) { '2012R2' }
@@ -102,9 +103,9 @@ describe 'cerner_splunk::_install' do
     let(:expected_properties) do
       {
         package: :universal_forwarder,
-        version: '6.3.7',
-        build: '8bf976cd6a7c',
-        user: 'SYSTEM',
+        version: '6.5.2',
+        build: '67571ef4b87d',
+        user: 'fauxhai',
         base_url: 'https://download.splunk.com/products'
       }
     end
@@ -119,8 +120,7 @@ describe 'cerner_splunk::_install' do
 
     it 'initializes the splunk service' do
       expect(subject).to init_splunk_service('universal_forwarder').with(
-        package: expected_properties[:package],
-        user: expected_properties[:user]
+        package: expected_properties[:package]
       )
     end
   end

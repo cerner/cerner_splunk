@@ -1,7 +1,8 @@
 
 # frozen_string_literal: true
 
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', '..', 'libraries'))
+# TODO: Whats this
+# $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', '..', 'libraries'))
 require 'rspec'
 require 'chefspec'
 require 'chefspec/berkshelf'

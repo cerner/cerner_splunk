@@ -10,51 +10,36 @@ require_relative 'databag'
 module CernerSplunk
   # Module contains functions to configure roles in a Splunk system
   module Roles
-    def self.configure_roles(hash) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+    def self.configure_roles(config)
       user_prefs = {}
       authorize = {}
 
-      hash.each do |stanza, values|
-        pref_entries, auth_entries = values.each_with_object([{}, {}]) do |(key, value), result|
-          prefs = result[0]
-          auth = result[1]
+      config.each do |stanza, props|
+        pref_entries, auth_entries = props.partition { |key, _| %w[tz app showWhatsNew].include?(key) }.map(&:to_h)
 
-          case key
-          when 'tz', 'showWhatsNew'
-            prefs[key] = value
-          when 'app'
-            prefs['default_namespace'] = value
-          when 'capabilities'
-            value.each do |cap|
-              if cap.start_with? '!'
-                cap[0] = ''
-                auth[cap] = 'disabled'
-              else
-                auth[cap] = 'enabled'
-              end
-            end
-          else
-            auth[key] =
-              if value.is_a? Array
-                value.join(';')
-              else
-                value
-              end
-          end
-        end
+        role_stanza = stanza != 'default' && "role_#{stanza}"
 
-        unless pref_entries.empty?
-          pref_stanza = stanza == 'default' ? 'general_default' : "role_#{stanza}"
-          user_prefs[pref_stanza] = pref_entries
-        end
-
-        if stanza == 'default'
-          authorize['default'] = auth_entries unless auth_entries.empty?
-        else
-          authorize["role_#{stanza}"] = auth_entries
-        end
+        user_prefs[role_stanza || 'general_default'] = prepare_preferences(pref_entries) unless pref_entries.empty?
+        authorize[role_stanza || 'default'] = prepare_authorizations(auth_entries) unless auth_entries.empty? # TODO: Do we care about non-default empty
       end
       [authorize, user_prefs]
+    end
+
+    def self.prepare_preferences(preferences)
+      preferences['default_namespace'] = preferences.delete('app') if preferences.key? 'app'
+      preferences
+    end
+
+    def self.prepare_authorizations(authorizations)
+      (authorizations.delete('capabilities') || []).each do |capability|
+        if capability.start_with? '!'
+          authorizations[capability[1..-1]] = 'disabled'
+        else
+          authorizations[capability] = 'enabled'
+        end
+      end
+
+      authorizations.map { |key, value| [key, value.is_a?(Array) ? value.join(';') : value] }.to_h
     end
   end
 end

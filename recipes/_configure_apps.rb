@@ -32,9 +32,9 @@ apps.each do |app_name, app_data|
     source_url download_data['url'] if download_data['url']
     version download_data['version'] if download_data['version']
 
-    configs CernerSplunk::AppHelpers.proc_conf(app_data['files'])
-    files CernerSplunk::AppHelpers.proc_files(files: app_data['files'], lookups: app_data['lookups'])
-    metadata app_data['permissions']
+    configs CernerSplunk::AppHelpers.proc_conf(app_data['files']) unless app_data['files'].empty?
+    files CernerSplunk::AppHelpers.proc_files(files: app_data['files'], lookups: app_data['lookups']) unless app_data['lookups'].empty? && app_data['files'].empty?
+    metadata app_data['permissions'] if app_data['permissions']
     notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately
   end
 end

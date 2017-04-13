@@ -64,9 +64,9 @@ app_configs = {
     version download_data['version'] if download_data['version']
     app_root :shcluster
 
-    configs CernerSplunk::AppHelpers.proc_conf(app_data['files'])
-    files CernerSplunk::AppHelpers.proc_files(files: app_data['files'], lookups: app_data['lookups'])
-    metadata app_data['permissions']
+    configs CernerSplunk::AppHelpers.proc_conf(app_data['files']) unless app_data['files'].empty?
+    files CernerSplunk::AppHelpers.proc_files(files: app_data['files'], lookups: app_data['lookups']) unless app_data['lookups'].empty? && app_data['files'].empty?
+    metadata app_data['permissions'] if app_data['permissions']
     notifies :run, 'execute[apply-shcluster-bundle]'
   end
 end
