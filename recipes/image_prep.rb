@@ -9,7 +9,7 @@
 #
 # Requires Chef 12.6.0 or above
 #
-# See http://docs.splunk.com/Documentation/Forwarder/6.5.2/Forwarder/Makeauniversalforwarderpartofahostimage
+# See http://docs.splunk.com/Documentation/Forwarder/6.5.3/Forwarder/Makeauniversalforwarderpartofahostimage
 
 execute 'clone-prep-clear-config' do
   command "#{node['splunk']['cmd']} clone-prep-clear-config"

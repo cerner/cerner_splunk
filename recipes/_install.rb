@@ -36,10 +36,19 @@ end
 
 include_recipe 'cerner_splunk::_configure_secret'
 
-splunk_service node['splunk']['package']['type'] do # renamed because splunk_restart resource name has to match with that of splunk_match
+splunk_service node['splunk']['package']['type'] do
   package node['splunk']['package']['type'].to_sym
   ulimit node['splunk']['limits']['open_files'].to_i unless node['platform_family'] == 'windows'
   action :init
+  notifies :run, 'execute[finish splunk setup]', :immediately
+end
+
+# The above initialization does not handle creating splunk.secret and encrypted config.
+# This is an unexpected behavior of the Splunk CLI, as the command used there does not call
+# splunkd (which automatically creates secrets), while every other command does.
+execute 'finish splunk setup' do
+  command "#{node['splunk']['cmd']} help commands"
+  action :nothing
   notifies :run, 'ruby_block[read splunk.secret]', :immediately
 end
 
@@ -47,15 +56,11 @@ ruby_block 'read splunk.secret' do
   block do
     node.run_state['cerner_splunk'] ||= {}
     node.run_state['cerner_splunk']['splunk.secret'] = ::File.open(::File.join(node['splunk']['home'], 'etc/auth/splunk.secret'), 'r') { |file| file.readline.chomp }
+    Chef::Log.error node.run_state['cerner_splunk']
+    puts node.run_state['cerner_splunk']
   end
   action :nothing
 end
-
-# splunk_restart node['splunk']['package']['type'] do
-#   package node['splunk']['package']['type'].to_sym # I think Chefspec is not playing nice with symbols
-#   supports ensure: true, check: true, clear: true
-#   action :nothing
-# end
 
 directory node['splunk']['external_config_directory'] do
   owner node['splunk']['user']

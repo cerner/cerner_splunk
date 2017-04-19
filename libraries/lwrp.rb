@@ -17,8 +17,8 @@ module CernerSplunk
   # Methods involved with augmenting the LWRP syntax / writing recipies
   module LWRP
     # Change a list of monitors to a hash of stanzas for writing to a config file
-    def self.convert_monitors(node, monitors, default_index = nil, base = {})
-      monitors ||= []
+    def self.convert_monitors(node, node_monitors, default_index = nil, base = {})
+      monitors = node_monitors.dup || []
       monitor_stanzas = monitors.map do |monitor|
         monitor.each_key(&:to_s)
         type = monitor.delete('type') || 'monitor'

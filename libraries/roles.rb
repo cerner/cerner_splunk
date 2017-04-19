@@ -15,11 +15,11 @@ module CernerSplunk
       authorize = {}
 
       config.each do |stanza, props|
-        pref_entries, auth_entries = props.partition { |key, _| %w[tz app showWhatsNew].include?(key) }.map(&:to_h)
+        pref_entries, auth_entries = props.partition { |key, _| %w[tz app].include?(key) }.map(&:to_h)
 
         role_stanza = stanza != 'default' && "role_#{stanza}"
 
-        user_prefs[role_stanza || 'general_default'] = prepare_preferences(pref_entries) unless pref_entries.empty?
+        user_prefs[role_stanza || 'general_default'] = prepare_preferences(pref_entries)
         authorize[role_stanza || 'default'] = prepare_authorizations(auth_entries) unless auth_entries.empty? # TODO: Do we care about non-default empty
       end
       [authorize, user_prefs]
