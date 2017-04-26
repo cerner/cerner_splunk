@@ -18,11 +18,9 @@ if !key || platform_family?('windows')
 end
 
 secret = CernerSplunk::DataBag.load secrets_hash[key], type: :vault, handle_load_failure: true
-Chef::Log.warn(secret.to_s)
 raise 'Configured splunk secret must resolve to a String' unless secret.is_a?(String)
 
 secret_path = ::File.join(node['splunk']['home'], 'etc', 'auth', 'splunk.secret')
-Chef::Log.warn(secret_path.to_s)
 
 ruby_block 'Check splunk.secret file' do
   block do

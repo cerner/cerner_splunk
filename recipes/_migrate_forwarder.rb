@@ -10,20 +10,16 @@
 require 'fileutils'
 
 opposite_package_name = CernerSplunk.opposite_package_name(node['splunk']['package']['base_name'])
-old_package =
-  case opposite_package_name # TODO: Let's DRY up this bit
-  when 'splunk' then :splunk
-  when 'splunkforwarder' then :universal_forwarder
-  end
+old_package_type = CernerSplunk.package_type(opposite_package_name).to_sym
 
 splunk_service 'stop old service' do
-  package old_package
+  package old_package_type
   action :stop
 end
 
 ruby_block 'backup-splunk-artifacts' do
   block do
-    splunk_home = CernerSplunk.splunk_home(node['platform_family'], node['kernel']['machine'], opposite_package_name)
+    splunk_home = CernerSplunk::PathHelpers.cerner_default_install_dirs.dig(old_package_type, node['os'].to_sym)
     FileUtils.cp_r(::File.join(splunk_home, '/var/lib/splunk/fishbucket'), Chef::Config[:file_cache_path])
     FileUtils.cp(::File.join(splunk_home, '/etc/passwd'), Chef::Config[:file_cache_path])
     node.run_state['cerner_splunk']['splunk_forwarder_migrate'] = true
@@ -31,6 +27,6 @@ ruby_block 'backup-splunk-artifacts' do
 end
 
 splunk_install 'uninstall old splunk' do
-  package old_package
+  package old_package_type
   action :uninstall
 end

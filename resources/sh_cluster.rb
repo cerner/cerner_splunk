@@ -10,7 +10,7 @@ resource_name :sh_cluster
 provides :cerner_splunk_sh_cluster
 
 property :search_heads, Array
-property :admin_password, String
+property :admin_password, String, sensitive: true
 
 default_action :add
 

@@ -65,24 +65,21 @@ module CernerSplunk
     order
   end
 
-  # Return Splunk home location based on package, platform, and kernel
-  def self.splunk_home(platform_family, machine_kernel, package_base_name)
-    if platform_family == 'windows'
-      if machine_kernel == 'x86_64'
-        "#{ENV['PROGRAMW6432'].tr('\\', '/')}/#{package_base_name}"
-      else
-        "#{ENV['PROGRAMFILES'].tr('\\', '/')}/#{package_base_name}"
-      end
-    else
-      "/opt/#{package_base_name}"
+  # Convert Splunk artifact name into installation type
+  def self.package_type(package_name)
+    case package_name
+    when 'splunk', :splunk then 'splunk'
+    when 'splunkforwarder', :splunkforwarder, :universal_forwarder then 'universal_forwarder'
     end
   end
 
   # Returns filepath to splunk bin based on platform family
   def self.splunk_command(node)
+    Chef::Log.warn(node['splunk']['home'])
     filepath = "#{node['splunk']['home']}/bin/splunk"
+    Chef::Log.warn(filepath)
 
-    return filepath.tr('/', '\\').gsub(/\w+\s\w+/) { |directory| %("#{directory}") } if node['platform_family'] == 'windows'
+    return %("#{filepath.tr('/', '\\')}") if node['platform_family'] == 'windows'
 
     filepath
   end
@@ -105,7 +102,8 @@ module CernerSplunk
   # Returns Boolean for whether a separate Splunk artifact is already installed.
   def self.separate_splunk_installed?(node)
     opposite_package_name = opposite_package_name(node['splunk']['package']['base_name'])
-    Dir.exist?(splunk_home(node['platform_family'], node['kernel']['machine'], opposite_package_name))
+    old_package_type = package_type(opposite_package_name).to_sym
+    Dir.exist?(CernerSplunk::PathHelpers.cerner_default_install_dirs.dig(old_package_type, node['os'].to_sym))
   end
 
   # Returns the Splunk service name based on platform and package name

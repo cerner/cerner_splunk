@@ -39,7 +39,7 @@ raise 'Non-unique hostnames' if @network.collect { |_, v| v[:hostname] }.uniq!
 raise 'Non-unique ports' if @network.collect { |_, v| v[:ports].keys }.flat_map { |v| v }.uniq!
 
 def default_omnibus(config)
-  config.omnibus.chef_version = '12.14.89' # https://github.com/chef-cookbooks/chef-client/issues/425
+  config.omnibus.chef_version = '12.19.36'
 end
 
 def network(config, name, splunk_password = true)
@@ -70,8 +70,8 @@ def chef_defaults(chef, name, environment = 'splunk_server')
 end
 
 Vagrant.configure('2') do |config|
-  config.vm.box = 'bento/centos-6.7'
-  config.ohai.primary_nic = 'eth1'
+  config.vm.box = 'bento/centos-7.2'
+  config.ohai.primary_nic = 'enp0s8'
 
   if Vagrant.has_plugin? 'vagrant-berkshelf'
     config.berkshelf.enabled = false
@@ -82,7 +82,8 @@ Vagrant.configure('2') do |config|
   config.vm.provider :virtualbox do |vb|
     vb.customize ['modifyvm', :id, '--natdnsproxy1', 'off']
     vb.customize ['modifyvm', :id, '--natdnshostresolver1', 'off']
-    vb.customize ['modifyvm', :id, '--memory', 128]
+    vb.customize ['modifyvm', :id, '--cpus', 2]
+    vb.customize ['modifyvm', :id, '--memory', 256]
   end
 
   config.vm.define :chef do |cfg|
@@ -289,18 +290,22 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :f_win2012r2 do |cfg|
-    cfg.vm.box = 'opentable/win-2012r2-standard-amd64-nocm'
+    cfg.vm.box = 'mwrock/Windows2012R2'
     # Without the line below here or in the box, vagrant-omnibus breaks on windows.
     # Reference: https://github.com/chef/vagrant-omnibus/issues/90#issuecomment-51816397
     cfg.vm.guest = :windows
-    default_omnibus config
+    default_omnibus cfg
+    # https://github.com/chef/vagrant-omnibus/issues/118
+    cfg.omnibus.install_url = "https://packages.chef.io/stable/windows/2012r2/chef-client-#{cfg.omnibus.chef_version}-1-x64.msi"
     cfg.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', 1024]
+      vb.gui = false
     end
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :f_win2012r2, 'splunk_standalone'
       chef.add_role 'splunk_monitors_windows'
       chef.add_recipe 'cerner_splunk'
+      chef.verbose_logging = true
     end
     network cfg, :f_win2012r2, false
   end

@@ -8,6 +8,5 @@
 
 splunk_restart node['splunk']['package']['type'] do
   package node['splunk']['package']['type'].to_sym
-  supports ensure: true, check: true, clear: true
   action :nothing
 end

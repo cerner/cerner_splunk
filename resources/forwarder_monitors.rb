@@ -24,7 +24,7 @@ action :install do
   splunk_app_custom new_resource.app do
     configs(proc do
       splunk_conf 'inputs.conf' do
-        configs input_stanzas
+        config input_stanzas
       end
     end)
     notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately

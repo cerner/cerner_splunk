@@ -15,14 +15,9 @@ def nsp
 end
 
 # Attributes
-node.default['splunk']['home'] = CernerSplunk.splunk_home(node['platform_family'], node['kernel']['machine'], nsp['base_name'])
+node.default['splunk']['package']['type'] = CernerSplunk.package_type(nsp['base_name'])
+node.default['splunk']['home'] = CernerSplunk::PathHelpers.cerner_default_install_dirs.dig(nsp['type'].to_sym, node['os'].to_sym)
 node.default['splunk']['cmd'] = CernerSplunk.splunk_command(node)
-
-node.default['splunk']['package']['type'] =
-  case nsp['base_name']
-  when 'splunk' then 'splunk'
-  when 'splunkforwarder' then 'universal_forwarder'
-  end
 
 include_recipe 'cerner_splunk::_restart_prep'
 
@@ -40,16 +35,15 @@ splunk_service node['splunk']['package']['type'] do
   package node['splunk']['package']['type'].to_sym
   ulimit node['splunk']['limits']['open_files'].to_i unless node['platform_family'] == 'windows'
   action :init
-  notifies :run, 'execute[finish splunk setup]', :immediately
+  # notifies :run, 'execute[finish splunk setup]', :immediately
 end
 
 # The above initialization does not handle creating splunk.secret and encrypted config.
 # This is an unexpected behavior of the Splunk CLI, as the command used there does not call
-# splunkd (which automatically creates secrets), while every other command does.
+# splunkd (which automatically creates secrets).
 execute 'finish splunk setup' do
   command "#{node['splunk']['cmd']} help commands"
-  action :nothing
-  notifies :run, 'ruby_block[read splunk.secret]', :immediately
+  sensitive true # The output of this is long and useless
 end
 
 ruby_block 'read splunk.secret' do
@@ -59,7 +53,6 @@ ruby_block 'read splunk.secret' do
     Chef::Log.error node.run_state['cerner_splunk']
     puts node.run_state['cerner_splunk']
   end
-  action :nothing
 end
 
 directory node['splunk']['external_config_directory'] do
