@@ -6,6 +6,7 @@
 # Drop in replacement for the existing splunk_forwarder_monitors
 
 actions :install, :delete
+default_action :install
 
 attribute :app,      kind_of: String, name_attribute: true, regex: [/^[A-Za-z0-9_-]/]
 attribute :index,    kind_of: String, required: false
@@ -17,7 +18,6 @@ provides :cerner_splunk_forwarder_monitors if respond_to?(:provides)
 def initialize(name, run_context = nil)
   super
   @index = node['splunk']['main_project_index']
-  @action = :install
 end
 
 def after_created

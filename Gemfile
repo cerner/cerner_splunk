@@ -1,9 +1,10 @@
 source 'https://rubygems.org'
 
 # Going forward, these should be updated to the latest versions immediately post release
-chefspec_version = '= 6.2.0'
-foodcritic_version = '= 10.2.2'
+chefspec_version = '= 7.0.0'
+foodcritic_version = '= 11.0.0'
 rubocop_version = '= 0.48.1'
+chef_vault_version = '> 0.0.0'
 
 case RUBY_VERSION
 when '2.1.6'
@@ -15,6 +16,8 @@ when '2.1.6'
   # This is our target chef for this ruby version
   # Omnibus Definition: https://github.com/chef/omnibus-chef/blob/chef-12.4.3/config/projects/chef.rb#L36
   chef_version = '= 12.4.3'
+  # Later versions require Ruby 2.2
+  chef_vault_version = '< 3.0'
   # Later versions require Ruby 2.2
   gem 'fauxhai', '< 3.10'
   # Later versions require Ruby 2.2
@@ -31,7 +34,7 @@ end
 
 gem 'berkshelf'
 gem 'chef', chef_version
-gem 'chef-vault'
+gem 'chef-vault', chef_vault_version
 gem 'chefspec', chefspec_version
 gem 'foodcritic', foodcritic_version
 gem 'rubocop', rubocop_version
