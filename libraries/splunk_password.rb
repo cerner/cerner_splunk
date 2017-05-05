@@ -8,7 +8,7 @@ require 'base64'
 # Module contains different functions to encrypt and decrypt splunk passwords
 module CernerSplunk
   # Encrypts the password before writing into config files. As of now all the passwords
-  # needs to be XORed except for the sslKeyFilePassword. The boolean
+  # needs to be XORed except for the sslKeyFilePassword / sslPassword. The boolean
   # parameter xor controls the XOR logic.
   def self.splunk_encrypt_password(plain_text, splunk_secret, xor = true)
     rc4key = splunk_secret.strip[0..15]
@@ -24,7 +24,7 @@ module CernerSplunk
   end
 
   # Decrypts the splunk passwords. As of now the encrypted passwords needs to be XORed
-  # to retrieve the plain_text for every password except the sslKeyFilePassword.
+  # to retrieve the plain_text for every password except the sslKeyFilePassword / sslPassword.
   # The boolean parameter xor controls the XOR logic.
   def self.splunk_decrypt_password(encryp_password, splunk_secret, xor = true)
     rc4key = splunk_secret.strip[0..15]
