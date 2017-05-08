@@ -10,8 +10,8 @@ default['splunk']['external_config_directory'] =
     '/etc/splunk'
   end
 
-default['splunk']['package']['version'] = '6.5.3'
-default['splunk']['package']['build'] = '36937ad027d4'
+default['splunk']['package']['version'] = '6.6.0'
+default['splunk']['package']['build'] = '1c4f3bbe1aea'
 
 default['splunk']['package']['base_url'] = 'https://download.splunk.com/products'
 default['splunk']['package']['platform'] = node['os']
