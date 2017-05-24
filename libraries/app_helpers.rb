@@ -32,8 +32,8 @@ module CernerSplunk # rubocop:disable Style/Documentation
         proc do |app_base|
           app_path = Pathname.new app_base
 
-          files.each do |file, contents|
-            file_path = app_path + file
+          files.each do |filename, contents|
+            file_path = app_path + filename
 
             directory file_path.to_s do
               owner node['splunk']['user']
@@ -51,8 +51,9 @@ module CernerSplunk # rubocop:disable Style/Documentation
             end
           end
 
-          lookups.each do |file, url|
-            file_path = app_path + 'lookups' + file
+          lookups.each do |filename, url|
+            raise "Unsupported lookup file format for #{filename}" unless filename =~ /\.(?:csv\.gz|csv|kmz)$/i
+            file_path = app_path + 'lookups' + filename
 
             directory file_path.to_s do
               owner node['splunk']['user']
@@ -64,7 +65,6 @@ module CernerSplunk # rubocop:disable Style/Documentation
               if (url ||= '').empty?
                 action :delete
               else
-                raise "Unsupported lookup file format for #{file}" unless file =~ /\.(?:csv\.gz|csv|kmz)$/i
                 owner node['splunk']['user']
                 group node['splunk']['group']
                 mode '0600'

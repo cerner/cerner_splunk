@@ -62,7 +62,7 @@ module CernerSplunk
               case bag
               when nil then temp
               # ew. Hm... I wonder if we can have the library guarantee a Hash...
-              when Hash, Chef::DataBagItem then bag.clone.merge temp
+              when Hash, Chef::DataBagItem then bag.clone.merge temp # ~FC086 False Positive
               else raise "Unexpected type for LDAP Strategy #{bag.class} at #{bag_coords}"
               end
             else raise "Unexpected type for LDAP Strategy #{strategy.class}"

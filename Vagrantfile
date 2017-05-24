@@ -54,7 +54,7 @@ def network(config, name, splunk_password = true)
 
   config.berkshelf.enabled = false if Vagrant.has_plugin? 'vagrant-berkshelf'
 
-  config.vm.provision :shell, inline: 'cat /etc/splunk/password; echo' if splunk_password
+  config.vm.provision :shell, inline: "cat /etc/splunk/password || knife vault show cerner_splunk shc_passwords -s 'http://#{@chefip}:4000/' -u #{name} -k /vagrant/vagrant_repo/pems/#{name}.pem; echo" if splunk_password
 end
 
 def chef_defaults(chef, name, environment = 'splunk_server')

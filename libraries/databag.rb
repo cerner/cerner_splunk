@@ -60,7 +60,7 @@ module CernerSplunk #:nodoc:
         raise "Array '#{array}' can only contain Strings or nil" unless array.all? { |i| i.nil? || i.is_a?(String) }
         data_bag, bag_item, key = array
         Chef::DataBag.validate_name!(data_bag) if data_bag
-        Chef::DataBagItem.validate_id!(bag_item) if bag_item
+        Chef::DataBagItem.validate_id!(bag_item) if bag_item # TODO: ~FC086
 
         str = bag_item.to_s
         str = "#{data_bag}/#{str}" if data_bag
@@ -82,7 +82,7 @@ module CernerSplunk #:nodoc:
       clazz =
         case opts[:type]
         when :simple
-          Chef::DataBagItem
+          Chef::DataBagItem # TODO: ~FC086
         when :vault
           require 'chef-vault'
           ChefVault::Item

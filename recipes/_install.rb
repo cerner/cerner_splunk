@@ -50,8 +50,6 @@ ruby_block 'read splunk.secret' do
   block do
     node.run_state['cerner_splunk'] ||= {}
     node.run_state['cerner_splunk']['splunk.secret'] = ::File.open(::File.join(node['splunk']['home'], 'etc/auth/splunk.secret'), 'r') { |file| file.readline.chomp }
-    Chef::Log.error node.run_state['cerner_splunk']
-    puts node.run_state['cerner_splunk']
   end
 end
 

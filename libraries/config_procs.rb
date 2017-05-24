@@ -34,9 +34,6 @@ module CernerSplunk
 
       def self.splunk_encrypt(node:, xor: true, **_)
         proc do |x|
-          Chef::Log.error node.run_state
-          Chef::Log.error node.run_state['cerner_splunk']
-          Chef::Log.error node.run_state['cerner_splunk']['splunk.secret']
           CernerSplunk.splunk_encrypt_password(x, node.run_state['cerner_splunk']['splunk.secret'], xor) if x
         end
       end

@@ -51,7 +51,7 @@ when :search_head, :shc_search_head, :shc_captain, :server
     master_uri = bag['master_uri'] || ''
     next if master_uri.empty?
 
-    pass = bag.dig('settings','pass4SymmKey') || ''
+    pass = bag.dig('settings', 'pass4SymmKey') || ''
 
     server_stanzas[stanza] = {}
     server_stanzas[stanza]['master_uri'] = master_uri
