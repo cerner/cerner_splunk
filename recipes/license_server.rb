@@ -58,7 +58,7 @@ license_groups.each do |type, keys|
       group node['splunk']['group']
       mode '0600'
       sensitive true
-      notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately
+      notifies :desired_restart, "splunk_service[#{node['splunk']['package']['type']}]", :immediately
     end
   end
 end
@@ -76,7 +76,7 @@ b = ruby_block 'license cleanup' do
       @changed = to_delete.any?
     end
   end
-  notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately
+  notifies :desired_restart, "splunk_service[#{node['splunk']['package']['type']}]", :immediately
 end
 
 # Hack to not always notify with a ruby_block

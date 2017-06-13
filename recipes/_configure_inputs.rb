@@ -29,5 +29,5 @@ end
 splunk_conf 'system/inputs.conf' do
   config input_stanzas
   action :configure
-  notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately
+  notifies :desired_restart, "splunk_service[#{node['splunk']['package']['type']}]", :immediately
 end

@@ -5,10 +5,11 @@ require_relative '../spec_helper'
 
 describe 'cerner_splunk::_configure_shc_authentication' do
   subject do
-    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '7.2') do |node|
+    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.8') do |node|
       node.normal['splunk']['package']['type'] = 'splunk'
       node.normal['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
       node.normal['splunk']['config']['authentication'] = 'cerner_splunk/authentication'
+      node.run_state.merge!('cerner_splunk' => { 'admin_password' => 'changeme' })
     end
     runner.converge('cerner_splunk::shc_deployer', described_recipe)
   end

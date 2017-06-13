@@ -19,8 +19,11 @@ module CernerSplunk
 
         role_stanza = stanza != 'default' && "role_#{stanza}"
 
-        user_prefs[role_stanza || 'general_default'] = prepare_preferences(pref_entries)
-        authorize[role_stanza || 'default'] = prepare_authorizations(auth_entries) unless auth_entries.empty? # TODO: Do we care about non-default empty
+        # Set the role user prefs -- unless it's empty, then we can leave it out
+        user_prefs[role_stanza || 'general_default'] = prepare_preferences(pref_entries) unless pref_entries.empty?
+        # Always create authorization config for a role, even if empty.
+        # Default doesn't apply to this, but we don't care if it is empty, so leave out the extra complexity.
+        authorize[role_stanza || 'default'] = prepare_authorizations(auth_entries)
       end
       [authorize, user_prefs]
     end

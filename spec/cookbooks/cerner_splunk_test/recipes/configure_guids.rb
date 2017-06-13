@@ -26,5 +26,5 @@ guid =
 template path do
   source 'instance.cfg.erb'
   variables guid: guid
-  notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately
+  notifies :desired_restart, "splunk_service[#{node['splunk']['package']['type']}]", :immediately
 end

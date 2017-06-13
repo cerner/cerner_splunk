@@ -16,9 +16,5 @@ cerner_splunk_sh_cluster 'remove SH from SHC' do
   admin_password(lazy { node.run_state['cerner_splunk']['admin_password'] })
   action :remove
   sensitive true
-end
-
-ruby_block 'splunk-stop' do
-  block { true }
   notifies :stop, "splunk_service[#{node['splunk']['package']['type']}]", :immediately
 end

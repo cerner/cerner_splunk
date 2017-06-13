@@ -12,14 +12,16 @@ search_heads = CernerSplunk.my_cluster_data(node)['shc_members']
 
 raise 'Search Heads are not configured for sh clustering in the cluster databag' if search_heads.nil? || search_heads.empty?
 
+## Attributes
 instance_exec :shc_captain, &CernerSplunk::NODE_TYPE
+
 ## Recipes
 include_recipe 'cerner_splunk::_install_server'
 include_recipe 'cerner_splunk::_start'
 
-cerner_splunk_sh_cluster 'Captain assignment' do
+sh_cluster 'Captain assignment' do
   search_heads search_heads
   admin_password(lazy { node.run_state['cerner_splunk']['admin_password'] })
   action :initialize
-  # sensitive true
+  sensitive true
 end

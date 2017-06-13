@@ -27,7 +27,7 @@ action :install do
         config input_stanzas
       end
     end)
-    notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately
+    notifies :desired_restart, "splunk_service[#{node['splunk']['package']['type']}]", :immediately
   end
 end
 

@@ -5,8 +5,11 @@ require_relative '../spec_helper'
 
 describe 'cerner_splunk::shc_remove_search_head' do
   subject do
-    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '7.2') do |node|
+    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.8') do |node|
       node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
+      node.override['splunk']['config']['password_secrets'] = { 'shc_search_head': 'cerner_splunk/shc_passwords' }
+      node.override['splunk']['bootstrap_shc_member'] = bootstrap_shc_member
+      node.run_state.merge!('cerner_splunk' => { 'admin_password' => 'changeme' })
     end
     runner.converge(described_recipe)
   end
@@ -32,7 +35,7 @@ describe 'cerner_splunk::shc_remove_search_head' do
     }
   end
 
-  let(:bootstrap_shc_member) { false }
+  let(:bootstrap_shc_member) { true }
 
   before do
     allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'cluster').and_return(cluster_config)
@@ -43,15 +46,12 @@ describe 'cerner_splunk::shc_remove_search_head' do
     CernerSplunk.reset
   end
 
-  it 'includes cerner_splunk::shc_search_head recipe' do
-    expect(subject).to include_recipe('cerner_splunk::shc_search_head')
-  end
+  it { is_expected.to include_recipe('cerner_splunk::shc_search_head') }
 
-  it 'removes the search head from the cluster' do
-    expect(subject).to remove_sh_member('remove SH from SHC')
-  end
+  it { is_expected.not_to add_sh_member('add SH to SHC') }
+  it { is_expected.to remove_sh_member('remove SH from SHC') }
 
-  it 'runs the ruby block splunk-stop' do
-    expect(subject).to run_ruby_block('splunk-stop')
+  it 'notifies the splunk service to stop' do
+    expect(subject.cerner_splunk_sh_cluster('remove SH from SHC')).to notify('splunk_service[splunk]').to(:stop).immediately
   end
 end

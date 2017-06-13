@@ -28,7 +28,7 @@ describe 'cerner_splunk::_install' do
   end
 
   let(:platform) { 'redhat' }
-  let(:platform_version) { '7.2' }
+  let(:platform_version) { '6.8' }
 
   let(:initd_exists) { nil }
   let(:ui_login_exists) { nil }
@@ -61,13 +61,7 @@ describe 'cerner_splunk::_install' do
     CernerSplunk.reset
   end
 
-  it 'includes default chef-vault recipe' do
-    expect(subject).to include_recipe('chef-vault::default')
-  end
-
-  it 'includes cerner_splunk::_restart_prep recipe' do
-    expect(subject).to include_recipe('cerner_splunk::_restart_prep')
-  end
+  it { is_expected.to include_recipe('chef-vault::default') }
 
   let(:expected_properties) do
     {
@@ -79,20 +73,9 @@ describe 'cerner_splunk::_install' do
     }
   end
 
-  it 'installs splunk' do
-    expect(subject).to install_splunk('splunk').with(expected_properties)
-  end
-
-  it 'initializes the splunk service' do
-    expect(subject).to init_splunk_service('universal_forwarder').with(
-      package: expected_properties[:package],
-      ulimit: 8192
-    )
-  end
-
-  it 'notifies the ruby block "read splunk.secret"' do
-    expect(subject.splunk_service('universal_forwarder')).to notify('ruby_block[read splunk.secret]').to(:run).immediately
-  end
+  it { is_expected.to install_splunk('splunk').with(expected_properties) }
+  it { is_expected.to init_splunk_service('universal_forwarder').with(package: expected_properties[:package], ulimit: 8192) }
+  it { is_expected.to run_ruby_block('read splunk.secret') }
 
   # TODO: We test for windows but cerner_splunk does not, what happened?
 
@@ -114,60 +97,27 @@ describe 'cerner_splunk::_install' do
       ENV['PROGRAMW6432'] = 'test'
     end
 
-    it 'installs splunk' do
-      expect(subject).to install_splunk('splunk').with(expected_properties)
-    end
-
-    it 'initializes the splunk service' do
-      expect(subject).to init_splunk_service('universal_forwarder').with(
-        package: expected_properties[:package]
-      )
-    end
+    it { is_expected.to install_splunk('splunk').with(expected_properties) }
+    it { is_expected.to init_splunk_service('universal_forwarder').with(package: expected_properties[:package]) }
   end
 
-  it 'includes cerner_splunk::_configure_secret recipe' do
-    expect(subject).to include_recipe('cerner_splunk::_configure_secret')
-  end
+  it { is_expected.to include_recipe('cerner_splunk::_configure_secret') }
+  it { is_expected.to create_directory('/etc/splunk').with(owner: 'splunk', group: 'splunk', mode: '0700') }
+  it { is_expected.to create_directory('/opt/splunkforwarder/var/log/introspection').with(owner: 'splunk', group: 'splunk', mode: '0700') }
 
-  it 'creates external config directory' do
-    expected_attrs = {
-      owner: 'splunk',
-      group: 'splunk',
-      mode: '0700'
-    }
-    expect(subject).to create_directory('/etc/splunk').with(expected_attrs)
-  end
-
-  it 'creates introspection log directory' do
-    expected_attrs = {
-      owner: 'splunk',
-      group: 'splunk',
-      mode: '0700'
-    }
-    expect(subject).to create_directory('/opt/splunkforwarder/var/log/introspection').with(expected_attrs)
-  end
-
-  it 'includes cerner_splunk::_user_management recipe' do
-    expect(subject).to include_recipe('cerner_splunk::_user_management')
-  end
+  it { is_expected.to include_recipe('cerner_splunk::_user_management') }
 
   context 'when .ui_login file exists' do
     let(:ui_login_exists) { true }
 
-    it 'does not touch .ui_login file' do
-      expect(subject).to_not touch_file('/opt/splunkforwarder/etc/.ui_login')
-    end
+    it { is_expected.not_to touch_file('/opt/splunkforwarder/etc/.ui_login') }
   end
 
   context 'when .ui_login file does not exists' do
     let(:ui_login_exists) { false }
 
-    it 'touches .ui_login file' do
-      expect(subject).to touch_file('/opt/splunkforwarder/etc/.ui_login')
-    end
+    it { is_expected.to touch_file('/opt/splunkforwarder/etc/.ui_login') }
   end
 
-  it 'includes cerner_splunk::_configure recipe' do
-    expect(subject).to include_recipe('cerner_splunk::_configure')
-  end
+  it { is_expected.to include_recipe('cerner_splunk::_configure') }
 end

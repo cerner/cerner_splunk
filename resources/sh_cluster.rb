@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: odw_cron
+# Cookbook Name:: cerner_splunk
 # Resource:: sh_cluster
 #
 

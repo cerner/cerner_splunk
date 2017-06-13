@@ -8,11 +8,11 @@ describe 'cerner_splunk::_configure_apps' do
   let(:chef_run_stubs) {}
 
   subject do
-    ChefSpec::SoloRunner.new(platform: 'redhat', version: '7.2') do |node|
+    ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.8') do |node|
       chef_run_stubs
       node.normal['splunk']['package']['type'] = 'splunk'
       node.normal['splunk']['apps'] = app_config
-    end.converge('cerner_splunk::_restart_prep', described_recipe)
+    end.converge('cerner_splunk_test::init_splunk_service', described_recipe)
   end
 
   let(:app_config) do
@@ -56,6 +56,9 @@ describe 'cerner_splunk::_configure_apps' do
     end
 
     it { is_expected.to install_splunk_app_custom('test_app') }
+    it 'should notify the splunk service to restart' do
+      expect(subject.splunk_app_custom('test_app')).to notify('splunk_service[splunk]').to(:desired_restart).immediately
+    end
   end
 
   context 'when uninstalling the app' do
@@ -68,5 +71,8 @@ describe 'cerner_splunk::_configure_apps' do
     end
 
     it { is_expected.to uninstall_splunk_app_custom('test_app') }
+    it 'should notify the splunk service to restart' do
+      expect(subject.splunk_app_custom('test_app')).to notify('splunk_service[splunk]').to(:desired_restart).immediately
+    end
   end
 end

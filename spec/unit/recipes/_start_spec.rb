@@ -33,7 +33,7 @@ describe 'cerner_splunk::_start' do
   end
 
   let(:platform) { 'redhat' }
-  let(:platform_version) { '7.2' }
+  let(:platform_version) { '6.8' }
 
   before do
     allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'cluster').and_return(cluster_config)

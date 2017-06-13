@@ -19,8 +19,6 @@ node.default['splunk']['package']['type'] = CernerSplunk.package_type(nsp['base_
 node.default['splunk']['home'] = CernerSplunk::PathHelpers.cerner_default_install_dirs.dig(nsp['type'].to_sym, node['os'].to_sym)
 node.default['splunk']['cmd'] = CernerSplunk.splunk_command(node)
 
-include_recipe 'cerner_splunk::_restart_prep'
-
 splunk_install 'splunk' do
   package node['splunk']['package']['type'].to_sym
   version node['splunk']['package']['version']
@@ -35,7 +33,6 @@ splunk_service node['splunk']['package']['type'] do
   package node['splunk']['package']['type'].to_sym
   ulimit node['splunk']['limits']['open_files'].to_i unless node['platform_family'] == 'windows'
   action :init
-  # notifies :run, 'execute[finish splunk setup]', :immediately
 end
 
 # The above initialization does not handle creating splunk.secret and encrypted config.

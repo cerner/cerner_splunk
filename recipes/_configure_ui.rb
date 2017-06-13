@@ -10,5 +10,5 @@
 splunk_conf 'system/ui-prefs.conf' do
   config node['splunk']['config']['ui_prefs']
   action :configure
-  notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately
+  notifies :desired_restart, "splunk_service[#{node['splunk']['package']['type']}]", :immediately
 end

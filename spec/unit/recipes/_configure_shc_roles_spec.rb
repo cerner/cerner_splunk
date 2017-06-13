@@ -5,9 +5,10 @@ require_relative '../spec_helper'
 
 describe 'cerner_splunk::_configure_shc_roles' do
   subject do
-    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '7.2') do |node|
+    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.8') do |node|
       node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
       node.override['splunk']['config']['roles'] = 'cerner_splunk/roles'
+      node.run_state.merge!('cerner_splunk' => { 'admin_password' => 'changeme' })
     end
     runner.converge('cerner_splunk::shc_deployer', described_recipe)
   end
@@ -36,7 +37,6 @@ describe 'cerner_splunk::_configure_shc_roles' do
         'default' => {
           'app' => 'launcher',
           'tz' => 'America/Chicago',
-          'showWhatsNew' => 0,
           'capabilities' => ['!schedule_rtsearch']
         }
       }
@@ -72,8 +72,7 @@ describe 'cerner_splunk::_configure_shc_roles' do
       config: {
         'general_default' => {
           'default_namespace' => 'launcher',
-          'tz' => 'America/Chicago',
-          'showWhatsNew' => 0
+          'tz' => 'America/Chicago'
         }
       }
     }

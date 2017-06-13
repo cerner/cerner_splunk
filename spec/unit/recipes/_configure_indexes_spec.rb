@@ -5,12 +5,12 @@ require_relative '../spec_helper'
 
 describe 'cerner_splunk::_configure_indexes' do
   subject do
-    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '7.2') do |node|
+    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.8') do |node|
       node.normal['splunk']['package']['type'] = 'splunk'
       node.normal['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
     end
 
-    runner.converge('cerner_splunk::_restart_prep', described_recipe)
+    runner.converge('cerner_splunk_test::init_splunk_service', described_recipe)
   end
 
   let(:cluster_config) do
@@ -71,6 +71,9 @@ describe 'cerner_splunk::_configure_indexes' do
       }
 
       expect(subject).to configure_splunk('system/indexes.conf').with(expected_attributes)
+    end
+    it 'should notify the splunk service to restart' do
+      expect(subject.splunk_conf('system/indexes.conf')).to notify('splunk_service[splunk]').to(:desired_restart).immediately
     end
   end
 
@@ -136,6 +139,9 @@ describe 'cerner_splunk::_configure_indexes' do
       }
 
       expect(subject).to configure_splunk('system/indexes.conf').with(expected_attributes)
+    end
+    it 'should notify the splunk service to restart' do
+      expect(subject.splunk_conf('system/indexes.conf')).to notify('splunk_service[splunk]').to(:desired_restart).immediately
     end
   end
 end

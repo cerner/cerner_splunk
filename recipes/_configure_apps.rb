@@ -35,6 +35,6 @@ apps.each do |app_name, app_data|
     configs CernerSplunk::AppHelpers.proc_conf(app_data['files']) unless app_data['files'].empty?
     files CernerSplunk::AppHelpers.proc_files(files: app_data['files'], lookups: app_data['lookups']) unless app_data['lookups'].empty? && app_data['files'].empty?
     metadata app_data['permissions'] if app_data['permissions']
-    notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately
+    notifies :desired_restart, "splunk_service[#{node['splunk']['package']['type']}]", :immediately
   end
 end

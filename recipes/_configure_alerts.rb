@@ -17,5 +17,5 @@ end
 splunk_conf 'system/alert_actions.conf' do
   config CernerSplunk::Alerts.configure_alerts(node, hash)
   action :configure
-  notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately
+  notifies :desired_restart, "splunk_service[#{node['splunk']['package']['type']}]", :immediately
 end

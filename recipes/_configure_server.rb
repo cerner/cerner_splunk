@@ -214,5 +214,5 @@ server_stanzas['license'] = {
 splunk_conf 'system/server.conf' do
   config server_stanzas
   action :configure
-  notifies :ensure, "splunk_restart[#{node['splunk']['package']['type']}]", :immediately
+  notifies :desired_restart, "splunk_service[#{node['splunk']['package']['type']}]", :immediately
 end
