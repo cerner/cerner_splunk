@@ -39,9 +39,9 @@ encrypt_password = CernerSplunk::ConfigProcs::Transform.splunk_encrypt node: nod
 encrypt_noxor_password = CernerSplunk::ConfigProcs::Transform.splunk_encrypt node: node, xor: false
 
 # default pass4SymmKey value is 'changeme'
-server_stanzas['general']['pass4SymmKey'] = CernerSplunk::ConfigProcs.compose encrypt_password, CernerSplunk::ConfigProcs::Value.constant(value: 'changeme')
-# default sslKeysfilePassword value is 'password'
-server_stanzas['sslConfig']['sslKeysfilePassword'] = CernerSplunk::ConfigProcs.compose encrypt_noxor_password, CernerSplunk::ConfigProcs::Value.constant(value: 'password')
+server_stanzas['general']['pass4SymmKey'] = CernerSplunk::ConfTemplate.compose encrypt_password, CernerSplunk::ConfTemplate::Value.constant(value: 'changeme')
+# default sslPassword value is 'password'
+server_stanzas['sslConfig']['sslPassword'] = CernerSplunk::ConfTemplate.compose encrypt_noxor_password, CernerSplunk::ConfTemplate::Value.constant(value: 'password')
 
 # Indexer Cluster Configuration
 case node['splunk']['node_type']

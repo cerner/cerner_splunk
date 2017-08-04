@@ -10,12 +10,9 @@
   - `REGEN_APPS=1 vagrant provision chef` - Will repackage all apps.
 - You can speed up repeated provisioning attempts by mirroring the Splunk package downloads locally:
   1. Download the needed splunk packages locally, in a directory structure mirroring that of download.splunk.com
-  2. You can find URLs for Splunk packages at the [Splunk download page](http://splunk.com/download)
-  3. Host the root of your mirrored structure on port 8080 using a lightweight HTTP server such as the node package [http-server](https://npmjs.org/package/http-server)
-  4. Un-comment the `splunk-mirrors` role in the Vagrant file. (Do not check in this modification of your Vagrantfile)
-  5. Required files and sizes (assuming current cookbook versions)
-  6. `splunk-6.5.3-36937ad027d4-linux-2.6-x86_64.rpm` and `splunk-6.5.3-36937ad027d4-linux-2.6-amd64.deb` ~ 216MB each
-  7. `splunkforwarder-6.5.3-36937ad027d4-linux-2.6-x86_64.rpm` and `splunkforwarder-6.5.3-36937ad027d4-linux-2.6-amd64.deb` ~ 19MB each
+    - You can find URLs for Splunk packages at the [Splunk download page](http://splunk.com/download)
+  2. Host the root of your mirrored structure on port 8080 using a lightweight HTTP server such as the node package [http-server](https://npmjs.org/package/http-server)
+  3. Un-comment the `splunk-mirrors` role in the Vagrant file. (Do not check in this modification of your Vagrantfile)
 - `vagrant-omnibus` installer currently requires internet access to function.
 
 **Note**:
