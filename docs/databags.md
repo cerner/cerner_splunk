@@ -65,12 +65,13 @@ An Indexes Hash is part of a plaintext data bag item that defines the set of ind
 
 A Roles Hash is a contextual (see above) Hash, part of a plaintext data bag item that defines roles for every node in a cluster, and is pointed to by the `node[:splunk][:config][:roles]` attribute (usually set in your environment). A special key of 'shcluster' is used for managing the roles on the search heads in a search head cluster.
 
+**Note:** `[context][role_name]['showWhatsNew']` is deprecated and should be removed from current config.
+
 - `[context]` - Final Hash, String Alias, or force unconfigured (null)
 - `[context]['default']` - defines the base settings for all roles
 - `[context][role_name]` - defines the settings for a particular role
 - `[context][role_name]['app']` - Default app for the role ('default\_namespace' in [user-prefs.conf][])
 - `[context][role_name]['tz']` - Default timezone for the role ('tz' in [user-prefs.conf][])
-- `[context][role_name]['showWhatsNew']` - 0 to supress the "what's new in Splunk 6 popup" ('showWhatsNew in [user-prefs.conf][])
 - `[context][role_name]['capabilities']` - An array of capability names to enable for this role or when prefixed with an '!' to explicitly disable (which is only useful when applied to those roles that ship with Splunk/other apps in default configurations) in [authorize.conf][].
 - `[context][role_name][something_else]` - A string, or array for something else defined in [authorize.conf][]. Arrays are automatically turned into semi-colon delimited lists.
 

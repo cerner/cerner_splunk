@@ -15,7 +15,7 @@ module CernerSplunk
       authorize = {}
 
       config.each do |stanza, props|
-        pref_entries, auth_entries = props.partition { |key, _| %w[tz app].include?(key) }.map(&:to_h)
+        pref_entries, auth_entries = props.partition { |key, _| %w[tz showWhatsNew app].include?(key) }.map(&:to_h)
 
         role_stanza = stanza != 'default' && "role_#{stanza}"
 

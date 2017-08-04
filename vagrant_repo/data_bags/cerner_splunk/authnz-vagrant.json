@@ -39,7 +39,6 @@
       "default":{
         "app":"launcher",
         "tz":"America/Chicago",
-        "showWhatsNew":0,
         "capabilities":["!schedule_rtsearch"]
       },
       "nobody": {},
