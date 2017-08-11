@@ -103,7 +103,7 @@ module CernerSplunk
   def self.separate_splunk_installed?(node)
     opposite_package_name = opposite_package_name(node['splunk']['package']['base_name'])
     old_package_type = package_type(opposite_package_name).to_sym
-    Dir.exist?(CernerSplunk::PathHelpers.cerner_default_install_dirs.dig(old_package_type, node['os'].to_sym))
+    Dir.exist?(CernerSplunk::PathHelpers.default_install_dirs.dig(old_package_type, node['os'].to_sym))
   end
 
   # Returns the Splunk service name based on platform and package name

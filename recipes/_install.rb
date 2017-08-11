@@ -16,7 +16,7 @@ end
 
 # Attributes
 node.default['splunk']['package']['type'] = CernerSplunk.package_type(nsp['base_name'])
-node.default['splunk']['home'] = CernerSplunk::PathHelpers.cerner_default_install_dirs.dig(nsp['type'].to_sym, node['os'].to_sym)
+node.default['splunk']['home'] = CernerSplunk::PathHelpers.default_install_dirs.dig(nsp['type'].to_sym, node['os'].to_sym)
 node.default['splunk']['cmd'] = CernerSplunk.splunk_command(node)
 
 splunk_install 'splunk' do

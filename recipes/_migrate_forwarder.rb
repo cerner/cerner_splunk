@@ -19,7 +19,7 @@ end
 
 ruby_block 'backup-splunk-artifacts' do
   block do
-    splunk_home = CernerSplunk::PathHelpers.cerner_default_install_dirs.dig(old_package_type, node['os'].to_sym)
+    splunk_home = CernerSplunk::PathHelpers.default_install_dirs.dig(old_package_type, node['os'].to_sym)
     FileUtils.cp_r(::File.join(splunk_home, '/var/lib/splunk/fishbucket'), Chef::Config[:file_cache_path])
     FileUtils.cp(::File.join(splunk_home, '/etc/passwd'), Chef::Config[:file_cache_path])
     node.run_state['cerner_splunk']['splunk_forwarder_migrate'] = true
