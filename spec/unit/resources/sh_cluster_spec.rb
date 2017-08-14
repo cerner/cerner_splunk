@@ -3,24 +3,47 @@
 
 require_relative '../spec_helper'
 
-describe 'sh_cluster' do
+describe 'cerner_splunk::shc_search_head' do
   subject do
     runner = ChefSpec::SoloRunner.new(step_into: ['cerner_splunk_sh_cluster']) do |node|
+      node.automatic['ipaddress'] = '127.0.0.1'
       node.normal['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
       node.normal['splunk']['cmd'] = '/opt/splunk/bin/splunk'
+      node.normal['splunk']['package']['base_name'] = 'splunk'
+      node.override['splunk']['config']['password_secrets'] = { 'shc_search_head': 'cerner_splunk/shc_passwords' }
+      node.run_state.merge!('cerner_splunk' => { 'admin_password' => 'changeme' })
     end
     runner.converge('cerner_splunk::_install', described_recipe)
   end
 
-  let(:search_heads) { ['https://33.33.33.15:8089', 'https://33.33.33.17:8089'] }
-  let(:admin_password) { 'changeme' }
   let(:existing_member) { false }
+  let(:cluster_config) do
+    {
+      'receivers' => ['33.33.33.20'],
+      'license_uri' => nil,
+      'receiver_settings' => {
+        'splunktcp' => {
+          'port' => '9997'
+        }
+      },
+      'indexes' => 'cerner_splunk/indexes',
+      'shc_members' => [
+        'https://33.33.33.15:8089',
+        'https://33.33.33.17:8089'
+      ]
+    }
+  end
 
   describe 'action :initialize' do
     before do
+      allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'cluster').and_return(cluster_config)
+      allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'indexes').and_return({})
       stub_command('/opt/splunk/bin/splunk list shcluster-members -auth admin:changeme | grep 127.0.0.1').and_return(existing_member)
     end
 
+    after do
+      CernerSplunk.reset
+    end
     it 'adds the SH to the SHC' do
       expect(subject).to run_execute('add search head')
     end
@@ -38,6 +61,7 @@ end
 describe 'cerner_splunk::shc_remove_search_head' do
   subject do
     runner = ChefSpec::SoloRunner.new(step_into: ['cerner_splunk_sh_cluster']) do |node|
+      node.automatic['ipaddress'] = '127.0.0.1'
       node.normal['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
       node.normal['splunk']['cmd'] = '/opt/splunk/bin/splunk'
       node.normal['splunk']['package']['base_name'] = 'splunk'
@@ -67,7 +91,13 @@ describe 'cerner_splunk::shc_remove_search_head' do
   let(:existing_member) { nil }
 
   before do
+    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'cluster').and_return(cluster_config)
+    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'indexes').and_return({})
     stub_command('/opt/splunk/bin/splunk list shcluster-members -auth admin:changeme | grep 127.0.0.1').and_return(existing_member)
+  end
+
+  after do
+    CernerSplunk.reset
   end
 
   context 'when a member needs to be removed from the cluster and is an existing member of the cluster' do
@@ -90,6 +120,7 @@ end
 describe 'cerner_splunk::shc_captain' do
   subject do
     runner = ChefSpec::SoloRunner.new(step_into: ['cerner_splunk_sh_cluster']) do |node|
+      node.automatic['ipaddress'] = '127.0.0.1'
       node.normal['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
       node.normal['splunk']['cmd'] = '/opt/splunk/bin/splunk'
       node.normal['splunk']['package']['base_name'] = 'splunk'

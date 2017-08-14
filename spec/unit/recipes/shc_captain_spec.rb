@@ -45,7 +45,7 @@ describe 'cerner_splunk::shc_captain' do
 
   it { is_expected.to include_recipe('cerner_splunk::_install_server') }
   it { is_expected.to include_recipe('cerner_splunk::_start') }
-  it { is_expected.to initialize_sh_cluster('Captain assignment') }
+  it { is_expected.to initialize_cerner_splunk_sh_cluster('Captain assignment') }
 
   context 'when the search heads are not specified for sh clustering in the cluster databag' do
     let(:cluster_config) { { 'sh_cluster' => [] } }

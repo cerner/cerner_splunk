@@ -19,7 +19,7 @@ instance_exec :shc_captain, &CernerSplunk::NODE_TYPE
 include_recipe 'cerner_splunk::_install_server'
 include_recipe 'cerner_splunk::_start'
 
-sh_cluster 'Captain assignment' do
+cerner_splunk_sh_cluster 'Captain assignment' do
   search_heads search_heads
   admin_password(lazy { node.run_state['cerner_splunk']['admin_password'] })
   action :initialize

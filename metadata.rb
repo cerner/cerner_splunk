@@ -11,8 +11,7 @@ version           '3.0.0'
 source_url        'https://github.com/cerner/cerner_splunk'
 issues_url        'https://github.com/cerner/cerner_splunk/issues'
 
-depends           'chef-vault', '~> 2.1'
-depends           'xml', '~> 1.2'
+depends           'chef-vault', '~> 3.0'
 depends           'cerner_splunk_ingredient'
 
 gem               'unix-crypt'

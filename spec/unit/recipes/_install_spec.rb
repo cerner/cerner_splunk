@@ -66,8 +66,8 @@ describe 'cerner_splunk::_install' do
   let(:expected_properties) do
     {
       package: :universal_forwarder,
-      version: '6.5.3',
-      build: '36937ad027d4',
+      version: '6.6.2',
+      build: '4b804538c686',
       user: 'splunk',
       base_url: 'https://download.splunk.com/products'
     }
@@ -86,8 +86,8 @@ describe 'cerner_splunk::_install' do
     let(:expected_properties) do
       {
         package: :universal_forwarder,
-        version: '6.5.3',
-        build: '36937ad027d4',
+        version: '6.6.2',
+        build: '4b804538c686',
         user: 'fauxhai',
         base_url: 'https://download.splunk.com/products'
       }
