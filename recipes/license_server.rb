@@ -9,7 +9,6 @@
 
 raise 'License Server installation not currently supported on windows' if platform_family?('windows')
 
-include_recipe 'xml::ruby'
 require 'nokogiri'
 
 ## Attributes
