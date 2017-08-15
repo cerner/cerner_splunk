@@ -5,7 +5,7 @@ require_relative '../spec_helper'
 
 describe 'cerner_splunk::_generate_password' do
   subject do
-    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.8') do |node|
+    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.9') do |node|
       node.override['splunk']['node_type'] = node_type
       node.override['splunk']['config']['password_secrets'] = password_secrets
     end

@@ -14,7 +14,7 @@ password_hashes = {
 
 describe 'splunk_admin_password' do
   subject do
-    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.8', step_into: 'splunk_admin_password') do |node|
+    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.9', step_into: 'splunk_admin_password') do |node|
       node.normal['splunk']['home'] = '/opt/splunk'
       node.normal['splunk']['cmd'] = '/opt/splunk/bin/splunk'
       node.normal['test_parameters'] = test_params

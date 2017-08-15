@@ -8,7 +8,7 @@ describe 'cerner_splunk::_configure_apps' do
   let(:chef_run_stubs) {}
 
   subject do
-    ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.8') do |node|
+    ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.9') do |node|
       chef_run_stubs
       node.normal['splunk']['package']['type'] = 'splunk'
       node.normal['splunk']['apps'] = app_config

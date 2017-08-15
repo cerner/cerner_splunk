@@ -6,7 +6,7 @@ require_relative '../../../libraries/app_helpers'
 
 describe 'cerner_splunk::shc_deployer' do
   subject do
-    ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.8') do |node|
+    ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.9') do |node|
       chef_run_stubs
       node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
       node.run_state.merge!('cerner_splunk' => { 'admin_password' => 'changeme' })

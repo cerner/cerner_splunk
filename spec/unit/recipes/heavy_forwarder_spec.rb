@@ -5,7 +5,7 @@ require_relative '../spec_helper'
 
 describe 'cerner_splunk::heavy_forwarder' do
   subject do
-    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.8') do |node|
+    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.9') do |node|
       node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
       node.run_state['cerner_splunk'] = {}
       node.run_state['cerner_splunk']['splunk_forwarder_migrate'] = splunk_installed

@@ -16,7 +16,7 @@ RSpec.configure do |config|
   config.expect_with(:rspec) { |c| c.syntax = :expect }
 
   config.platform = 'redhat'
-  config.version = '6.8'
+  config.version = '6.9'
 end
 
 module CernerSplunk

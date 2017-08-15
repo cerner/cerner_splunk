@@ -5,7 +5,7 @@ require_relative '../spec_helper'
 
 describe 'cerner_splunk::_configure_shc_outputs' do
   subject do
-    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.8') do |node|
+    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.9') do |node|
       node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
       node.run_state.merge!('cerner_splunk' => { 'admin_password' => 'changeme' })
     end

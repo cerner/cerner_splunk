@@ -28,7 +28,7 @@ describe 'cerner_splunk::_install' do
   end
 
   let(:platform) { 'redhat' }
-  let(:platform_version) { '6.8' }
+  let(:platform_version) { '6.9' }
 
   let(:initd_exists) { nil }
   let(:ui_login_exists) { nil }
