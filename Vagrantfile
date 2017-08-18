@@ -305,7 +305,6 @@ Vagrant.configure('2') do |config|
       chef_defaults chef, :f_win2012r2, 'splunk_standalone'
       chef.add_role 'splunk_monitors_windows'
       chef.add_recipe 'cerner_splunk'
-      chef.verbose_logging = true
     end
     network cfg, :f_win2012r2, false
   end
