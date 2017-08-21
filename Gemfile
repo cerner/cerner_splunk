@@ -30,6 +30,7 @@ when '2.1.6'
 else
   # https://github.com/cerner/cerner_splunk/issues/142
   chef_version = '= 12.18.31'
+  gem 'molinillo', '~> 0.5.0'
 end
 
 gem 'berkshelf'
