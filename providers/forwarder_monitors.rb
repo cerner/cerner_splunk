@@ -11,7 +11,7 @@ provides :splunk_forwarder_monitors if respond_to?(:provides)
 provides :cerner_splunk_forwarder_monitors if respond_to?(:provides)
 
 action :install do
-  input_stanzas = CernerSplunk::LWRP.convert_monitors(node, new_resource.monitors, new_resource.index)
+  input_stanzas = CernerSplunk::LWRP.convert_monitors(new_resource.monitors, new_resource.index)
 
   file new_resource.app do
     action :nothing

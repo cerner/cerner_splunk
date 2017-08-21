@@ -7,7 +7,11 @@
 
 # Verify that clusters are configured
 if node['splunk']['node_type'] != :license_server && node['splunk']['config']['clusters'].empty?
-  throw 'You need to configure at least one cluster databag.'
+  if node['splunk']['node_type'] == :forwarder
+    Chef::Log.warn 'No cluster data bag configured, ensure your outputs are configured elsewhere.'
+  else
+    throw 'You need to configure at least one cluster databag.'
+  end
 end
 
 node['splunk']['config']['clusters'].each do |cluster|

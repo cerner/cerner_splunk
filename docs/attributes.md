@@ -41,7 +41,6 @@ Configurable (with defaults)
 * `node['splunk']['bootstrap_shc_member']` - Set this attribute to `true` to bootstrap a member to the Search Head Cluster (SHC). (`false`)
 * `node['splunk']['mgmt_host']` - The host other SHC members use when connecting to the current node. You probably want a wrapper cookbook to override this. (`node['ipaddress']`)
 * `node['splunk']['heavy_forwarder']['use_license_uri']` - Set this attribute to `true` to point the Heavy Forwarder to the license master. (`false`)
-* `node['splunk']['flags']['index_checks_fail']` - If `true` raises an exception failing the chef run, when monitors are configured to be sent to non-existent indexes. If `false` logs a warning, but does not fail the chef run for the same condition.(`true`)
 * `node['splunk']['apps']` - An [apps hash](databags.md#apps-hash) of apps to configure locally. (Does not support downloading apps ... yet...)
 
 
