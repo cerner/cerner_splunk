@@ -27,6 +27,7 @@ In depth look at all attributes available for this cookbook.
 - `node['splunk']['config']['host']` - Hostname to configure the Splunk instance to report as. (EC2 Instance ID or Fully Qualified Domain Name)
 - `node['splunk']['config']['roles']` - Data bag item used to configure roles (`nil` - roles not managed by chef)
 - `node['splunk']['config']['secrets']` - Coordinate String (see [data bags documentation][data_bags]), pointing to a key within a Chef Vault encrypted data bag item used to configure the splunk.secret file. The value must be a string. (`nil` - secrets not managed by chef).  Note: this is currently not supported on windows.
+- `node['splunk']['config']['password_secrets']` - Coordinate String (see [data bags documentation][data_bags]), pointing to a key within a Chef Vault encrypted data bag item used to configure the admin password. The value must be a string. This property is required for search head clusters. (`nil` - do not refer to the vault).
 - `node['splunk']['config']['licenses']` - Data bag item that the license server recipe uses as the source of truth for the license data.
 - `node['splunk']['config']['license-pool']` - Data bag item used to configure license pools.
 - `node['splunk']['config']['ui_prefs']` - Hash of stanzas used to configure [ui-prefs.conf][] on the search head in a clustered configuration or a standalone instance.
