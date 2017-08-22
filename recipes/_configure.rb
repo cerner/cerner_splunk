@@ -9,12 +9,13 @@
 
 # Verify that clusters are configured
 if node['splunk']['node_type'] != :license_server && node['splunk']['config']['clusters'].empty?
-  throw 'You need to configure at least one cluster databag.'
+  raise 'You need to configure at least one cluster databag.' unless node['splunk']['node_type'] == :forwarder
+  Chef::Log.warn 'No cluster data bag configured, ensure your outputs are configured elsewhere.'
 end
 
 node['splunk']['config']['clusters'].each do |cluster|
   unless CernerSplunk::DataBag.load(cluster)
-    throw "Unknown databag configured for node['splunk']['config]['clusters'] => '#{cluster}'"
+    raise "Unknown databag configured for node['splunk']['config]['clusters'] => '#{cluster}'"
   end
 end
 

@@ -19,7 +19,7 @@ def after_created
 end
 
 action :install do
-  input_stanzas = CernerSplunk::LWRP.convert_monitors(node, new_resource.monitors, new_resource.index)
+  input_stanzas = CernerSplunk::LWRP.convert_monitors(new_resource.monitors, new_resource.index)
 
   splunk_app_custom new_resource.app do
     configs(proc do
