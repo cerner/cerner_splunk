@@ -4,7 +4,7 @@ require_relative '../spec_helper'
 
 describe 'cerner_splunk::_configure' do
   subject do
-    ChefSpec::SoloRunner.new(platform: 'centos', version: '6.8') do |node|
+    ChefSpec::SoloRunner.new(platform: 'centos', version: '6.9') do |node|
       node.normal['splunk']['config']['clusters'] = clusters
       node.normal['splunk']['node_type'] = node_type
       node.normal['splunk']['package']['type'] = 'splunk'
