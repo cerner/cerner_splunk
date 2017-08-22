@@ -21,7 +21,7 @@ execute 'apply-shcluster-bundle' do # ~FC009
   command(lazy { "#{node['splunk']['cmd']} apply shcluster-bundle -target '#{search_heads.first}' --answer-yes -auth admin:#{node.run_state['cerner_splunk']['admin_password']}" })
   environment 'HOME' => node['splunk']['home']
   action :nothing
-  sensitive false
+  sensitive true
 end
 
 cluster_data = CernerSplunk.my_cluster_data(node) || {}
