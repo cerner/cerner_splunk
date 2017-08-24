@@ -1,9 +1,9 @@
 source 'https://rubygems.org'
 
 # Going forward, these should be updated to the latest versions immediately post release
-chefspec_version = '= 7.0.0'
-foodcritic_version = '= 11.0.0'
-rubocop_version = '= 0.48.1'
+chefspec_version = '= 7.1.0'
+foodcritic_version = '= 11.3.1'
+rubocop_version = '= 0.49.1'
 chef_vault_version = '> 0.0.0'
 
 case RUBY_VERSION
