@@ -59,6 +59,6 @@ describe 'cerner_splunk::shc_captain' do
   end
 
   it 'assigns the captain' do
-    expect(subject).to initialize_sh_cluster('Captain assignment')
+    expect(subject).to initialize_cerner_splunk_sh_cluster('Captain assignment')
   end
 end

@@ -80,7 +80,8 @@ describe 'cerner_splunk::_configure' do
 
     context 'when node is not a forwarder' do
       it 'should raise an exception' do
-        expect { subject }.to raise_exception
+        message = 'uncaught throw "You need to configure at least one cluster databag."'
+        expect { subject }.to raise_exception(UncaughtThrowError, message)
       end
     end
   end

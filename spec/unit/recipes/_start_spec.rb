@@ -76,7 +76,7 @@ describe 'cerner_splunk::_start' do
 
   context 'when platform is not windows' do
     let(:platform) { 'centos' }
-    let(:platform_version) { '6.6' }
+    let(:platform_version) { '6.8' }
     let(:windows) { false }
 
     it 'executes boot-start script' do
