@@ -1,4 +1,3 @@
-
 # frozen_string_literal: true
 
 #
@@ -50,8 +49,8 @@ module CernerSplunk
 
       when 'LDAP'
         raise 'LDAP_strategies required for LDAP authentication' unless hash['LDAP_strategies']
-        strategies = [hash.delete('LDAP_strategies')] unless hash['LDAP_strategies'].is_a? Array
-        strategies = strategies.collect do |strategy|
+        config_strategies = hash.delete('LDAP_strategies')
+        strategies = (config_strategies.is_a?(Array) ? config_strategies : [config_strategies]).collect do |strategy|
           hash =
             case strategy
             when String then CernerSplunk::DataBag.load strategy, default: default_coords
