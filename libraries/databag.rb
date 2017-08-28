@@ -60,7 +60,7 @@ module CernerSplunk #:nodoc:
         raise "Array '#{array}' can only contain Strings or nil" unless array.all? { |i| i.nil? || i.is_a?(String) }
         data_bag, bag_item, key = array
         Chef::DataBag.validate_name!(data_bag) if data_bag
-        Chef::DataBagItem.validate_id!(bag_item) if bag_item # TODO: ~FC086
+        Chef::DataBagItem.validate_id!(bag_item) if bag_item # ~FC086 False Positive
 
         str = bag_item.to_s
         str = "#{data_bag}/#{str}" if data_bag
@@ -100,7 +100,7 @@ module CernerSplunk #:nodoc:
           rescue => e
             raise e unless opts[:handle_load_failure]
             Chef::Log.warn "Could not load the data bag item referenced by: #{to_value([data_bag, bag_item])}. Details available at debug log level, continuing chef run assuming nil."
-            Chef::Log.debug "#{e.class}: #{e}\n#{e.backtrace.join("\n")}" if Chef::Log.level == :debug
+            Chef::Log.debug "#{e.class}: #{e}\n#{e.backtrace.join("\n")}"
             nil
           end
         end
