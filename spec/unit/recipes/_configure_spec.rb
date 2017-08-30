@@ -80,7 +80,7 @@ describe 'cerner_splunk::_configure' do
 
     context 'when node is not a forwarder' do
       it 'should raise an exception' do
-        expect { subject }.to raise_exception
+        expect { subject }.to raise_error
       end
     end
   end
