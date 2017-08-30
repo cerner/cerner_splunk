@@ -75,9 +75,7 @@ module CernerSplunk
 
   # Returns filepath to splunk bin based on platform family
   def self.splunk_command(node)
-    # Chef::Log.warn(node['splunk']['home'])
     filepath = "#{node['splunk']['home']}/bin/splunk"
-    # Chef::Log.warn(filepath)
 
     return %("#{filepath.tr('/', '\\')}") if node['platform_family'] == 'windows'
 

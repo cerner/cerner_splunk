@@ -131,20 +131,15 @@ if %i[shc_search_head shc_captain].include? node['splunk']['node_type']
 end
 
 # License Configuration
-# TODO: Can this ever not be license uri or self?
 license_uri =
   case node['splunk']['node_type']
-  when :license_server
-    'self'
   when :cluster_master, :cluster_slave, :server, :search_head, :shc_search_head, :shc_captain, :shc_deployer
-    'self' || !node['splunk']['free_license'] && CernerSplunk.my_cluster_data(node)['license_uri']
+    CernerSplunk.my_cluster_data(node)['license_uri'] unless node['splunk']['free_license']
   when :forwarder
     if node['splunk']['package']['base_name'] == 'splunk' && node['splunk']['heavy_forwarder']['use_license_uri']
-      CernerSplunk.my_cluster_data(node)['license_uri'] || 'self'
-    else
-      'self'
+      CernerSplunk.my_cluster_data(node)['license_uri']
     end
-  end
+  end || 'self'
 
 license_group =
   case node['splunk']['node_type']

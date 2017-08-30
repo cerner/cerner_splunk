@@ -159,7 +159,7 @@ describe 'splunk_admin_password' do
       let(:vault_item) {}
 
       it 'fails the chef run' do
-        expect { subject }.to raise_error(ChefVault::Exceptions::ItemNotFound, /Vault item for admin password does not exist$/)
+        expect { subject }.to raise_error(ChefVault::Exceptions::ItemNotFound, %r{Vault item for admin password does not exist: cerner_splunk/admin_password$})
       end
     end
   end

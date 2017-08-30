@@ -27,7 +27,7 @@ action_class do
     return unless vault_bag && vault_item
     @vault ||= ChefVault::Item.load(vault_bag, vault_item)
   rescue ChefVault::Exceptions::KeysNotFound, ChefVault::Exceptions::ItemNotFound => e
-    raise e, 'Vault item for admin password does not exist'
+    raise e, "Vault item for admin password does not exist: #{vault_bag}/#{vault_item}"
   end
 
   def load_password_from_vault
