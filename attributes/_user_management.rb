@@ -12,7 +12,7 @@ end
 
 # This attribute you can add splunk to additional groups
 default['splunk']['groups'] = []
-# This attribute you can remove splunk from additional groups (Chef 11+ only)
+# This attribute you can remove splunk from additional groups
 default['splunk']['exclude_groups'] = %w[root wheel admin]
 
 # This is Splunk's recommendation for open file limit

@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 
 gem 'berkshelf'
-gem 'chef', '= 12.18.31' # https://github.com/cerner/cerner_splunk/issues/142
+gem 'chef', '= 12.19.36'
 gem 'chef-vault'
 gem 'unix-crypt', '= 1.3.0'
 

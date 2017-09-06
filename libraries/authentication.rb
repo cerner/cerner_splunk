@@ -18,7 +18,7 @@ module CernerSplunk
         'passwordHashAlgorithm' => 'Splunk'
       }.freeze
 
-      probable_types = config_mapping.values_at(*settings.keys)
+      probable_types = config_mapping.values_at(*settings.keys).uniq
       raise "Conflicting authentication types were derived from the config: #{probable_types.join(',')}" if probable_types.length > 1
 
       settings['authType'] || probable_types.first || 'Splunk'

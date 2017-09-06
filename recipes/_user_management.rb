@@ -35,18 +35,12 @@ groups_to_add.uniq.each do |grp|
   end
 end
 
-# Chef versions less than 11.10 do not support removing users from groups
-# But if you're on a new enough version, we can take advantage of this functionality
-if Chef::Resource::Group.instance_methods.include?(:excluded_members)
-  node['splunk']['exclude_groups'].uniq.each do |grp|
-    group "#{node['splunk']['user']}_#{grp}" do
-      append true
-      group_name grp
-      excluded_members [node['splunk']['user']]
-      action :manage
-      notifies :desired_restart, "splunk_service[#{node['splunk']['package']['type']}]", :immediately
-    end
+node['splunk']['exclude_groups'].uniq.each do |grp|
+  group "#{node['splunk']['user']}_#{grp}" do
+    append true
+    group_name grp
+    excluded_members [node['splunk']['user']]
+    action :manage
+    notifies :desired_restart, "splunk_service[#{node['splunk']['package']['type']}]", :immediately
   end
-else
-  Chef::Log.info "This version of Chef client does not support removing users from groups. If you need to remove '#{node['splunk']['user']}' from groups you must do so manually."
 end
