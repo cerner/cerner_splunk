@@ -12,9 +12,9 @@ source_url        'https://github.com/cerner/cerner_splunk'
 issues_url        'https://github.com/cerner/cerner_splunk/issues'
 
 depends           'chef-vault', '~> 3.0'
-depends           'cerner_splunk_ingredient'
+depends           'cerner_splunk_ingredient', '~> 1.0'
 
-gem               'unix-crypt'
+gem               'unix-crypt', '~> 1.0'
 
 chef_version      '~> 12.16'
 
