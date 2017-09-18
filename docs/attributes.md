@@ -18,8 +18,8 @@ In depth look at all attributes available for this cookbook.
   - `node['splunk']['monitors'][]['type']` - Type of stanza (`monitor`). See [inputs.conf][] for stanzas.
   - `node['splunk']['monitors'][][???]` - Other attributes for an inputs.conf stanza. See [inputs.conf][]
 - `node['splunk']['cleanup']` - Determines whether the recipe should attempt to clean up the old forwarder install (`true`)
-- `node['splunk']['package']['version']` - Major version to install (`6.6.2`)
-- `node['splunk']['package']['build']` - Corresponding build number (`4b804538c686`)
+- `node['splunk']['package']['version']` - Major version to install (`6.6.3`)
+- `node['splunk']['package']['build']` - Corresponding build number (`e21ee54bc796`)
 - `node['splunk']['package']['base_url']` - Base download path (`https://download.splunk.com/products`)
 - `node['splunk']['package']['base_name']` - Name of the package to install (`splunkforwarder`/`splunk`)
 - `node['splunk']['config']['alerts']` - Data bag item used to configure alerts (`nil` - alerts not managed by chef)

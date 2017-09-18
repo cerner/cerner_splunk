@@ -116,6 +116,7 @@ More in depth documentation including server configuration and data bag formats 
 
 - Author:: David Crowder (david.crowder@cerner.com)
 - Author:: Charlie Huggard (charlie.huggard@cerner.com)
+- Author:: Alec Sears (alec.sears@cerner.com)
 
 ### Original Cerner Cookbook
 

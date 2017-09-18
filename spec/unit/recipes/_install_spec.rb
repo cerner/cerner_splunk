@@ -37,7 +37,7 @@ describe 'cerner_splunk::_install' do
 
   let(:windows) { nil }
 
-  let(:splunk_file) { 'splunkforwarder-6.6.2-4b804538c686' }
+  let(:splunk_file) { 'splunkforwarder-6.6.3-e21ee54bc796' }
   let(:splunk_filepath) { "/var/chef/cache/#{splunk_file}.txt" }
 
   before do
@@ -51,7 +51,7 @@ describe 'cerner_splunk::_install' do
     allow(File).to receive(:exist?).with('/opt/splunkforwarder/ftr').and_return(ftr_exists)
 
     allow(Dir).to receive(:glob).and_call_original
-    allow(Dir).to receive(:glob).with('/opt/splunkforwarder/splunkforwarder-6.6.2-4b804538c686-*').and_return(glob)
+    allow(Dir).to receive(:glob).with('/opt/splunkforwarder/splunkforwarder-6.6.3-e21ee54bc796-*').and_return(glob)
 
     # Stub alt separator for windows in Ruby 1.9.3
     stub_const('::File::ALT_SEPARATOR', '/')
@@ -66,8 +66,8 @@ describe 'cerner_splunk::_install' do
   let(:expected_properties) do
     {
       package: :universal_forwarder,
-      version: '6.6.2',
-      build: '4b804538c686',
+      version: '6.6.3',
+      build: 'e21ee54bc796',
       user: 'splunk',
       base_url: 'https://download.splunk.com/products'
     }
@@ -86,8 +86,8 @@ describe 'cerner_splunk::_install' do
     let(:expected_properties) do
       {
         package: :universal_forwarder,
-        version: '6.6.2',
-        build: '4b804538c686',
+        version: '6.6.3',
+        build: 'e21ee54bc796',
         user: 'fauxhai',
         base_url: 'https://download.splunk.com/products'
       }
