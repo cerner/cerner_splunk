@@ -1,5 +1,7 @@
-# coding: UTF-8
 
+# frozen_string_literal: true
+
+#
 # Cookbook Name:: cerner_splunk
 # Recipe:: _configure_inputs
 #
@@ -12,20 +14,20 @@ input_stanzas = CernerSplunk::LWRP.convert_monitors node['splunk']['monitors'], 
 
 if %i[server cluster_slave].include? node['splunk']['node_type']
   bag = CernerSplunk.my_cluster_data(node)
-  port = bag['receiver_settings']
-  port = port['splunktcp'] if port
-  port = port['port'] if port
+
+  port = bag.dig('receiver_settings', 'splunktcp', 'port')
+  port ||= bag.dig('receiver_settings', 'splunktcp')
+  port ||= bag['receiver_settings']
 
   if port
-    input_stanzas["splunktcp://:#{port}"] = {}
-    input_stanzas["splunktcp://:#{port}"]['disabled'] = 0
-    input_stanzas["splunktcp://:#{port}"]['connection_host'] = 'none'
+    input_stanzas["splunktcp://:#{port}"] = { 'disabled' => 0, 'connection_host' => 'none' }
   else
     Chef::Log.warn "Receiver settings missing in configured cluster data bag: #{cluster}"
   end
 end
 
-splunk_template 'system/inputs.conf' do
-  stanzas input_stanzas
-  notifies :touch, 'file[splunk-marker]', :immediately
+splunk_conf 'system/inputs.conf' do
+  config input_stanzas
+  action :configure
+  notifies :desired_restart, "splunk_service[#{node['splunk']['package']['type']}]", :immediately
 end

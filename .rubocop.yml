@@ -1,5 +1,5 @@
 AllCops:
-  TargetRubyVersion: 2.1
+  TargetRubyVersion: 2.3
 
 BlockLength:
   Enabled: false
@@ -7,29 +7,8 @@ BlockLength:
 LineLength:
   Enabled: false
 
-EachWithObject:
-  Enabled: false
-
-EmptyWhen:
+Metrics/AbcSize:
   Enabled: false
 
 MethodLength:
   Max: 40
-
-Metrics/AbcSize:
-  Enabled: false
-
-Style/BracesAroundHashParameters:
-  EnforcedStyle: context_dependent
-
-Style/SignalException:
-  EnforcedStyle: semantic
-
-Style/NumericPredicate:
-  EnforcedStyle: comparison
-
-Style/TernaryParentheses:
-  Enabled: false
-
-Style/VariableNumber:
-  Enabled: false

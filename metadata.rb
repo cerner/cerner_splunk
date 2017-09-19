@@ -1,20 +1,23 @@
-name             'cerner_splunk'
-maintainer       'Healthe Intent Infrastructure - Cerner Innovation, Inc.'
-maintainer_email 'splunk@cerner.com'
-license          'Apache-2.0'
-description      'Installs/Configures Splunk Servers and Forwarders'
-long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          '2.14.0'
+# frozen_string_literal: true
 
-source_url       'https://github.com/cerner/cerner_splunk'
-issues_url       'https://github.com/cerner/cerner_splunk/issues'
+name              'cerner_splunk'
+maintainer        'Healthe Intent Infrastructure - Cerner Innovation, Inc.'
+maintainer_email  'splunk@cerner.com'
+license           'Apache-2.0'
+description       'Installs/Configures Splunk Servers and Forwarders'
+long_description  IO.read(File.join(File.dirname(__FILE__), 'README.md'))
+version           '3.0.0'
 
-chef_version     '~> 12.4' if respond_to?(:chef_version)
+source_url        'https://github.com/cerner/cerner_splunk'
+issues_url        'https://github.com/cerner/cerner_splunk/issues'
 
-depends          'chef-vault', '~> 1.3'
-depends          'ulimit', '~> 0.3'
-depends          'xml', '~> 1.2'
+depends           'chef-vault', '~> 3.0'
+depends           'cerner_splunk_ingredient', '~> 1.0'
 
-supports         'redhat', '>= 5.5'
-supports         'ubuntu', '>= 12.04'
-supports         'windows', '>= 6.1'
+gem               'unix-crypt', '~> 1.0'
+
+chef_version      '~> 12.16'
+
+supports          'redhat', '>= 6.8'
+supports          'ubuntu', '>= 12.04'
+supports          'windows', '>= 6.1'

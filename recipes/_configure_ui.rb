@@ -1,11 +1,14 @@
-# coding: UTF-8
 
+# frozen_string_literal: true
+
+#
 # Cookbook Name:: cerner_splunk
 # Recipe:: _configure_ui
 #
 # Configures the ui settings for the system
 
-splunk_template 'system/ui-prefs.conf' do
-  stanzas node['splunk']['config']['ui_prefs']
-  notifies :touch, 'file[splunk-marker]', :immediately
+splunk_conf 'system/ui-prefs.conf' do
+  config node['splunk']['config']['ui_prefs']
+  action :configure
+  notifies :desired_restart, "splunk_service[#{node['splunk']['package']['type']}]", :immediately
 end

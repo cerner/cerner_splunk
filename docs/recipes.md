@@ -1,9 +1,9 @@
-Recipes
-=======
+# Recipes
+
 These are all of the public facing recipes, and brief descriptions of what they do. Only one Installation recipe can be on your runlist at a time (since the Splunk UF and the full Splunk instance can both perform the same tasks of consuming data to be sent along).
 
-Forwarder Installation Recipes
-------------------------------
+## Forwarder Installation Recipes
+
 ### `cerner_splunk` / `cerner_splunk::forwarder`
 
 Installs the Splunk Universal Forwarder on your system. Most people will only want this recipe (hence why it's the default recipe)
@@ -16,8 +16,8 @@ Installs the Enterprise Splunk artifact on your system to be configured as a hea
 
 Makes a Universal Forwarder part of a host image.
 
-Server Installation Recipes
----------------------------
+## Server Installation Recipes
+
 These are installations of Full Splunk. Unless you are a Splunk Administrator, these are not the droids you are looking for.
 
 ### `cerner_splunk::license_server`
@@ -52,10 +52,10 @@ Installs and configures Splunk Server as a deployer in a search head cluster. De
 
 Installs and configures Splunk Server as a standalone server. Recieves & Indexes logs.
 
-Unconfiguration / Uninstallation Recipes
-----------------------------------------
+## Unconfiguration / Uninstallation Recipes
+
 These are recipes to remove and clean up aspects of Splunk
 
 ### `cerner_splunk::shc_remove_search_head`
 
-**_EXPERIMENTAL_** Removes a search head member from the Search Head Cluster and stops Splunk. It's currently troublesome re-adding a removed head back to a Search Head Cluster.
+***EXPERIMENTAL*** Removes a search head member from the Search Head Cluster and stops Splunk. It's currently troublesome re-adding a removed head back to a Search Head Cluster.

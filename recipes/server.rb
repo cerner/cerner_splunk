@@ -1,11 +1,13 @@
-# coding: UTF-8
 
+# frozen_string_literal: true
+
+#
 # Cookbook Name:: cerner_splunk
 # Recipe:: server
 #
 # Configures Splunk as a Standalone server (Indexer, Receiver, Search Head, Slave)
 
-fail 'Server installation not currently supported on windows' if platform_family?('windows')
+raise 'Server installation not currently supported on windows' if platform_family?('windows')
 
 ## Attributes
 instance_exec :server, &CernerSplunk::NODE_TYPE

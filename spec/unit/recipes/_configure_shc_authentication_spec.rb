@@ -1,12 +1,15 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
 
 require_relative '../spec_helper'
 
 describe 'cerner_splunk::_configure_shc_authentication' do
   subject do
-    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.8') do |node|
-      node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
-      node.override['splunk']['config']['authentication'] = 'cerner_splunk/authentication'
+    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.9') do |node|
+      node.normal['splunk']['package']['type'] = 'splunk'
+      node.normal['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
+      node.normal['splunk']['config']['authentication'] = 'cerner_splunk/authentication'
+      node.run_state.merge!('cerner_splunk' => { 'admin_password' => 'changeme' })
     end
     runner.converge('cerner_splunk::shc_deployer', described_recipe)
   end
@@ -76,7 +79,7 @@ describe 'cerner_splunk::_configure_shc_authentication' do
 
   it 'writes the authentication.conf file with the appropriate strategy and role Map' do
     expected_attributes = {
-      stanzas: {
+      config: {
         'ADDomain' => {
           'host' => 'ad.example.com',
           'SSLEnabled' => 1,
@@ -103,7 +106,7 @@ describe 'cerner_splunk::_configure_shc_authentication' do
       }
     }
 
-    expect(subject).to create_splunk_template('shcluster/_shcluster/authentication.conf').with(expected_attributes)
-    expect(subject.splunk_template('shcluster/_shcluster/authentication.conf')).to notify('execute[apply-shcluster-bundle]').to(:run)
+    expect(subject).to configure_splunk('shcluster/apps/_shcluster/authentication.conf').with(expected_attributes)
+    expect(subject.splunk_conf('shcluster/apps/_shcluster/authentication.conf')).to notify('execute[apply-shcluster-bundle]').to(:run)
   end
 end

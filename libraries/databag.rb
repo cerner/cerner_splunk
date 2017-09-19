@@ -1,5 +1,7 @@
-# coding: UTF-8
 
+# frozen_string_literal: true
+
+#
 # Cookbook Name:: cerner_splunk
 # File Name:: databag.rb
 
@@ -43,7 +45,7 @@ module CernerSplunk #:nodoc:
         key = process(data[:key], default[2], opts[:strip_key], opts[:default_empty_key])
         [bag, item, key]
       else
-        fail "Unexpected argument of type #{string.class}: #{string}"
+        raise "Unexpected argument of type #{string.class}: #{string}"
       end
     end
 
@@ -55,17 +57,17 @@ module CernerSplunk #:nodoc:
       when nil
         nil
       when Array
-        fail "Array '#{array}' can only contain Strings or nil" unless array.all? { |i| i.nil? || i.is_a?(String) }
+        raise "Array '#{array}' can only contain Strings or nil" unless array.all? { |i| i.nil? || i.is_a?(String) }
         data_bag, bag_item, key = array
         Chef::DataBag.validate_name!(data_bag) if data_bag
-        Chef::DataBagItem.validate_id!(bag_item) if bag_item
+        Chef::DataBagItem.validate_id!(bag_item) if bag_item # ~FC086 False Positive
 
         str = bag_item.to_s
         str = "#{data_bag}/#{str}" if data_bag
         str = "#{str}:#{key}" if key
         str
       else
-        fail "Unexpected argument of type #{array.class}: #{array}"
+        raise "Unexpected argument of type #{array.class}: #{array}"
       end
     end
 
@@ -80,12 +82,12 @@ module CernerSplunk #:nodoc:
       clazz =
         case opts[:type]
         when :simple
-          Chef::DataBagItem
+          Chef::DataBagItem # TODO: ~FC086
         when :vault
           require 'chef-vault'
           ChefVault::Item
         else
-          fail "Unexpected type of DataBag #{opts[:type]}"
+          raise "Unexpected type of DataBag #{opts[:type]}"
         end
 
       data_bag, bag_item, key = to_a(string, options)
@@ -98,7 +100,7 @@ module CernerSplunk #:nodoc:
           rescue => e
             raise e unless opts[:handle_load_failure]
             Chef::Log.warn "Could not load the data bag item referenced by: #{to_value([data_bag, bag_item])}. Details available at debug log level, continuing chef run assuming nil."
-            Chef::Log.debug "#{e.class}: #{e}\n#{e.backtrace.join("\n")}" if Chef::Log.level == :debug
+            Chef::Log.debug "#{e.class}: #{e}\n#{e.backtrace.join("\n")}"
             nil
           end
         end
@@ -126,7 +128,7 @@ module CernerSplunk #:nodoc:
       value = data_bag_item[key]
       while value.is_a? String
         if attempts.include? value
-          fail "Circular reference resolving key (#{attempts.join(';')})!"
+          raise "Circular reference resolving key (#{attempts.join(';')})!"
         end
         attempts << value
         value = data_bag_item[value]

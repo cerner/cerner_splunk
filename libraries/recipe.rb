@@ -1,5 +1,7 @@
-# coding: UTF-8
 
+# frozen_string_literal: true
+
+#
 # Cookbook Name:: cerner_splunk
 # File Name:: recipe.rb
 #
@@ -11,6 +13,7 @@ require_relative 'databag'
 module CernerSplunk
   # This lambda is used to ensure that only one of a set of recipes is on the run_list
   # Call it on each recipe with 'instance_exec :whatever_type, &CernerSplunk::NODE_TYPE'
+
   NODE_TYPE ||= lambda do |symbol|
     throw 'Symbol should not be nil' unless symbol
     throw "Cannot set type '#{symbol}', already set '#{node.default['splunk']['node_type']}'" if node.default['splunk']['node_type']
@@ -20,9 +23,7 @@ module CernerSplunk
     node.default['splunk']['node_type'] = symbol.to_sym
   end
 
-  def self.restart_marker_file
-    "#{Chef::Config[:file_cache_path]}/.restart_splunk"
-  end
+  # TODO: Rename these methods
 
   # Returns the key identifing the current cluster
   def self.my_cluster_key(node)
@@ -43,7 +44,7 @@ module CernerSplunk
   def self.all_clusters_data(node)
     unless @all_cluster_data
       _head, *others = node['splunk']['config']['clusters']
-      @all_cluster_data = [my_cluster_data(node)] + others.collect { |x| CernerSplunk::DataBag.load(x) }
+      @all_cluster_data = [my_cluster_data(node)] + (others.collect { |x| CernerSplunk::DataBag.load(x) })
     end
     @all_cluster_data
   end
@@ -64,16 +65,11 @@ module CernerSplunk
     order
   end
 
-  # Return Splunk home location based on package, platform, and kernel
-  def self.splunk_home(platform_family, machine_kernel, package_base_name)
-    if platform_family == 'windows'
-      if machine_kernel == 'x86_64'
-        "#{ENV['PROGRAMW6432'].tr('\\', '/')}/#{package_base_name}"
-      else
-        "#{ENV['PROGRAMFILES'].tr('\\', '/')}/#{package_base_name}"
-      end
-    else
-      "/opt/#{package_base_name}"
+  # Convert Splunk artifact name into installation type
+  def self.package_type(package_name)
+    case package_name
+    when 'splunk', :splunk then 'splunk'
+    when 'splunkforwarder', :splunkforwarder, :universal_forwarder then 'universal_forwarder'
     end
   end
 
@@ -81,7 +77,7 @@ module CernerSplunk
   def self.splunk_command(node)
     filepath = "#{node['splunk']['home']}/bin/splunk"
 
-    return filepath.tr('/', '\\').gsub(/\w+\s\w+/) { |directory| %("#{directory}") } if node['platform_family'] == 'windows'
+    return %("#{filepath.tr('/', '\\')}") if node['platform_family'] == 'windows'
 
     filepath
   end
@@ -104,7 +100,8 @@ module CernerSplunk
   # Returns Boolean for whether a separate Splunk artifact is already installed.
   def self.separate_splunk_installed?(node)
     opposite_package_name = opposite_package_name(node['splunk']['package']['base_name'])
-    Dir.exist?(splunk_home(node['platform_family'], node['kernel']['machine'], opposite_package_name))
+    old_package_type = package_type(opposite_package_name).to_sym
+    Dir.exist?(CernerSplunk::PathHelpers.default_install_dirs.dig(old_package_type, node['os'].to_sym))
   end
 
   # Returns the Splunk service name based on platform and package name
@@ -122,6 +119,6 @@ module CernerSplunk
   def self.validate_secret_file(secret_file_path, configured_secret)
     return unless ::File.exist?(secret_file_path)
     existing_secret = ::File.open(secret_file_path, 'r') { |file| file.readline.chomp }
-    fail 'The splunk.secret file already exists with a different value. Modification of that file is not currently supported.' if existing_secret != configured_secret
+    raise 'The splunk.secret file already exists with a different value. Modification of that file is not currently supported.' if existing_secret != configured_secret
   end
 end

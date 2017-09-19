@@ -1,7 +1,8 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
 
 require_relative '../spec_helper'
-require 'recipe'
+require_relative '../../../libraries/recipe'
 
 describe 'CernerSplunk' do
   describe '.validate_secret_file' do

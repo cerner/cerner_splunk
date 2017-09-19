@@ -1,5 +1,7 @@
-# coding: UTF-8
 
+# frozen_string_literal: true
+
+#
 # Cookbook Name:: cerner_splunk
 # Recipe:: _configure_server
 #
@@ -33,13 +35,13 @@ MASTER_ONLY_CONFIGS = %w[
   commit_retry_time
 ].freeze
 
-encrypt_password = CernerSplunk::ConfTemplate::Transform.splunk_encrypt node: node
-encrypt_noxor_password = CernerSplunk::ConfTemplate::Transform.splunk_encrypt node: node, xor: false
+encrypt_password = CernerSplunk::ConfigProcs::Transform.splunk_encrypt node: node
+encrypt_noxor_password = CernerSplunk::ConfigProcs::Transform.splunk_encrypt node: node, xor: false
 
 # default pass4SymmKey value is 'changeme'
-server_stanzas['general']['pass4SymmKey'] = CernerSplunk::ConfTemplate.compose encrypt_password, CernerSplunk::ConfTemplate::Value.constant(value: 'changeme')
+server_stanzas['general']['pass4SymmKey'] = CernerSplunk::ConfigProcs.compose encrypt_password, CernerSplunk::ConfigProcs::Value.constant(value: 'changeme')
 # default sslPassword value is 'password'
-server_stanzas['sslConfig']['sslPassword'] = CernerSplunk::ConfTemplate.compose encrypt_noxor_password, CernerSplunk::ConfTemplate::Value.constant(value: 'password')
+server_stanzas['sslConfig']['sslPassword'] = CernerSplunk::ConfigProcs.compose encrypt_noxor_password, CernerSplunk::ConfigProcs::Value.constant(value: 'password')
 
 # Indexer Cluster Configuration
 case node['splunk']['node_type']
@@ -47,26 +49,22 @@ when :search_head, :shc_search_head, :shc_captain, :server
   clusters = CernerSplunk.all_clusters(node).collect do |(cluster, bag)|
     stanza = "clustermaster:#{cluster}"
     master_uri = bag['master_uri'] || ''
-    settings = bag['settings'] || {}
-    pass = settings['pass4SymmKey'] || ''
-
     next if master_uri.empty?
+
+    pass = bag.dig('settings', 'pass4SymmKey') || ''
 
     server_stanzas[stanza] = {}
     server_stanzas[stanza]['master_uri'] = master_uri
-    server_stanzas[stanza]['pass4SymmKey'] = CernerSplunk::ConfTemplate.compose encrypt_password, CernerSplunk::ConfTemplate::Value.constant(value: pass) unless pass.empty?
+    server_stanzas[stanza]['pass4SymmKey'] = CernerSplunk::ConfigProcs.compose encrypt_password, CernerSplunk::ConfigProcs::Value.constant(value: pass) unless pass.empty?
     # Until we support multisite clusters, set multisite explicitly false
     server_stanzas[stanza]['multisite'] = false
     stanza
   end
 
+  # TODO: This isn't possible
   clusters.reject!(&:nil?)
+  server_stanzas['clustering'] = { 'mode' => 'searchhead', 'master_uri' => clusters.join(',') } if clusters.any?
 
-  if clusters.any?
-    server_stanzas['clustering'] = {}
-    server_stanzas['clustering']['mode'] = 'searchhead'
-    server_stanzas['clustering']['master_uri'] = clusters.join(',')
-  end
 when :cluster_master
   bag = CernerSplunk.my_cluster_data(node)
   settings = (bag['settings'] || {}).reject do |k, _|
@@ -109,8 +107,8 @@ if %i[shc_search_head shc_captain].include? node['splunk']['node_type']
   end
   pass = settings.delete('pass4SymmKey')
 
-  fail "Missing deployer URI for #{cluster}" if deployer_uri.empty?
-  fail "Missing replication port configuration for cluster '#{cluster}'" if replication_ports.empty?
+  raise "Missing deployer URI for #{cluster}" if deployer_uri.empty?
+  raise "Missing replication port configuration for cluster '#{cluster}'" if replication_ports.empty?
 
   replication_ports.each do |port, port_settings|
     ssl = port_settings['_cerner_splunk_ssl'] == true
@@ -121,11 +119,11 @@ if %i[shc_search_head shc_captain].include? node['splunk']['node_type']
   end
 
   path = "#{node['splunk']['home']}/etc/system/local/server.conf"
-  old_stanzas = CernerSplunk::Conf::Reader.new(path).read if File.exist?(path)
-  old_id = (old_stanzas['shclustering'] || {})['id'] if old_stanzas
+  old_stanzas = CernerSplunk::ConfHelpers.read_config(path)
+  old_id = (old_stanzas['shclustering'] || {})['id']
 
   server_stanzas['shclustering'] = settings
-  server_stanzas['shclustering']['pass4SymmKey'] = CernerSplunk::ConfTemplate.compose encrypt_password, CernerSplunk::ConfTemplate::Value.constant(value: pass) if pass
+  server_stanzas['shclustering']['pass4SymmKey'] = CernerSplunk::ConfigProcs.compose encrypt_password, CernerSplunk::ConfigProcs::Value.constant(value: pass) if pass
   server_stanzas['shclustering']['conf_deploy_fetch_url'] = deployer_uri
   server_stanzas['shclustering']['disabled'] = 0
   server_stanzas['shclustering']['mgmt_uri'] = "https://#{node['splunk']['mgmt_host']}:8089"
@@ -135,21 +133,13 @@ end
 # License Configuration
 license_uri =
   case node['splunk']['node_type']
-  when :license_server
-    'self'
   when :cluster_master, :cluster_slave, :server, :search_head, :shc_search_head, :shc_captain, :shc_deployer
-    if node['splunk']['free_license']
-      'self'
-    else
-      CernerSplunk.my_cluster_data(node)['license_uri'] || 'self'
-    end
+    CernerSplunk.my_cluster_data(node)['license_uri'] unless node['splunk']['free_license']
   when :forwarder
     if node['splunk']['package']['base_name'] == 'splunk' && node['splunk']['heavy_forwarder']['use_license_uri']
-      CernerSplunk.my_cluster_data(node)['license_uri'] || 'self'
-    else
-      'self'
+      CernerSplunk.my_cluster_data(node)['license_uri']
     end
-  end
+  end || 'self'
 
 license_group =
   case node['splunk']['node_type']
@@ -216,7 +206,8 @@ server_stanzas['license'] = {
   'active_group' => license_group
 }
 
-splunk_template 'system/server.conf' do
-  stanzas server_stanzas
-  notifies :touch, 'file[splunk-marker]', :immediately
+splunk_conf 'system/server.conf' do
+  config server_stanzas
+  action :configure
+  notifies :desired_restart, "splunk_service[#{node['splunk']['package']['type']}]", :immediately
 end

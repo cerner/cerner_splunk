@@ -16,6 +16,12 @@
           "c2_captain": "cerner_splunk/passwords:splunk.secret",
           "c2_deployer": "cerner_splunk/passwords:splunk.secret",
           "c2_newnode": "cerner_splunk/passwords:splunk.secret"
+        },
+        "password_secrets": {
+          "c2_boot1": "cerner_splunk/shc_passwords",
+          "c2_boot2": "cerner_splunk/shc_passwords",
+          "c2_captain": "cerner_splunk/shc_passwords",
+          "c2_newnode": "cerner_splunk/shc_passwords"
         }
       }
     }

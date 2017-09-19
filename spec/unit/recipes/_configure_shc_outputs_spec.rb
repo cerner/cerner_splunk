@@ -1,11 +1,13 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
 
 require_relative '../spec_helper'
 
 describe 'cerner_splunk::_configure_shc_outputs' do
   subject do
-    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.8') do |node|
+    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.9') do |node|
       node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
+      node.run_state.merge!('cerner_splunk' => { 'admin_password' => 'changeme' })
     end
     runner.converge('cerner_splunk::shc_deployer', described_recipe)
   end
@@ -40,7 +42,7 @@ describe 'cerner_splunk::_configure_shc_outputs' do
 
   it 'writes the outputs.conf file with the appropriate configs' do
     expected_attributes = {
-      stanzas: {
+      config: {
         'tcpout' => {
           'forwardedindex.0.whitelist' => '.*', 'forwardedindex.1.blacklist' => '_thefishbucket', 'forwardedindex.2.whitelist' => ''
         },
@@ -50,7 +52,7 @@ describe 'cerner_splunk::_configure_shc_outputs' do
       }
     }
 
-    expect(subject).to create_splunk_template('shcluster/_shcluster/outputs.conf').with(expected_attributes)
-    expect(subject.splunk_template('shcluster/_shcluster/outputs.conf')).to notify('execute[apply-shcluster-bundle]').to(:run)
+    expect(subject).to configure_splunk('shcluster/apps/_shcluster/outputs.conf').with(expected_attributes)
+    expect(subject.splunk_conf('shcluster/apps/_shcluster/outputs.conf')).to notify('execute[apply-shcluster-bundle]').to(:run)
   end
 end

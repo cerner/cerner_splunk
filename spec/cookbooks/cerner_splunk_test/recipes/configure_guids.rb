@@ -1,5 +1,7 @@
-# coding: UTF-8
 
+# frozen_string_literal: true
+
+#
 # Cookbook Name:: cerner_splunk_test
 # Recipe:: configure_guids
 #
@@ -24,5 +26,5 @@ guid =
 template path do
   source 'instance.cfg.erb'
   variables guid: guid
-  notifies :touch, 'file[splunk-marker]', :immediately
+  notifies :desired_restart, "splunk_service[#{node['splunk']['package']['type']}]", :immediately
 end

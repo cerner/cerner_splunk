@@ -1,5 +1,7 @@
-# coding: UTF-8
 
+# frozen_string_literal: true
+
+#
 # Cookbook Name:: cerner_splunk
 # Recipe:: heavy_forwarder
 #
@@ -9,7 +11,6 @@
 instance_exec :forwarder, &CernerSplunk::NODE_TYPE
 
 node.default['splunk']['package']['base_name'] = 'splunk'
-node.default['splunk']['package']['download_group'] = 'splunk'
 
 node.run_state['cerner_splunk'] ||= {}
 
@@ -21,7 +22,8 @@ include_recipe 'cerner_splunk::_install'
 
 ruby_block 'initialize-splunk-backup-artifacts' do
   block do
-    splunk_home = CernerSplunk.splunk_home(node['platform_family'], node['kernel']['machine'], node['splunk']['package']['base_name'])
+    package_type = CernerSplunk.package_type(node['splunk']['package']['base_name']).to_sym
+    splunk_home = CernerSplunk::PathHelpers.default_install_dirs.dig(package_type, node['os'].to_sym)
     FileUtils.cp_r(::File.join(Chef::Config[:file_cache_path], 'fishbucket'), ::File.join(splunk_home, '/var/lib/splunk'))
     FileUtils.cp(::File.join(Chef::Config[:file_cache_path], 'passwd'), ::File.join(splunk_home, '/etc/passwd'))
     FileUtils.rm_r(::File.join(Chef::Config[:file_cache_path], 'fishbucket'))

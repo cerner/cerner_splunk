@@ -1,7 +1,8 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
 
 require_relative '../spec_helper'
-require 'unit_converter'
+require_relative '../../../libraries/unit_converter'
 
 describe 'unit_converter' do
   subject { CernerSplunk.convert_to_bytes(size) }

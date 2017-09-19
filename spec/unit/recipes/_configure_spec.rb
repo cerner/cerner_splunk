@@ -1,14 +1,14 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 require_relative '../spec_helper'
 
 describe 'cerner_splunk::_configure' do
   subject do
-    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.8') do |node|
-      node.override['splunk']['config']['clusters'] = clusters
-      node.override['splunk']['node_type'] = node_type
-    end
-    runner.converge('cerner_splunk::_restart_marker', described_recipe)
+    ChefSpec::SoloRunner.new(platform: 'centos', version: '6.9') do |node|
+      node.normal['splunk']['config']['clusters'] = clusters
+      node.normal['splunk']['node_type'] = node_type
+      node.normal['splunk']['package']['type'] = 'splunk'
+    end.converge('cerner_splunk_test::init_splunk_service', described_recipe)
   end
 
   let(:node_type) { :server }
@@ -80,7 +80,7 @@ describe 'cerner_splunk::_configure' do
 
     context 'when node is not a forwarder' do
       it 'should raise an exception' do
-        expect { subject }.to raise_exception
+        expect { subject }.to raise_error RuntimeError, 'You need to configure at least one cluster databag.'
       end
     end
   end

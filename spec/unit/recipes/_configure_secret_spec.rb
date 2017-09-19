@@ -1,4 +1,5 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
 
 require_relative '../spec_helper'
 
@@ -12,8 +13,8 @@ describe 'cerner_splunk::_configure_secret' do
     runner.converge(described_recipe)
   end
 
-  let(:platform) { 'centos' }
-  let(:platform_version) { '6.6' }
+  let(:platform) { 'redhat' }
+  let(:platform_version) { '6.9' }
   let(:node_type) { :server }
 
   context 'when the secret is configured for the current node' do

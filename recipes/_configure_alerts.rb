@@ -1,5 +1,7 @@
-# coding: UTF-8
 
+# frozen_string_literal: true
+
+#
 # Cookbook Name:: cerner_splunk
 # Recipe:: _configure_alerts
 #
@@ -12,7 +14,8 @@ unless hash
   return
 end
 
-splunk_template 'system/alert_actions.conf' do
-  stanzas CernerSplunk::Alerts.configure_alerts(node, hash)
-  notifies :touch, 'file[splunk-marker]', :immediately
+splunk_conf 'system/alert_actions.conf' do
+  config CernerSplunk::Alerts.configure_alerts(node, hash)
+  action :configure
+  notifies :desired_restart, "splunk_service[#{node['splunk']['package']['type']}]", :immediately
 end

@@ -1,14 +1,16 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
 
 require_relative '../spec_helper'
 
 describe 'cerner_splunk::_configure_indexes' do
   subject do
-    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.8') do |node|
-      node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
+    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.9') do |node|
+      node.normal['splunk']['package']['type'] = 'splunk'
+      node.normal['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
     end
-    # Have to include marker recipe so that we can send notifications to its resources
-    runner.converge('cerner_splunk::_restart_marker', described_recipe)
+
+    runner.converge('cerner_splunk_test::init_splunk_service', described_recipe)
   end
 
   let(:cluster_config) do
@@ -52,7 +54,7 @@ describe 'cerner_splunk::_configure_indexes' do
 
     it 'writes the indexes.conf file with the proper paths' do
       expected_attributes = {
-        stanzas: {
+        config: {
           'volume:test' => index_config['config']['volume:test'],
           'index_a' => {
             'coldPath' => '$SPLUNK_DB/foo/colddb',
@@ -68,7 +70,10 @@ describe 'cerner_splunk::_configure_indexes' do
         }
       }
 
-      expect(subject).to create_splunk_template('system/indexes.conf').with(expected_attributes)
+      expect(subject).to configure_splunk('system/indexes.conf').with(expected_attributes)
+    end
+    it 'should notify the splunk service to restart' do
+      expect(subject.splunk_conf('system/indexes.conf')).to notify('splunk_service[splunk]').to(:desired_restart).immediately
     end
   end
 
@@ -111,7 +116,7 @@ describe 'cerner_splunk::_configure_indexes' do
 
     it 'writes the indexes.conf file with calculated maxTotalDataSizeMB' do
       expected_attributes = {
-        stanzas: {
+        config: {
           'default' => {
             'frozenTimePeriodInSecs' => 2_592_000,
             'maxTotalDataSizeMB' => 2200
@@ -133,7 +138,10 @@ describe 'cerner_splunk::_configure_indexes' do
         }
       }
 
-      expect(subject).to create_splunk_template('system/indexes.conf').with(expected_attributes)
+      expect(subject).to configure_splunk('system/indexes.conf').with(expected_attributes)
+    end
+    it 'should notify the splunk service to restart' do
+      expect(subject.splunk_conf('system/indexes.conf')).to notify('splunk_service[splunk]').to(:desired_restart).immediately
     end
   end
 end

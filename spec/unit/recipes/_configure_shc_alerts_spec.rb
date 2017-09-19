@@ -1,12 +1,14 @@
-# coding: UTF-8
+
+# frozen_string_literal: true
 
 require_relative '../spec_helper'
 
 describe 'cerner_splunk::_configure_shc_alerts' do
   subject do
-    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.8') do |node|
+    runner = ChefSpec::SoloRunner.new(platform: 'redhat', version: '6.9') do |node|
       node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
       node.override['splunk']['config']['alerts'] = 'cerner_splunk/alerts'
+      node.run_state.merge!('cerner_splunk' => { 'admin_password' => 'changeme' })
     end
     runner.converge('cerner_splunk::shc_deployer', described_recipe)
   end
@@ -60,7 +62,7 @@ describe 'cerner_splunk::_configure_shc_alerts' do
 
   it 'writes the alert_actions.conf file with the appropriate alert configs' do
     expected_attributes = {
-      stanzas: {
+      config: {
         'email' => {
           'mailserver' => 'smtprr.example.com',
           'from' => 'splunk@example.com',
@@ -69,7 +71,7 @@ describe 'cerner_splunk::_configure_shc_alerts' do
       }
     }
 
-    expect(subject).to create_splunk_template('shcluster/_shcluster/alert_actions.conf').with(expected_attributes)
-    expect(subject.splunk_template('shcluster/_shcluster/alert_actions.conf')).to notify('execute[apply-shcluster-bundle]').to(:run)
+    expect(subject).to configure_splunk('shcluster/apps/_shcluster/alert_actions.conf').with(expected_attributes)
+    expect(subject.splunk_conf('shcluster/apps/_shcluster/alert_actions.conf')).to notify('execute[apply-shcluster-bundle]').to(:run)
   end
 end

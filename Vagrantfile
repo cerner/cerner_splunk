@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
 Vagrant.require_version '>= 1.4.1'
 
 %w[vagrant-ohai vagrant-omnibus].each do |plugin|
-  fail "Missing #{plugin}. Please install it!" unless Vagrant.has_plugin? plugin
+  raise "Missing #{plugin}. Please install it!" unless Vagrant.has_plugin? plugin
 end
 
 @network = {
@@ -30,14 +32,14 @@ end
 @chefip = @network[:chef][:ip]
 
 # Network sanity checks.
-fail 'Non-unique ips' if @network.collect { |_, v| v[:ip] }.uniq!
+raise 'Non-unique ips' if @network.collect { |_, v| v[:ip] }.uniq!
 
-fail 'Non-unique hostnames' if @network.collect { |_, v| v[:hostname] }.uniq!
+raise 'Non-unique hostnames' if @network.collect { |_, v| v[:hostname] }.uniq!
 
-fail 'Non-unique ports' if @network.collect { |_, v| v[:ports].keys }.flat_map { |v| v }.uniq!
+raise 'Non-unique ports' if @network.collect { |_, v| v[:ports].keys }.flat_map { |v| v }.uniq!
 
 def default_omnibus(config)
-  config.omnibus.chef_version = '12'
+  config.omnibus.chef_version = '12.19.36'
 end
 
 def network(config, name, splunk_password = true)
@@ -52,7 +54,7 @@ def network(config, name, splunk_password = true)
 
   config.berkshelf.enabled = false if Vagrant.has_plugin? 'vagrant-berkshelf'
 
-  config.vm.provision :shell, inline: 'cat /etc/splunk/password; echo' if splunk_password
+  config.vm.provision :shell, inline: "cat /etc/splunk/password || knife vault show cerner_splunk shc_passwords -s 'http://#{@chefip}:4000/' -u #{name} -k /vagrant/vagrant_repo/pems/#{name}.pem; echo" if splunk_password
 end
 
 def chef_defaults(chef, name, environment = 'splunk_server')
@@ -68,7 +70,7 @@ def chef_defaults(chef, name, environment = 'splunk_server')
 end
 
 Vagrant.configure('2') do |config|
-  config.vm.box = 'bento/centos-6.7'
+  config.vm.box = 'bento/centos-6.9'
   config.ohai.primary_nic = 'eth1'
 
   if Vagrant.has_plugin? 'vagrant-berkshelf'
@@ -80,7 +82,8 @@ Vagrant.configure('2') do |config|
   config.vm.provider :virtualbox do |vb|
     vb.customize ['modifyvm', :id, '--natdnsproxy1', 'off']
     vb.customize ['modifyvm', :id, '--natdnshostresolver1', 'off']
-    vb.customize ['modifyvm', :id, '--memory', 128]
+    vb.customize ['modifyvm', :id, '--cpus', 2]
+    vb.customize ['modifyvm', :id, '--memory', 256]
   end
 
   config.vm.define :chef do |cfg|
@@ -287,13 +290,16 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :f_win2012r2 do |cfg|
-    cfg.vm.box = 'opentable/win-2012r2-standard-amd64-nocm'
+    cfg.vm.box = 'mwrock/Windows2012R2'
     # Without the line below here or in the box, vagrant-omnibus breaks on windows.
     # Reference: https://github.com/chef/vagrant-omnibus/issues/90#issuecomment-51816397
     cfg.vm.guest = :windows
-    default_omnibus config
+    default_omnibus cfg
+    # https://github.com/chef/vagrant-omnibus/issues/118
+    cfg.omnibus.install_url = "https://packages.chef.io/stable/windows/2012r2/chef-client-#{cfg.omnibus.chef_version}-1-x64.msi"
     cfg.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', 1024]
+      vb.gui = false
     end
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :f_win2012r2, 'splunk_standalone'

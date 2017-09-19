@@ -1,5 +1,7 @@
-# coding: UTF-8
 
+# frozen_string_literal: true
+
+#
 # Cookbook Name:: cerner_splunk
 # Recipe:: _configure_apps
 #
@@ -16,20 +18,23 @@ cluster_bag = CernerSplunk::DataBag.load(cluster_data['apps'], pick_context: Cer
 
 bag_bag = CernerSplunk::DataBag.load(cluster_bag['bag']) || {}
 
-apps = CernerSplunk::SplunkApp.merge_hashes(bag_bag, cluster_bag, attributes_bag, attributes)
+apps = CernerSplunk::AppHelpers.merge_hashes(bag_bag, cluster_bag, attributes_bag, attributes)
 
 apps.each do |app_name, app_data|
   download_data = app_data['download'] || {}
+  app_data['files'] ||= {}
+  app_data['lookups'] ||= {}
 
-  splunk_app app_name do
-    apps_dir "#{node['splunk']['home']}/etc/apps"
-    action app_data['remove'] ? :remove : :create
-    url download_data['url']
-    version download_data['version']
-    local app_data['local']
-    files app_data['files']
-    lookups app_data['lookups']
-    permissions app_data['permissions']
-    notifies :touch, 'file[splunk-marker]', :immediately
+  app_type = download_data['url'] ? :splunk_app_package : :splunk_app_custom
+
+  declare_resource(app_type, app_name) do
+    action app_data['remove'] ? :uninstall : :install
+    source_url download_data['url'] if download_data['url']
+    version download_data['version'] if download_data['version']
+
+    configs CernerSplunk::AppHelpers.proc_conf(app_data['files']) unless app_data['files'].empty?
+    files CernerSplunk::AppHelpers.proc_files(files: app_data['files'], lookups: app_data['lookups']) unless app_data['lookups'].empty? && app_data['files'].empty?
+    metadata app_data['permissions'] if app_data['permissions']
+    notifies :desired_restart, "splunk_service[#{node['splunk']['package']['type']}]", :immediately
   end
 end

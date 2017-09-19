@@ -1,15 +1,22 @@
-# coding: UTF-8
 
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', '..', 'libraries'))
+# frozen_string_literal: true
+
+# TODO: Whats this
+# $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', '..', 'libraries'))
 require 'rspec'
 require 'chefspec'
 require 'chefspec/berkshelf'
 require 'chef-vault'
 
 RSpec.configure do |config|
-  config.order = 'random'
+  config.color = true
+  config.formatter = 'documentation'
+  config.order = 'rand'
   config.file_cache_path = '/var/chef/cache'
   config.expect_with(:rspec) { |c| c.syntax = :expect }
+
+  config.platform = 'redhat'
+  config.version = '6.9'
 end
 
 module CernerSplunk

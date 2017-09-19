@@ -1,5 +1,7 @@
-# coding: UTF-8
 
+# frozen_string_literal: true
+
+#
 # Cookbook Name:: cerner_splunk
 # Recipe:: _configure_shc_roles
 #
@@ -15,18 +17,14 @@ end
 
 authorize, user_prefs = CernerSplunk::Roles.configure_roles(hash)
 
-authorize_action = authorize.empty? ? :delete : :create
-
-splunk_template 'shcluster/_shcluster/authorize.conf' do
-  stanzas authorize
-  action authorize_action
+splunk_conf 'shcluster/apps/_shcluster/authorize.conf' do
+  action authorize.empty? ? :delete : :configure
+  config authorize
   notifies :run, 'execute[apply-shcluster-bundle]'
 end
 
-user_prefs_action = user_prefs.empty? ? :delete : :create
-
-splunk_template 'shcluster/_shcluster/user-prefs.conf' do
-  stanzas user_prefs
-  action user_prefs_action
+splunk_conf 'shcluster/apps/_shcluster/user-prefs.conf' do
+  action user_prefs.empty? ? :delete : :configure
+  config user_prefs
   notifies :run, 'execute[apply-shcluster-bundle]'
 end

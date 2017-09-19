@@ -1,22 +1,24 @@
-# coding: UTF-8
 
+# frozen_string_literal: true
+
+#
 # Cookbook Name:: cerner_splunk
 # Recipe:: shc_deployer
 #
 # Configures the Deployer in a Search Head Cluster
 
-fail 'Deployer installation not currently supported on windows' if platform_family?('windows')
+raise 'Deployer installation not currently supported on windows' if platform_family?('windows')
 
 search_heads = CernerSplunk.my_cluster_data(node)['shc_members']
 
-fail 'Search Heads are not configured for sh clustering in the cluster databag' if search_heads.nil? || search_heads.empty?
+raise 'Search Heads are not configured for sh clustering in the cluster databag' if search_heads.nil? || search_heads.empty?
 
 instance_exec :shc_deployer, &CernerSplunk::NODE_TYPE
 
 include_recipe 'cerner_splunk::_install_server'
 
 execute 'apply-shcluster-bundle' do # ~FC009
-  command(lazy { "#{node['splunk']['cmd']} apply shcluster-bundle -target '#{search_heads.first}' --answer-yes -auth admin:#{node.run_state['cerner_splunk']['admin-password']}" })
+  command(lazy { "#{node['splunk']['cmd']} apply shcluster-bundle -target '#{search_heads.first}' --answer-yes -auth admin:#{node.run_state['cerner_splunk']['admin_password']}" })
   environment 'HOME' => node['splunk']['home']
   action :nothing
   sensitive true
@@ -28,7 +30,7 @@ cluster_bag = CernerSplunk::DataBag.load(cluster_data['apps'], pick_context: ['d
 
 global_apps_bag = CernerSplunk::DataBag.load(cluster_bag['bag']) || {}
 
-apps = CernerSplunk::SplunkApp.merge_hashes(global_apps_bag, cluster_bag)
+apps = CernerSplunk::AppHelpers.merge_hashes(global_apps_bag, cluster_bag)
 
 # Basic configs for the _shcluster app
 app_configs = {
@@ -51,16 +53,20 @@ app_configs = {
 
 { '_shcluster' => app_configs }.merge(apps).each do |app_name, app_data|
   download_data = app_data['download'] || {}
+  app_data['files'] ||= {}
+  app_data['lookups'] ||= {}
 
-  splunk_app app_name do
-    apps_dir "#{node['splunk']['home']}/etc/shcluster/apps"
-    action app_data['remove'] ? :remove : :create
-    url download_data['url']
-    version download_data['version']
-    local app_data['local']
-    files app_data['files']
-    lookups app_data['lookups']
-    permissions app_data['permissions']
+  app_type = download_data['url'] ? :splunk_app_package : :splunk_app_custom
+
+  declare_resource(app_type, app_name) do
+    action app_data['remove'] ? :uninstall : :install
+    source_url download_data['url'] if download_data['url']
+    version download_data['version'] if download_data['version']
+    app_root :shcluster
+
+    configs CernerSplunk::AppHelpers.proc_conf(app_data['files']) unless app_data['files'].empty?
+    files CernerSplunk::AppHelpers.proc_files(files: app_data['files'], lookups: app_data['lookups']) unless app_data['lookups'].empty? && app_data['files'].empty?
+    metadata app_data['permissions'] if app_data['permissions']
     notifies :run, 'execute[apply-shcluster-bundle]'
   end
 end

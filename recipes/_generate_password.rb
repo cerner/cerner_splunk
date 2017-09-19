@@ -1,5 +1,7 @@
-# coding: UTF-8
 
+# frozen_string_literal: true
+
+#
 # Cookbook Name:: cerner_splunk
 # Recipe:: _generate_password
 #
@@ -8,41 +10,19 @@
 
 return if node['splunk']['free_license'] && node['splunk']['node_type'] != :forwarder
 
-require 'securerandom'
-
-password_file = File.join node['splunk']['external_config_directory'], 'password'
-
-old_password = File.exist?(password_file) ? File.read(password_file) : 'changeme'
-new_password = SecureRandom.hex(36)
-
-node.run_state['cerner_splunk'] ||= {}
-node.run_state['cerner_splunk']['admin-password'] = old_password
-
-execute 'change-admin-password' do # ~FC009
-  command "#{node['splunk']['cmd']} edit user admin -password #{new_password} -roles admin -auth admin:#{old_password}"
-  environment 'HOME' => node['splunk']['home']
-  sensitive true
+# Identify the most specific vault path that matches the current node name and type.
+password_vault_paths = node['splunk']['config']['password_secrets'] || {}
+vault_path = (password_vault_paths.find { |k, _| CernerSplunk.keys(node).include? k } || []).last
+vault_bag, vault_item = CernerSplunk::DataBag.to_a(vault_path)
+if %i[shc_search_head shc_captain].include? node['splunk']['node_type']
+  raise "You must configure a vault item for this search head cluster's admin password" unless vault_bag && vault_item
 end
 
-ruby_block 'update admin password in run_state' do
-  block do
-    node.run_state['cerner_splunk']['admin-password'] = new_password
-  end
-end
+# If a password file exists, retrieve the admin password (lazy so we don't read the file if the vault is valid)
+password_file_path = Pathname.new(node['splunk']['external_config_directory']).join('password').to_s
 
-if platform_family?('windows')
-  system_user = 'SYSTEM'
-  system_group = 'SYSTEM'
-else
-  system_user = 'root'
-  system_group = 'root'
-end
-
-file password_file do
-  backup false
-  owner system_user
-  group system_group
-  mode '0600'
-  sensitive true
-  content new_password
+splunk_admin_password 'change the splunk admin password' do
+  vault_bag vault_bag
+  vault_item vault_item
+  password_file_path password_file_path
 end
