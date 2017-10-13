@@ -24,9 +24,9 @@ end
 
 cluster_data = CernerSplunk.my_cluster_data(node) || {}
 
-cluster_bag = CernerSplunk::DataBag.load(cluster_data['apps'], pick_context: ['deployer-apps']) || {}
+cluster_bag = CernerSplunk::DataBag.load(cluster_data['apps'], pick_context: ['deployer-apps'], secret: node['splunk']['data_bag_secret']) || {}
 
-global_apps_bag = CernerSplunk::DataBag.load(cluster_bag['bag']) || {}
+global_apps_bag = CernerSplunk::DataBag.load(cluster_bag['bag'], secret: node['splunk']['data_bag_secret']) || {}
 
 apps = CernerSplunk::SplunkApp.merge_hashes(global_apps_bag, cluster_bag)
 

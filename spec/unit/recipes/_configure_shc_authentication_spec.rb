@@ -63,11 +63,12 @@ describe 'cerner_splunk::_configure_shc_authentication' do
   end
 
   before do
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'cluster').and_return(cluster_config)
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'indexes').and_return({})
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'apps').and_return({})
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'authentication').and_return(auth)
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'ldap').and_return(ldap)
+    allow(ChefVault::Item).to receive(:data_bag_item_type).and_return(:normal)
+    stub_data_bag_item('cerner_splunk', 'cluster').and_return(cluster_config)
+    stub_data_bag_item('cerner_splunk', 'indexes').and_return({})
+    stub_data_bag_item('cerner_splunk', 'apps').and_return({})
+    stub_data_bag_item('cerner_splunk', 'authentication').and_return(auth)
+    stub_data_bag_item('cerner_splunk', 'ldap').and_return(ldap)
   end
 
   after do

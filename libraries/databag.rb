@@ -3,11 +3,14 @@
 # Cookbook Name:: cerner_splunk
 # File Name:: databag.rb
 
-require 'chef/data_bag_item'
+require 'chef/dsl/data_query'
+require 'chef-vault'
 
 module CernerSplunk #:nodoc:
   # This module has methods and classes dealing with databags
   module DataBag
+    extend Chef::DSL::DataQuery
+
     # Converts a string of the form "(data_bag/)bag_item(:key)" to an array of [data_bag,bag_item,key]
     # If provided nil, will return nil
     def self.to_a(string, options = {})
@@ -73,27 +76,24 @@ module CernerSplunk #:nodoc:
     # If provided nil or a string that doesn't resolve to a data_bag + item at least will return nil
     def self.load(string, options = {}) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
       opts = {
-        type: :simple,
         pick_context: nil,
         handle_load_failure: false
       }.merge(options)
-      clazz =
-        case opts[:type]
-        when :simple
-          Chef::DataBagItem
-        when :vault
-          require 'chef-vault'
-          ChefVault::Item
-        else
-          fail "Unexpected type of DataBag #{opts[:type]}"
-        end
 
       data_bag, bag_item, key = to_a(string, options)
       value =
         if data_bag && bag_item
           # Exception handler to check if data_bag or data_bag_item exists
           begin
-            bag = clazz.load(data_bag, bag_item)
+            bag = case ChefVault::Item.data_bag_item_type(data_bag, bag_item)
+                  when :normal
+                    data_bag_item(data_bag, bag_item)
+                  when :encrypted
+                    secret = ::IO.read(opts[:secret]) if opts[:secret]
+                    data_bag_item(data_bag, bag_item, secret)
+                  when :vault
+                    ChefVault::Item.load(data_bag, bag_item)
+                  end
             key ? bag[key] : bag
           rescue => e
             raise e unless opts[:handle_load_failure]

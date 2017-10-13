@@ -15,7 +15,7 @@ if node['splunk']['node_type'] != :license_server && node['splunk']['config']['c
 end
 
 node['splunk']['config']['clusters'].each do |cluster|
-  unless CernerSplunk::DataBag.load(cluster)
+  unless CernerSplunk::DataBag.load(cluster, secret: node['splunk']['data_bag_secret'])
     throw "Unknown databag configured for node['splunk']['config]['clusters'] => '#{cluster}'"
   end
 end

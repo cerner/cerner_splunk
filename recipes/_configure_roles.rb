@@ -6,7 +6,8 @@
 # Configures the roles available on the system
 
 hash = CernerSplunk::DataBag.load node['splunk']['config']['roles'],
-                                  pick_context: CernerSplunk.keys(node)
+                                  pick_context: CernerSplunk.keys(node),
+                                  secret: node['splunk']['data_bag_secret']
 
 unless hash
   Chef::Log.info 'Roles not configured for this node.'

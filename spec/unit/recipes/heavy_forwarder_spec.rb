@@ -28,8 +28,9 @@ describe 'cerner_splunk::heavy_forwarder' do
   let(:splunk_installed) { nil }
 
   before do
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'cluster').and_return(cluster_config)
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'indexes').and_return({})
+    allow(ChefVault::Item).to receive(:data_bag_item_type).and_return(:normal)
+    stub_data_bag_item('cerner_splunk', 'cluster').and_return(cluster_config)
+    stub_data_bag_item('cerner_splunk', 'indexes').and_return({})
 
     allow(Dir).to receive(:exist?).and_call_original
     allow(Dir).to receive(:exist?).with('/opt/splunkforwarder').and_return(splunk_installed)

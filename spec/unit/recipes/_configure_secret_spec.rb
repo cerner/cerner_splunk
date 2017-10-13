@@ -30,6 +30,7 @@ describe 'cerner_splunk::_configure_secret' do
     let(:configured_secret) { 'ThisIsMySplunkSecret' }
 
     before do
+      allow(ChefVault::Item).to receive(:data_bag_item_type).and_return(:vault)
       allow(ChefVault::Item).to receive(:load).with('cerner_splunk', 'secrets').and_return(secret_data_bag)
     end
 

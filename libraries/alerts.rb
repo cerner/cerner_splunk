@@ -11,11 +11,11 @@ module CernerSplunk
     def self.configure_alerts(node, hash)
       hash = hash.clone
       default_coords = CernerSplunk::DataBag.to_a node['splunk']['config']['alerts']
-      bag = CernerSplunk::DataBag.load hash.delete('bag'), default: default_coords
+      bag = CernerSplunk::DataBag.load hash.delete('bag'), default: default_coords, secret: node['splunk']['data_bag_secret']
 
       alert_stanzas =
         if bag
-          bag.merge(hash) do |_key, default_hash, override_hash|
+          bag.to_hash.merge(hash) do |_key, default_hash, override_hash|
             default_hash.merge(override_hash)
           end
         else
@@ -27,7 +27,7 @@ module CernerSplunk
       email_settings = alert_stanzas['email'] || {}
 
       if email_settings['auth_password']
-        password = CernerSplunk::DataBag.load email_settings['auth_password'], default: default_coords, type: :vault
+        password = CernerSplunk::DataBag.load email_settings['auth_password'], default: default_coords, secret: node['splunk']['data_bag_secret']
         fail 'Password must be a String' unless password.is_a?(String)
         email_settings['auth_password'] = password
       end

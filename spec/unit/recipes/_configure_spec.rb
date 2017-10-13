@@ -28,8 +28,9 @@ describe 'cerner_splunk::_configure' do
   let(:clusters) { ['cerner_splunk/cluster'] }
 
   before do
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'cluster').and_return(cluster_config)
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'indexes').and_return({})
+    allow(ChefVault::Item).to receive(:data_bag_item_type).and_return(:normal)
+    stub_data_bag_item('cerner_splunk', 'cluster').and_return(cluster_config)
+    stub_data_bag_item('cerner_splunk', 'indexes').and_return({})
   end
 
   after do
