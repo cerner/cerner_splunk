@@ -62,8 +62,8 @@ module CernerSplunk
         proc { value }
       end
 
-      def self.vault(coordinate:, default_coords: nil, pick_context: nil, **_)
-        proc { CernerSplunk::DataBag.load coordinate, type: :vault, default: default_coords, pick_context: pick_context }
+      def self.vault(coordinate:, default_coords: nil, pick_context: nil, node:, **_)
+        proc { CernerSplunk::DataBag.load coordinate, secret: node['splunk']['data_bag_secret'], default: default_coords, pick_context: pick_context }
       end
 
       def self.existing(filename:, **_)

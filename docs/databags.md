@@ -1,6 +1,6 @@
 Data Bags
 =========
-Here we'll describe the various types of hashes that come out of [data bag items](http://docs.opscode.com/essentials_data_bags.html) used with `cerner_splunk` cookbook, and their formats.
+Here we'll describe the various types of hashes that come out of [data bag items](https://docs.chef.io/data_bags.html) used with `cerner_splunk` cookbook, and their formats. Data bag items can be of any type: unencrypted, encrypted via shared secret, or encrypted via chef-vault.
 
 It is recommended that all of these items live in an `cerner_splunk` data bag, but they are configurable through [attributes](attributes.md) and keys on other Hashes.
 
@@ -21,7 +21,7 @@ The Cluster Hash is part of a plaintext data bag item that defines a logical gro
 * `['settings']` -  Hash of Cluster settings (Required for servers connecting to managed clusters),
 * `['settings'][???]` - Valid values are those under the clustering stanza of [server.conf][]
 * `['settings'][???]['_cerner_splunk_indexer_count']` - The number of indexers to use for calculating maxTotalDataSizeMB for each index in combination with _maxDailyDataSizeMB in the index configuration.
-* `['shc_settings'] - Hash of SH Cluster settings
+* `['shc_settings']` - Hash of SH Cluster settings
 * `['shc_settings']['???']` - Valid values are those under the shclustering stanza of [server.conf][]
 * `['replication_ports']` - Configuration for cluster slave replication ports (required for cluster slaves and Search Head Cluster members/captain)
 * `['replication_ports']['###']` - Port number to listen on
@@ -35,7 +35,7 @@ The Cluster Hash is part of a plaintext data bag item that defines a logical gro
 
 License Hash
 ------------
-The License Hash is part of a data bag item encrypted with [Chef Vault](https://github.com/Nordstrom/chef-vault) to hold the license data.
+The License Hash is part of an encrypted data bag item (either with [Chef Vault](https://github.com/chef/chef-vault) or a [shared secret encryption](https://docs.chef.io/secrets.html#encrypt-a-data-bag-item)) to hold the license data.
 
 * `[A Decriptive File-Name]` - Corresponding License (XML) contents. (There can be many of these) Remember to change newlines to `\n` to conform to proper JSON format.
 
@@ -95,7 +95,7 @@ An LDAP Hash is part of a plaintext data bag item that configures connection inf
 * `['roleMap']` - Hash mapping Splunk roles to 1 to many LDAP roles
 * `['roleMap'][splunk_role]` - String or Array of Strings of LDAP roles to map the given splunk role to
 * `['bindDNpassword']` - Coordinate String (see above), pointing to a String within a Chef Vault encrypted data bag item.
-* `[other]` - Other keys under an LDAP <authSettings-key> stanza as documented in [authentication.conf][].
+* `[other]` - Other keys under an LDAP &lt;authSettings-key&gt; stanza as documented in [authentication.conf][].
 
 Alerts Hash
 -----------

@@ -5,7 +5,9 @@
 #
 # Configures the roles available on the system
 
-hash = CernerSplunk::DataBag.load node['splunk']['config']['authentication'], pick_context: CernerSplunk.keys(node)
+hash = CernerSplunk::DataBag.load node['splunk']['config']['authentication'],
+                                  pick_context: CernerSplunk.keys(node),
+                                  secret: node['splunk']['data_bag_secret']
 
 unless hash
   Chef::Log.info 'Splunk Authentication not configured for this node.'

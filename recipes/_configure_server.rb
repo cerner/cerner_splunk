@@ -190,7 +190,7 @@ if license_uri == 'self'
   end
 end
 
-license_pools = CernerSplunk::DataBag.load(node['splunk']['config']['license-pool'])
+license_pools = CernerSplunk::DataBag.load(node['splunk']['config']['license-pool'], secret: node['splunk']['data_bag_secret'])
 
 if node['splunk']['node_type'] == :license_server && !license_pools.nil?
   auto_generated_pool_size = CernerSplunk.convert_to_bytes license_pools['auto_generated_pool_size']

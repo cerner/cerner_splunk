@@ -15,7 +15,7 @@ if !key || platform_family?('windows')
   return
 end
 
-secret = CernerSplunk::DataBag.load secrets_hash[key], type: :vault, handle_load_failure: true
+secret = CernerSplunk::DataBag.load secrets_hash[key], secret: node['splunk']['data_bag_secret'], handle_load_failure: true
 fail 'Configured splunk secret must resolve to a String' unless secret.is_a?(String)
 
 secret_path = ::File.join(node['splunk']['home'], 'etc', 'auth', 'splunk.secret')

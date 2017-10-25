@@ -35,8 +35,9 @@ describe 'cerner_splunk::_start' do
   let(:windows) { nil }
 
   before do
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'cluster').and_return(cluster_config)
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'indexes').and_return({})
+    allow(ChefVault::Item).to receive(:data_bag_item_type).and_return(:normal)
+    stub_data_bag_item('cerner_splunk', 'cluster').and_return(cluster_config)
+    stub_data_bag_item('cerner_splunk', 'indexes').and_return({})
     allow(Chef::Recipe).to receive(:platform_family?).with('windows').and_return(windows)
 
     allow(File).to receive(:exist?).and_call_original

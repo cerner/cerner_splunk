@@ -15,9 +15,10 @@
         "authentication": "cerner_splunk/authnz-vagrant:authn",
         "alerts": "cerner_splunk/alerts-vagrant:alerts",
         "secrets": {
-          "s_standalone": "cerner_splunk/passwords:splunk.secret"
+          "s_standalone": "cerner_splunk/standalone_passwords:splunk.secret"
         }
-      }
+      },
+      "data_bag_secret": "/vagrant/vagrant_repo/alternative_encrypted_data_bag_secret"
     }
   }
 }

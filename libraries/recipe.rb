@@ -31,7 +31,7 @@ module CernerSplunk
 
   # Returns the data bag item corresponding to my cluster (not other clusters)
   def self.my_cluster_data(node)
-    @my_cluster_data ||= CernerSplunk::DataBag.load(node['splunk']['config']['clusters'].first)
+    @my_cluster_data ||= CernerSplunk::DataBag.load(node['splunk']['config']['clusters'].first, secret: node['splunk']['data_bag_secret'])
   end
 
   # Returns a single (Array) pair of my cluster key with the corresponding data bag
@@ -43,7 +43,7 @@ module CernerSplunk
   def self.all_clusters_data(node)
     unless @all_cluster_data
       _head, *others = node['splunk']['config']['clusters']
-      @all_cluster_data = [my_cluster_data(node)] + others.collect { |x| CernerSplunk::DataBag.load(x) }
+      @all_cluster_data = [my_cluster_data(node)] + others.collect { |x| CernerSplunk::DataBag.load(x, secret: node['splunk']['data_bag_secret']) }
     end
     @all_cluster_data
   end

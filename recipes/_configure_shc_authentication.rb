@@ -5,7 +5,9 @@
 #
 # Configures the authentication available on the system in a search head cluster
 
-hash = CernerSplunk::DataBag.load node['splunk']['config']['authentication'], pick_context: ['shcluster']
+hash = CernerSplunk::DataBag.load node['splunk']['config']['authentication'],
+                                  pick_context: ['shcluster'],
+                                  secret: node['splunk']['data_bag_secret']
 
 unless hash
   Chef::Log.info 'Splunk Authentication not configured for the search heads in the search head cluster.'

@@ -72,11 +72,11 @@ module CernerSplunk
           hash =
             case strategy
             when String
-              CernerSplunk::DataBag.load strategy, default: default_coords
+              CernerSplunk::DataBag.load strategy, default: default_coords, secret: node['splunk']['data_bag_secret']
             when Hash
               temp = strategy.clone
               bag_coords = temp.delete('bag')
-              bag = CernerSplunk::DataBag.load bag_coords, default: default_coords
+              bag = CernerSplunk::DataBag.load bag_coords, default: default_coords, secret: node['splunk']['data_bag_secret']
               case bag
               when nil
                 temp
@@ -101,7 +101,7 @@ module CernerSplunk
           end
 
           if hash['bindDNpassword']
-            vault_password = CernerSplunk::ConfTemplate::Value.vault coordinate: hash['bindDNpassword'], default_coords: default_coords
+            vault_password = CernerSplunk::ConfTemplate::Value.vault coordinate: hash['bindDNpassword'], default_coords: default_coords, node: node
             encrypt = CernerSplunk::ConfTemplate::Transform.splunk_encrypt node: node
             hash['bindDNpassword'] = CernerSplunk::ConfTemplate.compose encrypt, vault_password
           end

@@ -6,7 +6,8 @@
 # Configures the roles available on the search heads in a search head cluster
 
 hash = CernerSplunk::DataBag.load node['splunk']['config']['roles'],
-                                  pick_context: ['shcluster']
+                                  pick_context: ['shcluster'],
+                                  secret: node['splunk']['data_bag_secret']
 
 unless hash
   Chef::Log.info 'Roles not configured for the search heads in the search head cluster.'

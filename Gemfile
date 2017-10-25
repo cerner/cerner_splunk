@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 chefspec_version = '= 7.0.0'
 foodcritic_version = '= 11.0.0'
 rubocop_version = '= 0.48.1'
-chef_vault_version = '> 0.0.0'
+chef_vault_version = '> 3.0'
 
 case RUBY_VERSION
 when '2.1.6'
@@ -30,7 +30,6 @@ when '2.1.6'
 else
   # https://github.com/cerner/cerner_splunk/issues/142
   chef_version = '= 12.18.31'
-  gem 'molinillo', '~> 0.5.0'
 end
 
 gem 'berkshelf'

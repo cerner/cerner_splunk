@@ -20,9 +20,9 @@ execute 'apply-cluster-bundle' do # ~FC009
   action :nothing
 end
 
-cluster_bag = CernerSplunk::DataBag.load(CernerSplunk.my_cluster_data(node)['apps'], pick_context: ['master-apps']) || {}
+cluster_bag = CernerSplunk::DataBag.load(CernerSplunk.my_cluster_data(node)['apps'], pick_context: ['master-apps'], secret: node['splunk']['data_bag_secret']) || {}
 
-bag_bag = CernerSplunk::DataBag.load(cluster_bag['bag']) || {}
+bag_bag = CernerSplunk::DataBag.load(cluster_bag['bag'], secret: node['splunk']['data_bag_secret']) || {}
 
 apps = CernerSplunk::SplunkApp.merge_hashes(bag_bag, cluster_bag)
 

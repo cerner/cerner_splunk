@@ -6,7 +6,7 @@
 # Configures the indexes.conf file.
 
 indexbag = CernerSplunk.my_cluster_data(node)['indexes']
-bag = CernerSplunk::DataBag.load(indexbag)
+bag = CernerSplunk::DataBag.load(indexbag, secret: node['splunk']['data_bag_secret'])
 
 unless bag
   Chef::Log.info 'No indexes data bag configured.'

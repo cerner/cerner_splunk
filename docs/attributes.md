@@ -42,6 +42,7 @@ Configurable (with defaults)
 * `node['splunk']['mgmt_host']` - The host other SHC members use when connecting to the current node. You probably want a wrapper cookbook to override this. (`node['ipaddress']`)
 * `node['splunk']['heavy_forwarder']['use_license_uri']` - Set this attribute to `true` to point the Heavy Forwarder to the license master. (`false`)
 * `node['splunk']['apps']` - An [apps hash](databags.md#apps-hash) of apps to configure locally. (Does not support downloading apps ... yet...)
+* `node['splunk']['data_bag_secret']` - The location of the shared secret file if your encrypted data bags are encrypted via shared secret rather than chef-vault. If this is not specified, and the encrypted data bags are using shared secret encryption then chef looks for a secret at the path specified by the encrypted_data_bag_secret setting in the client.rb file.
 
 
 Non-configurable (defaults)
