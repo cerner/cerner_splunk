@@ -87,6 +87,7 @@ when :cluster_master
     server_stanzas['indexer_discovery'] = indexer_discovery_settings
     server_stanzas['indexer_discovery']['pass4SymmKey'] = CernerSplunk::ConfTemplate.compose encrypt_password, CernerSplunk::ConfTemplate::Value.constant(value: pass) if pass
   end
+
   is_multisite = CernerSplunk.multisite_cluster?(bag, cluster)
   if is_multisite
     server_stanzas['general']['site'] = bag['site']
@@ -97,6 +98,7 @@ when :cluster_master
       k.start_with?('_cerner_splunk')
     end
 
+    pass = settings.delete('pass4SymmKey')
     server_stanzas['clustering'] = settings
     server_stanzas['clustering']['multisite'] = true
     server_stanzas['clustering']['available_sites'] = available_sites.join(',')
@@ -104,9 +106,11 @@ when :cluster_master
     settings = (bag['settings'] || {}).reject do |k, _|
       k.start_with?('_cerner_splunk') || SLAVE_ONLY_CONFIGS.include?(k)
     end
+    pass = settings.delete('pass4SymmKey')
     server_stanzas['clustering'] = settings
   end
   server_stanzas['clustering']['mode'] = 'master'
+  server_stanzas['clustering']['pass4SymmKey'] = CernerSplunk::ConfTemplate.compose encrypt_password, CernerSplunk::ConfTemplate::Value.constant(value: pass) if pass
 when :cluster_slave
   cluster, bag = CernerSplunk.my_cluster(node)
 
@@ -120,8 +124,11 @@ when :cluster_slave
   throw "Missing master uri for cluster '#{cluster}'" if master_uri.empty?
   throw "Missing replication port configuration for cluster '#{cluster}'" if replication_ports.empty?
 
+  pass = settings.delete('pass4SymmKey')
+
   server_stanzas['clustering'] = settings
   server_stanzas['clustering']['mode'] = 'slave'
+  server_stanzas['clustering']['pass4SymmKey'] = CernerSplunk::ConfTemplate.compose encrypt_password, CernerSplunk::ConfTemplate::Value.constant(value: pass) if pass
   server_stanzas['clustering']['master_uri'] = master_uri
 
   replication_ports.each do |port, port_settings|
@@ -131,6 +138,15 @@ when :cluster_slave
       k.start_with? '_cerner_splunk'
     end
   end
+when :shc_deployer
+  bag = CernerSplunk.my_cluster_data(node)
+  settings = (bag['shc_settings'] || {}).reject do |k, _|
+    k.start_with?('_cerner_splunk')
+  end
+  pass = settings.delete('pass4SymmKey')
+
+  server_stanzas['shclustering'] = settings
+  server_stanzas['shclustering']['pass4SymmKey'] = CernerSplunk::ConfTemplate.compose encrypt_password, CernerSplunk::ConfTemplate::Value.constant(value: pass) if pass
 end
 
 # Search Head Cluster configuration

@@ -17,6 +17,9 @@
         "alerts": "cerner_splunk/alerts-vagrant:alerts",
         "secrets": {
           "s_standalone": "cerner_splunk/standalone_passwords:splunk.secret"
+        },
+        "admin_password": {
+          "s_standalone": "cerner_splunk/standalone_passwords:admin_password"
         }
       },
       "data_bag_secret": "/vagrant/vagrant_repo/alternative_encrypted_data_bag_secret"
