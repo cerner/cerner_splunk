@@ -63,10 +63,6 @@ describe 'cerner_splunk::_install' do
     CernerSplunk.reset
   end
 
-  it 'includes cerner_splunk::_cleanup_aeon recipe' do
-    expect(subject).to include_recipe('cerner_splunk::_cleanup_aeon')
-  end
-
   it 'includes cerner_splunk::_restart_marker recipe' do
     expect(subject).to include_recipe('cerner_splunk::_restart_marker')
   end
