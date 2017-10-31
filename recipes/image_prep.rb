@@ -16,3 +16,10 @@ execute 'clone-prep-clear-config' do
   notifies :stop, 'service[splunk]', :before
   notifies :delete, 'file[splunk-marker]', :before
 end
+
+execute 'clean eventdata' do
+  command "#{node['splunk']['cmd']} clean eventdata -f"
+  user node['splunk']['user']
+  group node['splunk']['group']
+  only_if { node['splunk']['package']['base_name'] == 'splunk' }
+end

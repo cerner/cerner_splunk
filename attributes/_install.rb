@@ -1,5 +1,8 @@
 # coding: UTF-8
 
+# Put this here to initialize the run state so we don't have to check it everywhere
+node.run_state['cerner_splunk'] ||= {} # ~FC046
+
 default['splunk']['node_type'] = nil
 default['splunk']['cleanup'] = true
 
