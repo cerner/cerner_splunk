@@ -1,0 +1,5 @@
+{
+  "id": "cluster-vagrant-site2",
+  "site": "site2",
+  "multisite": "cerner_splunk/multisiteUS"
+}

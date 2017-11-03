@@ -41,8 +41,11 @@ server_stanzas['general']['pass4SymmKey'] = CernerSplunk::ConfTemplate.compose e
 # default sslPassword value is 'password'
 server_stanzas['sslConfig']['sslPassword'] = CernerSplunk::ConfTemplate.compose encrypt_noxor_password, CernerSplunk::ConfTemplate::Value.constant(value: 'password')
 
-# Indexer Cluster Configuration
 case node['splunk']['node_type']
+when :forwarder
+  # Apparently there is no option to configure site awareness for different multisite clusters.
+  # https://answers.splunk.com/answers/590556/how-to-configure-site-awareness-on-forwarders-for.html
+  server_stanzas['general']['site'] = node['splunk']['forwarder_site']
 when :search_head, :shc_search_head, :shc_captain, :server
   clusters = CernerSplunk.all_clusters(node).collect do |(cluster, bag)|
     stanza = "clustermaster:#{cluster}"
@@ -55,8 +58,13 @@ when :search_head, :shc_search_head, :shc_captain, :server
     server_stanzas[stanza] = {}
     server_stanzas[stanza]['master_uri'] = master_uri
     server_stanzas[stanza]['pass4SymmKey'] = CernerSplunk::ConfTemplate.compose encrypt_password, CernerSplunk::ConfTemplate::Value.constant(value: pass) unless pass.empty?
-    # Until we support multisite clusters, set multisite explicitly false
-    server_stanzas[stanza]['multisite'] = false
+    if CernerSplunk.multisite_cluster?(bag, cluster)
+      server_stanzas[stanza]['multisite'] = true
+      server_stanzas[stanza]['site'] = bag['disable_search_affinity'] == true ? 'site0' : bag['site']
+    else
+      # Should be explicitly set to false to avoid spamming _internal logs
+      server_stanzas[stanza]['multisite'] = false
+    end
     stanza
   end
 
@@ -68,13 +76,7 @@ when :search_head, :shc_search_head, :shc_captain, :server
     server_stanzas['clustering']['master_uri'] = clusters.join(',')
   end
 when :cluster_master
-  bag = CernerSplunk.my_cluster_data(node)
-  settings = (bag['settings'] || {}).reject do |k, _|
-    k.start_with?('_cerner_splunk') || SLAVE_ONLY_CONFIGS.include?(k)
-  end
-
-  server_stanzas['clustering'] = settings
-  server_stanzas['clustering']['mode'] = 'master'
+  cluster, bag = CernerSplunk.my_cluster(node)
 
   if bag['indexer_discovery'] == true
     indexer_discovery_settings = ((bag['indexer_discovery_settings'] && bag['indexer_discovery_settings']['master_configs']) || {}).reject do |k, _|
@@ -85,9 +87,30 @@ when :cluster_master
     server_stanzas['indexer_discovery'] = indexer_discovery_settings
     server_stanzas['indexer_discovery']['pass4SymmKey'] = CernerSplunk::ConfTemplate.compose encrypt_password, CernerSplunk::ConfTemplate::Value.constant(value: pass) if pass
   end
+  is_multisite = CernerSplunk.multisite_cluster?(bag, cluster)
+  if is_multisite
+    server_stanzas['general']['site'] = bag['site']
+    multisite_configs = CernerSplunk::DataBag.load(bag['multisite'], secret: node['splunk']['data_bag_secret']) || {}
+    fail "sites attribute not configured in the multisite cluster databag: #{bag['multisite']}" if multisite_configs['sites'].nil? || multisite_configs['sites'].empty?
+    available_sites = multisite_configs['sites'].map { |site| CernerSplunk::DataBag.load(site, secret: node['splunk']['data_bag_secret'])['site'] }
+    settings = (multisite_configs['multisite_settings'] || {}).reject do |k, _|
+      k.start_with?('_cerner_splunk')
+    end
 
+    server_stanzas['clustering'] = settings
+    server_stanzas['clustering']['multisite'] = true
+    server_stanzas['clustering']['available_sites'] = available_sites.join(',')
+  else
+    settings = (bag['settings'] || {}).reject do |k, _|
+      k.start_with?('_cerner_splunk') || SLAVE_ONLY_CONFIGS.include?(k)
+    end
+    server_stanzas['clustering'] = settings
+  end
+  server_stanzas['clustering']['mode'] = 'master'
 when :cluster_slave
   cluster, bag = CernerSplunk.my_cluster(node)
+
+  server_stanzas['general']['site'] = bag['site'] if CernerSplunk.multisite_cluster?(bag, cluster)
   master_uri = bag['master_uri'] || ''
   replication_ports = bag['replication_ports'] || {}
   settings = (bag['settings'] || {}).reject do |k, _|

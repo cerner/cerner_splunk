@@ -1,0 +1,32 @@
+{
+  "id": "multisiteUS",
+  "sites" : ["cerner_splunk/cluster-vagrant-site1", "cerner_splunk/cluster-vagrant-site2"],
+  "master_uri": "https://33.33.33.35:8089",
+  "license_uri": null,
+  "cluster_label": "Multisite-1",
+  "multisite_settings": {
+    "forwarder_site_failover": "site1:site2",
+    "site_replication_factor": "origin:2,total:3",
+    "site_search_factor": "origin:1,total:2"
+  },
+  "indexer_discovery": true,
+  "indexer_discovery_settings" :{
+    "outputs_configs": {
+      "send_timeout": 30,
+      "rcv_timeout": 30
+    },
+    "master_configs": {
+      "indexerWeightByDiskCapacity": true
+    }
+  },
+  "replication_ports": {
+    "8080" : { }
+  },
+  "receiver_settings": {
+    "splunktcp": {
+      "port": 9997
+    }
+  },
+  "indexes" : "cerner_splunk/indexes-vagrant",
+  "apps": "cerner_splunk/cluster-apps-vagrant"
+}

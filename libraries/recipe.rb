@@ -30,8 +30,12 @@ module CernerSplunk
   end
 
   # Returns the data bag item corresponding to my cluster (not other clusters)
+  # If the cluster is a site in the multisite cluster, return data after merging with the multisite data bag item
   def self.my_cluster_data(node)
     @my_cluster_data ||= CernerSplunk::DataBag.load(node['splunk']['config']['clusters'].first, secret: node['splunk']['data_bag_secret'])
+    return @my_cluster_data if @my_cluster_data.nil?
+    @multisite_bag_data ||= CernerSplunk::DataBag.load(@my_cluster_data['multisite'], secret: node['splunk']['data_bag_secret']) || {}
+    CernerSplunk::SplunkApp.merge_hashes({ cluster_configs: @multisite_bag_data.to_h }, { cluster_configs: @my_cluster_data.to_h })[:cluster_configs]
   end
 
   # Returns a single (Array) pair of my cluster key with the corresponding data bag
@@ -123,5 +127,12 @@ module CernerSplunk
     return unless ::File.exist?(secret_file_path)
     existing_secret = ::File.open(secret_file_path, 'r') { |file| file.readline.chomp }
     fail 'The splunk.secret file already exists with a different value. Modification of that file is not currently supported.' if existing_secret != configured_secret
+  end
+
+  # Checks if multisite configs are configured in the cluster databag.
+  def self.multisite_cluster?(bag, cluster)
+    return false if bag['multisite'].nil? || bag['multisite'].empty?
+    fail "'site' attribute not configured in the cluster databag: #{cluster}" if bag['site'].nil? || bag['site'].empty?
+    true
   end
 end

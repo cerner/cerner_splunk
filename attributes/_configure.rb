@@ -33,3 +33,6 @@ default['splunk']['config']['assumed_index'] = 'main'
 
 # Attribute used to point a heavy forwarder to license master
 default['splunk']['heavy_forwarder']['use_license_uri'] = false
+
+# Disable site awareness for multisite clustering.
+default['splunk']['forwarder_site'] = 'site0'

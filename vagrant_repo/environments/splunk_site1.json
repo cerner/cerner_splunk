@@ -1,0 +1,16 @@
+{
+  "name": "splunk_site1",
+  "description": "Environment for site1 in the multisite cluster",
+  "default_attributes": {
+    "splunk": {
+      "config": {
+        "clusters": [
+          "cerner_splunk/cluster-vagrant-site1"
+        ],
+        "roles": "cerner_splunk/authnz-vagrant:roles",
+        "authentication": "cerner_splunk/authnz-vagrant:authn",
+        "alerts": "cerner_splunk/alerts-vagrant:alerts"
+      }
+    }
+  }
+}
