@@ -75,6 +75,17 @@ when :cluster_master
 
   server_stanzas['clustering'] = settings
   server_stanzas['clustering']['mode'] = 'master'
+
+  if bag['indexer_discovery'] == true
+    indexer_discovery_settings = ((bag['indexer_discovery_settings'] && bag['indexer_discovery_settings']['master_configs']) || {}).reject do |k, _|
+      k.start_with?('_cerner_splunk')
+    end
+    pass = (bag['indexer_discovery_settings'] && bag['indexer_discovery_settings']['pass4SymmKey']) || nil
+
+    server_stanzas['indexer_discovery'] = indexer_discovery_settings
+    server_stanzas['indexer_discovery']['pass4SymmKey'] = CernerSplunk::ConfTemplate.compose encrypt_password, CernerSplunk::ConfTemplate::Value.constant(value: pass) if pass
+  end
+
 when :cluster_slave
   cluster, bag = CernerSplunk.my_cluster(node)
   master_uri = bag['master_uri'] || ''
