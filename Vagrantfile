@@ -150,7 +150,7 @@ Vagrant.configure('2') do |config|
   config.vm.define :c1_master do |cfg|
     default_omnibus config
     cfg.vm.provision :chef_client do |chef|
-      chef_defaults chef, :c1_master
+      chef_defaults chef, :c1_master, 'splunk_cluster_master'
       chef.add_recipe 'cerner_splunk::cluster_master'
     end
     network cfg, :c1_master

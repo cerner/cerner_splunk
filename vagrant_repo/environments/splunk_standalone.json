@@ -9,7 +9,7 @@
       "config": {
         "clusters": [
           "cerner_splunk/cluster-standalone",
-          "cerner_splunk/cluster-vagrant"
+          "cerner_splunk/cluster-indexer-discovery"
         ],
         "roles": "cerner_splunk/authnz-vagrant:roles",
         "authentication": "cerner_splunk/authnz-vagrant:authn",

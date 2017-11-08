@@ -5,6 +5,7 @@ require 'rspec'
 require 'chefspec'
 require 'chefspec/berkshelf'
 require 'chef-vault'
+require 'conf_template'
 
 RSpec.configure do |config|
   config.order = 'random'

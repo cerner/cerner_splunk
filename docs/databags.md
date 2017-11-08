@@ -30,6 +30,14 @@ The Cluster Hash is part of a plaintext data bag item that defines a logical gro
 * `['shc_replication_ports']` - identical as `['replication_ports']` but take precedence for Search Head Cluster members/captain when replication port settings need to differ between SHC members and indexer cluster slaves in the same cluster.
 * `['receivers']` - Array of strings of hosts where this cluster's indexers are listening. (Required for forwarders)
 * `['receiver_settings']['splunktcp']['port']` - Port indexers are listening on, and forwarders are sending data (required for forwarders and receivers)
+* `['tcpout_settings']` - Hash of tcpout settings to be configured in the outputs.conf under the `tcpout` stanza.
+* `['tcpout_settings'][???]` - Valid values are those under the tcpout stanza of [outputs.conf][]
+* `['indexer_discovery']` - Boolean to toggle indexer_discovery. Set this to `true` to leverage indexer discovery. Note that `['receivers']` configured when `['indexer_discovery']` is set to `true` will be ignored.
+* `['indexer_discovery_settings']['pass4SymmKey']` - pass4Symmkey value to be set under the `index_discovery` stanza in [server.conf][] and [outputs.conf][]
+* `['indexer_discovery_settings']['master_configs']` - Hash of indexer discovery settings to be configured on the cluster master under the `indexer_discovery` stanza.
+* `['indexer_discovery_settings']['master_configs'][???]` - Valid values are those under the indexer_discovery stanza of [server.conf][]
+* `['indexer_discovery_settings']['outputs_configs']` - Hash of indexer discovery settings to be configured in the outputs.conf under the `indexer_discovery` stanza.
+* `['indexer_discovery_settings']['outputs_configs'][???]` - Valid values are those under the indexer_discovery stanza of [outputs.conf][]
 * `['indexes']` - A String pointing to an indexes data bag hash. (Coordinate form as described above)
 * `['apps']` - A String pointing to an apps data bag hash. (Coordinate form as described above)
 
@@ -135,11 +143,12 @@ Docs Navigation
 * [Docs Readme](README.md)
 * [Repository Readme](../README.md)
 
-[server.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Serverconf
-[indexes.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Indexesconf
-[user-prefs.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/User-prefsconf
-[authorize.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Authorizeconf
-[authentication.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Authenticationconf
 [alert-actions.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Alert-actionsconf
-[default.meta]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Defaultmetaconf
 [app.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/appconf
+[authentication.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Authenticationconf
+[authorize.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Authorizeconf
+[default.meta]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Defaultmetaconf
+[indexes.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Indexesconf
+[outputs.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Outputsconf
+[server.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/Serverconf
+[user-prefs.conf]: http://docs.splunk.com/Documentation/Splunk/latest/Admin/User-prefsconf
