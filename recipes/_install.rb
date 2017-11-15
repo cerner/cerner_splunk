@@ -5,8 +5,6 @@
 #
 # Performs the installation of the Splunk software via package.
 
-include_recipe 'cerner_splunk::_cleanup_aeon'
-
 # Interpolation Alias
 def nsp
   node['splunk']['package']
@@ -79,7 +77,6 @@ end
 
 ruby_block 'read splunk.secret' do
   block do
-    node.run_state['cerner_splunk'] ||= {}
     node.run_state['cerner_splunk']['splunk.secret'] = ::File.open(::File.join(node['splunk']['home'], 'etc/auth/splunk.secret'), 'r') { |file| file.readline.chomp }
   end
 end

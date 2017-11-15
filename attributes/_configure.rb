@@ -22,7 +22,6 @@ default['splunk']['mgmt_host'] = node['ipaddress']
 
 default['splunk']['free_license'] = false
 
-# Legacy attributes from the aeon-operations cookbook
 default['splunk']['main_project_index'] = nil
 default['splunk']['monitors'] = []
 default['splunk']['apps'] = {}

@@ -52,6 +52,10 @@ Installs and configures Splunk Server as a deployer in a search head cluster. De
 
 Installs and configures Splunk Server as a standalone server. Recieves & Indexes logs.
 
+### `cerner_splunk::server_install_only`
+
+Install a Splunk Server for the purposes of baking a base server image. Skips the vast majority of configuration since it's likely environment specific.
+
 Unconfiguration / Uninstallation Recipes
 ----------------------------------------
 These are recipes to remove and clean up aspects of Splunk

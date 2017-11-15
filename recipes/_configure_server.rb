@@ -218,7 +218,6 @@ if node['splunk']['node_type'] == :license_server && !license_pools.nil?
     }
     allotted_pool_size += pool_max_size
   end
-  node.run_state['cerner_splunk'] ||= {}
   node.run_state['cerner_splunk']['total_allotted_pool_size'] = allotted_pool_size + auto_generated_pool_size
 end
 

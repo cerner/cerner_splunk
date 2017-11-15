@@ -15,7 +15,6 @@ password_file = File.join node['splunk']['external_config_directory'], 'password
 old_password = File.exist?(password_file) ? File.read(password_file) : 'changeme'
 new_password = SecureRandom.hex(36)
 
-node.run_state['cerner_splunk'] ||= {}
 node.run_state['cerner_splunk']['admin-password'] = old_password
 
 execute 'change-admin-password' do # ~FC009
