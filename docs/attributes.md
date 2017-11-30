@@ -4,7 +4,7 @@ In depth look at all attributes available for this cookbook.
 
 Required
 ----------
-* `node['splunk']['config']['clusters']` - Array of strings "data_bag/data_bag_item" identifying the [databags](databags.md) containing cluster information to connect to.
+* `node['splunk']['config']['clusters']` - Array of strings "data_bag/data_bag_item" identifying the [databags](databags.md) containing cluster/site information to connect to.
 
 Configurable (with defaults)
 -----------------------------
@@ -43,6 +43,7 @@ Configurable (with defaults)
 * `node['splunk']['heavy_forwarder']['use_license_uri']` - Set this attribute to `true` to point the Heavy Forwarder to the license master. (`false`)
 * `node['splunk']['apps']` - An [apps hash](databags.md#apps-hash) of apps to configure locally. (Does not support downloading apps ... yet...)
 * `node['splunk']['data_bag_secret']` - The location of the shared secret file if your encrypted data bags are encrypted via shared secret rather than chef-vault. If this is not specified, and the encrypted data bags are using shared secret encryption then chef looks for a secret at the path specified by the encrypted_data_bag_secret setting in the client.rb file.
+* `node['splunk']['forwarder_site']` - Set this attribute to configure site awareness for your forwarders.(`site0`)
 
 
 Non-configurable (defaults)

@@ -21,6 +21,13 @@ end
   c2_captain:   { ip: '33.33.33.17', hostname: 'search03.splunk', ports: { 8010 => 8000, 8100 => 8089 } },
   c2_newnode:   { ip: '33.33.33.18', hostname: 'search04.splunk', ports: { 8011 => 8000, 8101 => 8089 } },
   c2_deployer:  { ip: '33.33.33.28', hostname: 'deployer.splunk', ports: { 8012 => 8000, 8102 => 8089 } },
+  s1_slave1:    { ip: '33.33.33.31', hostname: 's1.slave01.splunk', ports: { 8013 => 8000, 8103 => 8089 } },
+  s1_slave2:    { ip: '33.33.33.32', hostname: 's1.slave02.splunk', ports: { 8014 => 8000, 8104 => 8089 } },
+  s1_slave3:    { ip: '33.33.33.34', hostname: 's1.slave03.splunk', ports: { 8015 => 8000, 8105 => 8089 } },
+  s1_master:    { ip: '33.33.33.35', hostname: 's1.master.splunk', ports: { 8016 => 8000, 8106 => 8089 } },
+  s2_search:    { ip: '33.33.33.36', hostname: 's2.search.splunk', ports: { 8017 => 8000, 8107 => 8089 } },
+  s2_slave1:    { ip: '33.33.33.37', hostname: 's2.slave01.splunk', ports: { 8018 => 8000, 8108 => 8089 } },
+  s2_slave2:    { ip: '33.33.33.38', hostname: 's2.slave02.splunk', ports: { 8019 => 8000, 8109 => 8089 } },
   f_default:    { ip: '33.33.33.50', hostname: 'default.forward', ports: { 9090 => 8089 } },
   f_debian:     { ip: '33.33.33.51', hostname: 'debian.forward', ports: { 9091 => 8089 } },
   f_heavy:      { ip: '33.33.33.52', hostname: 'heavy.forward', ports: { 9092 => 8089 } },
@@ -150,7 +157,7 @@ Vagrant.configure('2') do |config|
   config.vm.define :c1_master do |cfg|
     default_omnibus config
     cfg.vm.provision :chef_client do |chef|
-      chef_defaults chef, :c1_master, 'splunk_cluster_master'
+      chef_defaults chef, :c1_master
       chef.add_recipe 'cerner_splunk::cluster_master'
     end
     network cfg, :c1_master
@@ -172,6 +179,57 @@ Vagrant.configure('2') do |config|
       end
       network cfg, symbol
     end
+  end
+
+  config.vm.define :s1_master do |cfg|
+    default_omnibus config
+    cfg.vm.provision :chef_client do |chef|
+      chef_defaults chef, :s1_master, 'splunk_site1'
+      chef.add_recipe 'cerner_splunk::cluster_master'
+    end
+    network cfg, :s1_master
+  end
+
+  (1..3).each do |n|
+    symbol = "s1_slave#{n}".to_sym
+    config.vm.define symbol do |cfg|
+      default_omnibus config
+      cfg.vm.provider :virtualbox do |vb|
+        vb.customize ['modifyvm', :id, '--memory', 256]
+      end
+      cfg.vm.provision :chef_client do |chef|
+        chef_defaults chef, symbol, 'splunk_site1'
+        chef.add_recipe 'cerner_splunk::cluster_slave'
+      end
+      network cfg, symbol
+    end
+  end
+
+  (1..2).each do |n|
+    symbol = "s2_slave#{n}".to_sym
+    config.vm.define symbol do |cfg|
+      default_omnibus config
+      cfg.vm.provider :virtualbox do |vb|
+        vb.customize ['modifyvm', :id, '--memory', 256]
+      end
+      cfg.vm.provision :chef_client do |chef|
+        chef_defaults chef, symbol, 'splunk_site2'
+        chef.add_recipe 'cerner_splunk::cluster_slave'
+      end
+      network cfg, symbol
+    end
+  end
+
+  config.vm.define :s2_search do |cfg|
+    default_omnibus config
+    cfg.vm.provider :virtualbox do |vb|
+      vb.customize ['modifyvm', :id, '--memory', 256]
+    end
+    cfg.vm.provision :chef_client do |chef|
+      chef_defaults chef, :s2_search, 'splunk_site2'
+      chef.add_recipe 'cerner_splunk::search_head'
+    end
+    network cfg, :s2_search
   end
 
   config.vm.define :c1_search do |cfg|

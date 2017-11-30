@@ -1,0 +1,6 @@
+{
+  "id": "cluster-vagrant-site1",
+  "site": "site1",
+  "multisite": "cerner_splunk/multisiteUS",
+  "disable_search_affinity": true
+}

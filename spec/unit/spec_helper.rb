@@ -18,5 +18,6 @@ module CernerSplunk
   def self.reset
     @my_cluster_data = nil
     @all_cluster_data = nil
+    @multisite_bag_data = nil
   end
 end

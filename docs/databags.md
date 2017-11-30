@@ -41,6 +41,22 @@ The Cluster Hash is part of a plaintext data bag item that defines a logical gro
 * `['indexes']` - A String pointing to an indexes data bag hash. (Coordinate form as described above)
 * `['apps']` - A String pointing to an apps data bag hash. (Coordinate form as described above)
 
+Site Hash
+------------
+The Site Hash is part of a plaintext data bag item that defines a group of Splunk Servers (Often a single master and multiple slave VMs) in a single site in a multisite cluster. It is created and owned by the splunk cluster administrator, and is referenced by others who want to point forwarders or search heads to the cluster. This hash supports all attributes supported by the `Cluster` hash and requires the following attributes.
+
+* `['site']` - Set a site id for the site in the multisite cluster. Valid values follow the format site<n> where 0<n<64 (Required for all servers except forwarders)
+* `['multisite']` - A string pointing to the `Multisite` data bag hash. (Required)
+* `['disable_search_affinity']` - Boolean to toggle search affinity on the search heads in the site. Set this to true to disable search affinity.
+
+Multisite Hash
+------------
+The Multisite Hash is part of a plaintext data bag item and defines the multisite cluster. It is created and owned by the splunk cluster administrator, and is referenced in the `Site` hash.
+
+* `['sites']` - Array of strings pointing to all the `site` data bag hashes that are part of this multisite cluster.
+* `['multisite_settings']` -  Hash of multisite cluster settings
+* `['multisite_settings'][???]` - Valid values are those under the clustering stanza of [server.conf][] in a multisite cluster setup.
+
 License Hash
 ------------
 The License Hash is part of an encrypted data bag item (either with [Chef Vault](https://github.com/chef/chef-vault) or a [shared secret encryption](https://docs.chef.io/secrets.html#encrypt-a-data-bag-item)) to hold the license data.
