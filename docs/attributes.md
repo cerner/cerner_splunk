@@ -33,7 +33,8 @@ Configurable (with defaults)
 * `node['splunk']['config']['authentication']` - Data bag item used to configure authentication (`nil` - authentication not managed by chef)
 * `node['splunk']['config']['host']` - Hostname to configure the Splunk instance to report as. (EC2 Instance ID or Fully Qualified Domain Name)
 * `node['splunk']['config']['roles']` - Data bag item used to configure roles (`nil` - roles not managed by chef)
-* `node['splunk']['config']['secrets']` - Coordinate String (see [data bags documentation][data_bags]), pointing to a key within a Chef Vault encrypted data bag item used to configure the splunk.secret file. The value must be a string. (`nil` - secrets not managed by chef).  Note: this is currently not supported on windows.
+* `node['splunk']['config']['secrets']` - A Contextual Hash of coordinate strings (see [data bags documentation][data_bags]), pointing to a key within a data bag item used to configure the splunk.secret file. (`nil` - secrets not managed by chef).  Note: this is currently not supported on windows.
+* `node['splunk']['config']['admin_password']` - A Contextual Hash of coordinate strings (see [data bags documentation][data_bags]), pointing to a key within a data bag item used to configure the local admin password. (`nil` - password is randomly generated and changed on every chef-client run).
 * `node['splunk']['config']['licenses']` - Data bag item that the license server recipe uses as the source of truth for the license data.
 * `node['splunk']['config']['license-pool']` - Data bag item used to configure license pools.
 * `node['splunk']['config']['ui_prefs']` - Hash of stanzas used to configure [ui-prefs.conf][] on the search head in a clustered configuration or a standalone instance.

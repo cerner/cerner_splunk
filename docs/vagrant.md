@@ -21,7 +21,7 @@ After you spin up the cluster slaves you will have to restart the cluster master
 
 # Spinning up a Search Head Cluster in Vagrant
 
-<code>vagrant up /c2_.*/</code>
+`vagrant up /c2_.*/`
 
 c2_boot1 and c2_boot2 are the bootstrap nodes and are provisioned first. c2_captain is then provisioned and the cluster is established. c2_deployer is provisioned and pushes apps to the cluster. Finally c2_newnode is provisioned and joins the cluster as a scale up example.
 

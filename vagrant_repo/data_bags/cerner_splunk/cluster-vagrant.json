@@ -31,7 +31,8 @@
   ],
   "shc_settings":{
     "replication_factor" : 2,
-    "shcluster_label": "main-cluster"
+    "shcluster_label": "main-cluster",
+    "pass4SymmKey": "$1$4SvBVSpNjhiY51BIRp6C3urG7YJU"
   },
   "indexes" : "cerner_splunk/indexes-vagrant",
   "apps": "cerner_splunk/cluster-apps-vagrant"
