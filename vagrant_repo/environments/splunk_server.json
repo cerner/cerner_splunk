@@ -16,8 +16,15 @@
           "c2_captain": "cerner_splunk/passwords:splunk.secret",
           "c2_deployer": "cerner_splunk/passwords:splunk.secret",
           "c2_newnode": "cerner_splunk/passwords:splunk.secret"
+        },
+        "admin_password": {
+          "c2_boot1": "cerner_splunk/standalone_passwords:admin_password",
+          "c2_boot2": "cerner_splunk/standalone_passwords:admin_password",
+          "c2_captain": "cerner_splunk/standalone_passwords:admin_password",
+          "c2_newnode": "cerner_splunk/standalone_passwords:admin_password"
         }
-      }
+      },
+      "data_bag_secret": "/vagrant/vagrant_repo/alternative_encrypted_data_bag_secret"
     }
   }
 }
