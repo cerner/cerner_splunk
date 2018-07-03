@@ -26,9 +26,6 @@ default['splunk']['main_project_index'] = nil
 default['splunk']['monitors'] = []
 default['splunk']['apps'] = {}
 
-# Flag attributes for warnings
-default['splunk']['flags']['index_checks_fail'] = true
-
 default['splunk']['config']['assumed_index'] = 'main'
 
 # Attribute used to point a heavy forwarder to license master
