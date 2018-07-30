@@ -4,7 +4,7 @@ default['splunk']['config']['host'] = node['ec2'] ? node['ec2']['instance_id'] :
 
 default['splunk']['config']['licenses'] = nil
 default['splunk']['config']['ui_prefs']['default'] = {
-  'dispatch.earliest_time' => '@d',
+  'dispatch.earliest_time' => '-1h',
   'dispatch.latest_time' => 'now',
   'display.prefs.enableMetaData' => 0,
   'display.prefs.showDataSummary' => 0
