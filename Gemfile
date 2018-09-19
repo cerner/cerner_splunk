@@ -8,6 +8,7 @@ chef_vault_version = '> 3.0'
 
 # https://github.com/cerner/cerner_splunk/issues/142
 #chef_version = '= 12.18.31'
+chef_version = '~> 14'
 
 gem 'berkshelf'
 gem 'chef', chef_version
