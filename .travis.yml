@@ -5,7 +5,7 @@ language: ruby
 cache: bundler
 sudo: false
 rvm:
-- 2.3.1
+- 2.4.0
 script:
 - bundle exec rubocop
 - bundle exec foodcritic -f any .
