@@ -31,7 +31,7 @@ license_groups = data_bag_item.inject('enterprise' => {}) do |hash, (key, value)
     type = doc.at_xpath('/license/payload/type/text()').to_s
     quota = doc.at_xpath('/license/payload/quota/text()').to_s.to_i
     expiration_time = doc.at_xpath('/license/payload/expiration_time/text()').to_s.to_i
-    total_available_license_quota += quota if type == 'enterprise' || type = 'fixed-sourcetype' && expiration_time > Time.now.to_i
+    total_available_license_quota += quota if type == 'enterprise' || type == 'fixed-sourcetype' && expiration_time > Time.now.to_i
     hash[type] ||= {}
     hash[type][key] = value
   end
