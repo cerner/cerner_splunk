@@ -9,7 +9,7 @@ version          '2.21.1'
 source_url       'https://github.com/cerner/cerner_splunk'
 issues_url       'https://github.com/cerner/cerner_splunk/issues'
 
-#chef_version     '~> 12.4' if respond_to?(:chef_version)
+chef_version     '~> 14' if respond_to?(:chef_version)
 
 depends          'chef-vault', '~> 3.0'
 depends          'ulimit', '~> 0.3'
