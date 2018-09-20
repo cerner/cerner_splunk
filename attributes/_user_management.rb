@@ -4,6 +4,7 @@
 if node['platform_family'] == 'windows'
   default['splunk']['user'] = 'SYSTEM'
   default['splunk']['group'] = 'SYSTEM'
+  default['splunk']['password'] = 'splunk'
 else
   default['splunk']['user'] = 'splunk'
   default['splunk']['group'] = 'splunk'

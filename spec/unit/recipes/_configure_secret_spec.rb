@@ -13,7 +13,7 @@ describe 'cerner_splunk::_configure_secret' do
   end
 
   let(:platform) { 'centos' }
-  let(:platform_version) { '6.6' }
+  let(:platform_version) { '6.9' }
   let(:node_type) { :server }
 
   context 'when the secret is configured for the current node' do

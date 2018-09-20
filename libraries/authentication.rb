@@ -6,7 +6,7 @@
 require_relative 'databag'
 
 module CernerSplunk
-  ASSUMPTIONS =
+  ASSUMPTIONS ||=
     {
       'LDAP_strategies' => 'LDAP',
       'cacheTiming' => 'Scripted',

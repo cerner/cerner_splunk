@@ -6,9 +6,9 @@
 # Module contains different functions used to manipulate the units of file sizes.
 #
 module CernerSplunk
-  SIZE_SCALE = %w[KB MB GB TB].freeze
-  REGEX = /(?i)^\s*+(\d++(?>\.\d+)?+)\s*+([kmgt](?>i?+b)?+|b?+)\s*+$/
-  POWER = { '' => 0, 'B' => 0, 'K' => 1, 'M' => 2, 'G' => 3, 'T' => 4 }.freeze
+  SIZE_SCALE ||= %w[KB MB GB TB].freeze
+  REGEX ||= /(?i)^\s*+(\d++(?>\.\d+)?+)\s*+([kmgt](?>i?+b)?+|b?+)\s*+$/
+  POWER ||= { '' => 0, 'B' => 0, 'K' => 1, 'M' => 2, 'G' => 3, 'T' => 4 }.freeze
   # Methods converts file sizes in KB, MB, GB and TB into Bytes.
   def self.convert_to_bytes(string)
     matchdata = string.match REGEX

@@ -79,7 +79,7 @@ class Chef
         fail Exceptions::ValidationFailed, "#{message}\nKnown files are:\n\t#{KNOWN_CONFIG_FILES.join("\n\t")}" if fail_unknown
       end
 
-      KNOWN_CONFIG_FILES = %w[
+      KNOWN_CONFIG_FILES ||= %w[
         alert_actions.conf
         authentication.conf
         authorize.conf

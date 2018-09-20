@@ -107,7 +107,6 @@ describe 'cerner_splunk::_install' do
       it 'installs downloaded splunk package' do
         expected_attrs = {
           source: splunk_filepath,
-          provider: Chef::Provider::Package::Windows,
           options: %(AGREETOLICENSE=Yes SERVICESTARTTYPE=auto LAUNCHSPLUNK=0 INSTALLDIR="test\\splunkforwarder")
         }
         if Chef::VERSION.slice(0..1) == '11'
@@ -120,12 +119,11 @@ describe 'cerner_splunk::_install' do
 
     context 'when platform is rhel' do
       let(:platform) { 'centos' }
-      let(:platform_version) { '6.6' }
+      let(:platform_version) { '6.9' }
 
       it 'installs downloaded splunk package and notifies splunk-first-run' do
         expected_attrs = {
           source: splunk_filepath,
-          provider: Chef::Provider::Package::Rpm
         }
         expect(subject).to install_package('splunkforwarder').with(expected_attrs)
       end
@@ -138,7 +136,6 @@ describe 'cerner_splunk::_install' do
       it 'installs downloaded splunk package and notifies splunk-first-run' do
         expected_attrs = {
           source: splunk_filepath,
-          provider: Chef::Provider::Package::Dpkg
         }
         expect(subject).to install_package('splunkforwarder').with(expected_attrs)
       end
