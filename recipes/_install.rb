@@ -72,9 +72,7 @@ execute 'splunk-first-run' do
   command "#{node['splunk']['cmd']} help commands --accept-license --answer-yes --no-prompt"
   user node['splunk']['user']
   group node['splunk']['group']
-  if platform_family?('windows')
-    password node['splunk']['password']
-  end
+  password node['splunk']['password'] if platform_family?('windows')
   only_if { ::File.exist? "#{node['splunk']['home']}/ftr" }
 end
 

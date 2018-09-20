@@ -5,6 +5,7 @@
 
 require_relative 'databag'
 
+# CernerSplunk module for cerner_splunk cookbook.
 module CernerSplunk
   ASSUMPTIONS ||=
     {

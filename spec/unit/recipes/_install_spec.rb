@@ -123,7 +123,7 @@ describe 'cerner_splunk::_install' do
 
       it 'installs downloaded splunk package and notifies splunk-first-run' do
         expected_attrs = {
-          source: splunk_filepath,
+          source: splunk_filepath
         }
         expect(subject).to install_package('splunkforwarder').with(expected_attrs)
       end
@@ -135,7 +135,7 @@ describe 'cerner_splunk::_install' do
 
       it 'installs downloaded splunk package and notifies splunk-first-run' do
         expected_attrs = {
-          source: splunk_filepath,
+          source: splunk_filepath
         }
         expect(subject).to install_package('splunkforwarder').with(expected_attrs)
       end
