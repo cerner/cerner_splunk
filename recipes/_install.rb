@@ -71,6 +71,7 @@ include_recipe 'cerner_splunk::_configure_secret'
 execute 'splunk-first-run' do
   command "#{node['splunk']['cmd']} help commands --accept-license --answer-yes --no-prompt"
   user node['splunk']['user']
+  password node['splunk']['password']
   group node['splunk']['group']
   only_if { ::File.exist? "#{node['splunk']['home']}/ftr" }
 end
