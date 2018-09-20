@@ -3,6 +3,7 @@
 # Do not override these
 if node['platform_family'] == 'windows'
   default['splunk']['user'] = 'SYSTEM'
+  default['splunk']['password'] = 'SYSTEM'
   default['splunk']['group'] = 'SYSTEM'
 else
   default['splunk']['user'] = 'splunk'
