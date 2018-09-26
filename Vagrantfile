@@ -3,7 +3,7 @@
 
 Vagrant.require_version '>= 1.4.1'
 
-%w[vagrant-ohai vagrant-omnibus].each do |plugin|
+%w[vagrant-ohai2 vagrant-omnibus].each do |plugin|
   fail "Missing #{plugin}. Please install it!" unless Vagrant.has_plugin? plugin
 end
 
@@ -44,7 +44,7 @@ fail 'Non-unique hostnames' if @network.collect { |_, v| v[:hostname] }.uniq!
 fail 'Non-unique ports' if @network.collect { |_, v| v[:ports].keys }.flat_map { |v| v }.uniq!
 
 def default_omnibus(config)
-  config.omnibus.chef_version = '12'
+  config.omnibus.chef_version = '14.5.27'
 end
 
 def network(config, name, splunk_password = true)
@@ -76,7 +76,7 @@ end
 
 Vagrant.configure('2') do |config|
   config.vm.box = 'bento/centos-6.7'
-  config.ohai.primary_nic = 'eth1'
+  config.ohai2.primary_nic = 'eth1'
 
   if Vagrant.has_plugin? 'vagrant-berkshelf'
     config.berkshelf.enabled = false
