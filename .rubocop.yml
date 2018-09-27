@@ -33,3 +33,6 @@ Style/TernaryParentheses:
 
 Style/VariableNumber:
   Enabled: false
+
+Lint/UselessAssignment:
+  Enabled: false
