@@ -16,3 +16,4 @@ gem 'chef-vault', chef_vault_version
 gem 'chefspec', chefspec_version
 gem 'foodcritic', foodcritic_version
 gem 'rubocop', rubocop_version
+gem 'cucumber-core', '~> 3.2'
