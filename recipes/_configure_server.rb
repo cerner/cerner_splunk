@@ -249,11 +249,11 @@ if node['splunk']['node_type'] == :license_server && !license_pools.nil?
 
   license_pools['pools'].each do |pool, pool_config|
     pool_max_size = CernerSplunk.convert_to_bytes pool_config['size']
-    server_stanzas["lmpool:#{pool}"] = {
+    server_stanzas["lmpool:#{node.run_state['type']}"] = {
       'description' => pool,
       'quota' => pool_max_size,
       'slaves' => pool_config['GUIDs'].join(','),
-      'stack_id' => 'enterprise'
+      'stack_id' => node.run_state['type']
     }
     allotted_pool_size += pool_max_size
   end
