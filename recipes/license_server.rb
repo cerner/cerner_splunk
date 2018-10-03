@@ -29,14 +29,14 @@ total_available_license_quota = 0
 license_groups = data_bag_item.inject({}) do |hash, (key, value)|
   unless %w[id chef_type data_bag].include? key
     doc = Nokogiri::XML value
-    nodde.run_state['type'] = doc.at_xpath('/license/payload/type/text()').to_s
+    node.run_state['type'] = doc.at_xpath('/license/payload/type/text()').to_s
     sourcetypes = doc.search('//sourcetype').map(&:text).join
     node.run_state['type'] = "#{node.run_state['type']}_#{Digest::SHA256.hexdigest(sourcetypes).upcase}" if node.run_state['type'] == 'fixed-sourcetype'
     quota = doc.at_xpath('/license/payload/quota/text()').to_s.to_i
     expiration_time = doc.at_xpath('/license/payload/expiration_time/text()').to_s.to_i
-    total_available_license_quota += quota if (type == 'enterprise' || type == 'fixed-sourcetype') && expiration_time > Time.now.to_i
-    hash[type] ||= {}
-    hash[type][key] = value
+    total_available_license_quota += quota if (node.run_state['type'] == 'enterprise' || node.run_state['type'] == 'fixed-sourcetype') && expiration_time > Time.now.to_i
+    hash[node.run_state['type']] ||= {}
+    hash[node.run_state['type']][key] = value
   end
   hash
 end
@@ -46,8 +46,8 @@ unless node.run_state['cerner_splunk']['total_allotted_pool_size'].nil?
   fail "Sum of pool sizes is #{CernerSplunk.human_readable_size total_allotted_pool_size}. Exceeds total available pool size of #{CernerSplunk.human_readable_size total_available_license_quota}." if total_allotted_pool_size > total_available_license_quota
 end
 
-license_groups.each do |type, keys|
-  prefix = "#{node['splunk']['home']}/etc/licenses/#{type}"
+license_groups.each do |_type, keys|
+  prefix = "#{node['splunk']['home']}/etc/licenses/#{node.run_state['type']}"
   directory prefix do
     owner node['splunk']['user']
     group node['splunk']['group']
@@ -68,8 +68,8 @@ end
 
 b = ruby_block 'license cleanup' do
   block do
-    license_groups.each do |type, licenses|
-      existing_files = Dir.glob("#{node['splunk']['home']}/etc/licenses/#{type}/*.lic")
+    license_groups.each do |_type, licenses|
+      existing_files = Dir.glob("#{node['splunk']['home']}/etc/licenses/#{node.run_state['type']}/*.lic")
       expected_files = licenses.keys.collect { |name| "#{name}.lic" }
       to_delete = existing_files.delete_if { |x| expected_files.include?(File.basename(x)) }
       to_delete.each do |file|
