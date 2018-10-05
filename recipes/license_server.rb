@@ -29,12 +29,15 @@ total_available_license_quota = 0
 license_groups = data_bag_item.inject({}) do |hash, (key, value)|
   unless %w[id chef_type data_bag].include? key
     doc = Nokogiri::XML value
-    node.run_state['type'] = doc.at_xpath('/license/payload/type/text()').to_s
     sourcetypes = doc.search('//sourcetype').map(&:text).join
+    node.run_state['type'] = doc.at_xpath('/license/payload/type/text()').to_s
     node.run_state['type'] = "#{node.run_state['type']}_#{Digest::SHA256.hexdigest(sourcetypes).upcase}" if node.run_state['type'] == 'fixed-sourcetype'
     quota = doc.at_xpath('/license/payload/quota/text()').to_s.to_i
     expiration_time = doc.at_xpath('/license/payload/expiration_time/text()').to_s.to_i
     total_available_license_quota += quota if (node.run_state['type'] == 'enterprise' || node.run_state['type'] == "fixed-sourcetype_#{Digest::SHA256.hexdigest(sourcetypes).upcase}") && expiration_time > Time.now.to_i
+    unless hash[node.run_state['type']].nil?
+      fail 'Multiple license types are not currently supported' if hash[node.run_state['type']] != value
+    end
     hash[node.run_state['type']] ||= {}
     hash[node.run_state['type']][key] = value
   end

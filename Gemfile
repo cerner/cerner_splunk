@@ -14,6 +14,7 @@ gem 'chef', chef_version
 gem 'chef-sugar'
 gem 'chef-vault', chef_vault_version
 gem 'chefspec', chefspec_version
+# https://github.com/cucumber/cucumber-ruby-core/issues/160
 gem 'cucumber-core', '~> 3.2'
 gem 'foodcritic', foodcritic_version
 gem 'rubocop', rubocop_version
