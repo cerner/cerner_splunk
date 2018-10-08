@@ -242,13 +242,12 @@ end
 
 license_pools = CernerSplunk::DataBag.load(node['splunk']['config']['license-pool'], secret: node['splunk']['data_bag_secret'])
 
-ruby_block 'get_license_type' do
-  block do
-    if node['splunk']['node_type'] == :license_server && !license_pools.nil?
-      auto_generated_pool_size = CernerSplunk.convert_to_bytes license_pools['auto_generated_pool_size']
-      server_stanzas['lmpool:auto_generated_pool_enterprise']['quota'] = auto_generated_pool_size
-      allotted_pool_size = 0
-
+if node['splunk']['node_type'] == :license_server && !license_pools.nil?
+  auto_generated_pool_size = CernerSplunk.convert_to_bytes license_pools['auto_generated_pool_size']
+  server_stanzas['lmpool:auto_generated_pool_enterprise']['quota'] = auto_generated_pool_size
+  allotted_pool_size = 0
+  ruby_block 'get_license_type' do
+    block do
       license_pools['pools'].each do |pool, pool_config|
         pool_max_size = CernerSplunk.convert_to_bytes pool_config['size']
         server_stanzas["lmpool:#{pool}"] = {
@@ -259,9 +258,9 @@ ruby_block 'get_license_type' do
         }
         allotted_pool_size += pool_max_size
       end
-      node.run_state['cerner_splunk']['total_allotted_pool_size'] = allotted_pool_size + auto_generated_pool_size
     end
   end
+  node.run_state['cerner_splunk']['total_allotted_pool_size'] = allotted_pool_size + auto_generated_pool_size
 end
 
 server_stanzas['license'] = {
