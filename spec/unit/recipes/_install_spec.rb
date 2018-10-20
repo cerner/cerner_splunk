@@ -11,6 +11,7 @@ describe 'cerner_splunk::_install' do
       node.override['splunk']['package']['download_group'] = 'universalforwarder'
       node.override['splunk']['package']['file_suffix'] = '.txt'
       node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
+      node.override['splunk']['windows_password'] = password_databag
     end
     runner.converge(described_recipe)
   end
@@ -27,6 +28,7 @@ describe 'cerner_splunk::_install' do
       'indexes' => 'cerner_splunk/indexes'
     }
   end
+  let(:password_databag) { nil }
 
   let(:platform) { 'centos' }
   let(:platform_version) { '6.8' }
@@ -99,9 +101,12 @@ describe 'cerner_splunk::_install' do
       let(:platform) { 'windows' }
       let(:platform_version) { '2012R2' }
       let(:windows) { true }
+      let(:password_databag) { 'cerner_splunk/passwords:winpass' }
 
       before do
         ENV['PROGRAMW6432'] = 'test'
+        allow(ChefVault::Item).to receive(:data_bag_item_type).and_return(:normal)
+        stub_data_bag_item('cerner_splunk', 'passwords').and_return('winpass' => 'foobar')
       end
 
       it 'installs downloaded splunk package' do
@@ -109,11 +114,7 @@ describe 'cerner_splunk::_install' do
           source: splunk_filepath,
           options: %(AGREETOLICENSE=Yes SERVICESTARTTYPE=auto LAUNCHSPLUNK=0 INSTALLDIR="test\\splunkforwarder")
         }
-        if Chef::VERSION.slice(0..1) == '11'
-          expect(subject).to install_windows_package('splunkforwarder').with(expected_attrs)
-        else
-          expect(subject).to install_package('splunkforwarder').with(expected_attrs)
-        end
+        expect(subject).to install_windows_package('splunkforwarder').with(expected_attrs)
       end
     end
 
@@ -125,7 +126,7 @@ describe 'cerner_splunk::_install' do
         expected_attrs = {
           source: splunk_filepath
         }
-        expect(subject).to install_package('splunkforwarder').with(expected_attrs)
+        expect(subject).to install_rpm_package('splunkforwarder').with(expected_attrs)
       end
     end
 
@@ -137,7 +138,7 @@ describe 'cerner_splunk::_install' do
         expected_attrs = {
           source: splunk_filepath
         }
-        expect(subject).to install_package('splunkforwarder').with(expected_attrs)
+        expect(subject).to install_dpkg_package('splunkforwarder').with(expected_attrs)
       end
     end
   end

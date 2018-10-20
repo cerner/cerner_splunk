@@ -39,13 +39,3 @@ default['splunk']['package']['file_suffix'] =
       '-x86-release.msi'
     end
   end
-
-default['splunk']['package']['provider'] =
-  case node['platform_family']
-  when 'rhel', 'fedora'
-    Chef::Provider::Package::Rpm
-  when 'debian'
-    Chef::Provider::Package::Dpkg
-  when 'windows'
-    Chef::Provider::Package::Windows
-  end

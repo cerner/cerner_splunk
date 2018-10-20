@@ -18,7 +18,7 @@ default['splunk']['config']['authentication'] = nil
 # Attributes used for configuring SH clustering
 default['splunk']['bootstrap_shc_member'] = false
 # This is only used for SH Clustering identifying address to the management port
-default['splunk']['mgmt_host'] = node['ipaddress']
+default['splunk']['mgmt_interface'] = node['network']['default_interface']
 
 default['splunk']['free_license'] = false
 

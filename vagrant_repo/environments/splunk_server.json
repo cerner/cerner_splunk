@@ -24,7 +24,8 @@
           "c2_newnode": "cerner_splunk/standalone_passwords:admin_password"
         }
       },
-      "data_bag_secret": "/vagrant/vagrant_repo/alternative_encrypted_data_bag_secret"
+      "data_bag_secret": "/vagrant/vagrant_repo/alternative_encrypted_data_bag_secret",
+      "mgmt_interface": "eth1"
     }
   }
 }

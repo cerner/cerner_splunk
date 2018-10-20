@@ -3,7 +3,7 @@
 
 Vagrant.require_version '>= 1.4.1'
 
-%w[vagrant-ohai2 vagrant-omnibus].each do |plugin|
+%w[vagrant-omnibus].each do |plugin|
   fail "Missing #{plugin}. Please install it!" unless Vagrant.has_plugin? plugin
 end
 
@@ -76,7 +76,6 @@ end
 
 Vagrant.configure('2') do |config|
   config.vm.box = 'bento/centos-6.7'
-  config.ohai2.primary_nic = 'eth1'
 
   if Vagrant.has_plugin? 'vagrant-berkshelf'
     config.berkshelf.enabled = false
