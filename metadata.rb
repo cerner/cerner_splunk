@@ -13,6 +13,7 @@ chef_version     '>= 12.7', '< 15' if respond_to?(:chef_version)
 
 depends          'chef-vault', '~> 3.0'
 depends          'ulimit', '~> 1.0'
+
 supports         'redhat', '>= 6.7'
 supports         'ubuntu', '>= 12.04'
 supports         'windows', '>= 6.1'

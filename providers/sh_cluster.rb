@@ -22,13 +22,13 @@ end
 action :add do
   search_heads = new_resource.search_heads
   admin_password = new_resource.admin_password
-  default_ipaddress = CernerSplunk::Ipaddress.default_ipaddress(node)
+  management_ipaddress = CernerSplunk::IPaddress.management_ipaddress(node)
 
   execute 'add search head' do # ~FC009
     command "#{node['splunk']['cmd']} add shcluster-member -current_member_uri #{search_heads.first} -auth admin:#{admin_password}"
     environment 'HOME' => node['splunk']['home']
     # execute only if this SH is not an existing member of the SHC
-    not_if "#{node['splunk']['cmd']} list shcluster-members -auth admin:#{admin_password} | grep #{default_ipaddress}"
+    not_if "#{node['splunk']['cmd']} list shcluster-members -auth admin:#{admin_password} | grep #{management_ipaddress}"
     ignore_failure true
     sensitive true
   end
@@ -41,7 +41,7 @@ action :remove do
     command "#{node['splunk']['cmd']} remove shcluster-member -auth admin:#{admin_password}"
     environment 'HOME' => node['splunk']['home']
     # execute only if this SH is an existing member of the SHC
-    only_if "#{node['splunk']['cmd']} list shcluster-members -auth admin:#{admin_password} | grep #{default_ipaddress}"
+    only_if "#{node['splunk']['cmd']} list shcluster-members -auth admin:#{admin_password} | grep #{management_ipaddress}"
     sensitive true
   end
 end
