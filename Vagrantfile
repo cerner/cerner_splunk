@@ -44,7 +44,7 @@ fail 'Non-unique hostnames' if @network.collect { |_, v| v[:hostname] }.uniq!
 fail 'Non-unique ports' if @network.collect { |_, v| v[:ports].keys }.flat_map { |v| v }.uniq!
 
 def default_omnibus(config)
-  config.omnibus.chef_version = '14.5.27'
+  config.omnibus.chef_version = 14
 end
 
 def network(config, name, splunk_password = true)
