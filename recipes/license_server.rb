@@ -14,9 +14,6 @@ require 'digest'
 ## Attributes
 instance_exec :license_server, &CernerSplunk::NODE_TYPE
 
-## Recipes
-include_recipe 'cerner_splunk::_install_server'
-
 bag = CernerSplunk::DataBag.load node['splunk']['config']['licenses'], secret: node['splunk']['data_bag_secret']
 
 unless bag
@@ -44,6 +41,9 @@ license_groups = data_bag_item.inject({}) do |hash, (key, value)|
   node.run_state['type'] = type
   hash
 end
+
+## Recipes
+include_recipe 'cerner_splunk::_install_server'
 
 unless node.run_state['cerner_splunk']['total_allotted_pool_size'].nil?
   total_allotted_pool_size = node.run_state['cerner_splunk']['total_allotted_pool_size']
