@@ -44,6 +44,7 @@ Configurable (with defaults)
 * `node['splunk']['data_bag_secret']` - The location of the shared secret file if your encrypted data bags are encrypted via shared secret rather than chef-vault. If this is not specified, and the encrypted data bags are using shared secret encryption then chef looks for a secret at the path specified by the encrypted_data_bag_secret setting in the client.rb file.
 * `node['splunk']['forwarder_site']` - Set this attribute to configure site awareness for your forwarders.(`site0`)
 * `node['splunk']['mgmt_interface']` - The network interface this node should use for communicating with other members of a SHC. (`node['network']['default_interface']`)
+* `node['splunk']['windows_password']` - This should be the name of a data bag item key where your windows password for the `Splunk` user is stored.
 
 Non-configurable (defaults)
 ----------------------------
