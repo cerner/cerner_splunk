@@ -6,7 +6,11 @@ foodcritic_version = '= 11.0.0'
 rubocop_version = '= 0.48.1'
 chef_vault_version = '> 3.0'
 
-chef_version = '= 14.5.27'
+chef_version = if Bundler.current_ruby.on_23?
+                 '= 12.18.31'
+               else
+                 '= 14.5.27'
+               end
 
 gem 'berkshelf'
 gem 'chef', chef_version
