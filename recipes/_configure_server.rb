@@ -154,7 +154,7 @@ if %i[shc_search_head shc_captain].include? node['splunk']['node_type']
   cluster, bag = CernerSplunk.my_cluster(node)
   deployer_uri = bag['deployer_uri'] || ''
   replication_ports = bag['shc_replication_ports'] || bag['replication_ports'] || {}
-  management_ipaddress = CernerSplunk::IPaddress.management_ipaddress(node)
+  management_host = CernerSplunk.management_host(node)
   settings = (bag['shc_settings'] || {}).reject do |k, _|
     k.start_with?('_cerner_splunk')
   end
@@ -179,7 +179,7 @@ if %i[shc_search_head shc_captain].include? node['splunk']['node_type']
   server_stanzas['shclustering']['pass4SymmKey'] = CernerSplunk::ConfTemplate.compose encrypt_password, CernerSplunk::ConfTemplate::Value.constant(value: pass) if pass
   server_stanzas['shclustering']['conf_deploy_fetch_url'] = deployer_uri
   server_stanzas['shclustering']['disabled'] = 0
-  server_stanzas['shclustering']['mgmt_uri'] = "https://#{management_ipaddress}:8089"
+  server_stanzas['shclustering']['mgmt_uri'] = "https://#{management_host}:8089"
   server_stanzas['shclustering']['id'] = old_id if old_id
 end
 

@@ -87,7 +87,9 @@ execute 'splunk-first-run' do
   command "#{node['splunk']['cmd']} help commands --accept-license --answer-yes --no-prompt"
   user node['splunk']['user']
   group node['splunk']['group']
-  password windows_password if platform_family?('windows')
+  if Gem::Version.new(node['chef_packages']['chef']['version']) >= Gem::Version.new('12.19.33')
+    password windows_password if platform_family?('windows')
+  end
   only_if { ::File.exist? "#{node['splunk']['home']}/ftr" }
 end
 

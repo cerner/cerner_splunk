@@ -135,4 +135,16 @@ module CernerSplunk
     fail "'site' attribute not configured in the cluster databag: #{cluster}" if bag['site'].nil? || bag['site'].empty?
     true
   end
+
+  # Sets management_host for the search head cluster host value
+  def self.management_host(node)
+    if node['splunk']['mgmt_host']
+      management_host = node['splunk']['mgmt_host']
+    else
+      addresses_hash = node['network']['interfaces'][node['splunk']['mgmt_interface']]['addresses']
+      management_host = addresses_hash.select { |_, v| v['family'] == 'inet' }.keys.first
+    end
+
+    management_host
+  end
 end

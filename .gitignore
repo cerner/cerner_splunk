@@ -9,6 +9,7 @@
 *.bak
 *.DS_Store
 *.un~
+.ruby-version
 
 # Generated from metadata.rb
 metadata.json
