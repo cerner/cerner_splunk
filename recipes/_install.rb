@@ -84,11 +84,10 @@ include_recipe 'cerner_splunk::_configure_secret'
 windows_password = CernerSplunk::DataBag.load(node['splunk']['windows_password'], secret: node['splunk']['data_bag_secret'])
 
 execute 'splunk-first-run' do
-  puts "This is the chef version #{node['chef_packages']['chef']['version']} !!!!!!!!!!!!!!!!!!!!!!!"
   command "#{node['splunk']['cmd']} help commands --accept-license --answer-yes --no-prompt"
   user node['splunk']['user']
   group node['splunk']['group']
-  if Gem::Version.new(node['chef_packages']['chef']['version']) >= Gem::Version.new('12.19.33')
+  if Gem::Version.new(Chef::VERSION) >= Gem::Version.new('12.19.33')
     password windows_password if platform_family?('windows')
   end
   only_if { ::File.exist? "#{node['splunk']['home']}/ftr" }
