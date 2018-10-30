@@ -10,6 +10,7 @@ fail 'License Server installation not currently supported on windows' if platfor
 include_recipe 'xml::ruby'
 require 'nokogiri'
 require 'digest'
+require 'fileutils'
 
 ## Attributes
 instance_exec :license_server, &CernerSplunk::NODE_TYPE
@@ -33,9 +34,7 @@ license_groups = data_bag_item.inject({}) do |hash, (key, value)|
     expiration_time = doc.at_xpath('/license/payload/expiration_time/text()').to_s.to_i
     total_available_license_quota += quota if (type == 'enterprise' || type == "fixed-sourcetype_#{Digest::SHA256.hexdigest(sourcetypes).upcase}") && expiration_time > Time.now.to_i
     hash[type] ||= {}
-    unless hash[type].empty?
-      fail 'Multiple license types are not currently supported' unless hash.key?(type)
-    end
+    fail 'Multiple license types are not currently supported' if hash.length > 1
     hash[type][key] = value
   end
   node.run_state['type'] = type
@@ -73,6 +72,11 @@ end
 b = ruby_block 'license cleanup' do
   block do
     license_groups.each do |type, licenses|
+      existing_directory = Dir.glob("#{node['splunk']['home']}/etc/licenses/*")
+      existing_directory.each do |dir|
+        FileUtils.rm_rf(dir) unless dir.end_with?(type)
+        Chef::Log.info("ruby_block[license cleanup] deleted unconfigured license directory #{dir}") unless dir.end_with? type
+      end
       existing_files = Dir.glob("#{node['splunk']['home']}/etc/licenses/#{type}/*.lic")
       expected_files = licenses.keys.collect { |name| "#{name}.lic" }
       to_delete = existing_files.delete_if { |x| expected_files.include?(File.basename(x)) }
