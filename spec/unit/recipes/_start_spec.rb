@@ -8,6 +8,7 @@ describe 'cerner_splunk::_start' do
       node.override['splunk']['cmd'] = 'splunk'
       node.override['splunk']['user'] = 'splunk'
       node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
+      node.override['splunk']['windows_password'] = password_databag
     end
     # Have to include forwarder recipe so that _start recipe can send notifications to services
     runner.converge('cerner_splunk::forwarder', described_recipe)
@@ -25,6 +26,7 @@ describe 'cerner_splunk::_start' do
       'indexes' => 'cerner_splunk/indexes'
     }
   end
+  let(:password_databag) { nil }
 
   let(:platform) { 'centos' }
   let(:platform_version) { '6.8' }
@@ -57,9 +59,12 @@ describe 'cerner_splunk::_start' do
     let(:platform) { 'windows' }
     let(:platform_version) { '2012R2' }
     let(:windows) { true }
+    let(:password_databag) { 'cerner_splunk/passwords:winpass' }
 
     before do
       ENV['PROGRAMW6432'] = 'test'
+      allow(ChefVault::Item).to receive(:data_bag_item_type).and_return(:normal)
+      stub_data_bag_item('cerner_splunk', 'passwords').and_return('winpass' => 'foobar')
     end
 
     it 'does not execute boot-start script' do
@@ -77,7 +82,7 @@ describe 'cerner_splunk::_start' do
 
   context 'when platform is not windows' do
     let(:platform) { 'centos' }
-    let(:platform_version) { '6.6' }
+    let(:platform_version) { '6.9' }
     let(:windows) { false }
 
     it 'executes boot-start script' do

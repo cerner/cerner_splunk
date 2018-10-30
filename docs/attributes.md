@@ -28,7 +28,6 @@ Configurable (with defaults)
 * `node['splunk']['package']['file_suffix']` - URI path portion, suffix to append after building (set based on ohai attributes)
 * `node['splunk']['package']['file_name']` - Actual package file name (`"#{node['splunk']['package']['name']}#{node['splunk']['package']['file_suffix']}"`)
 * `node['splunk']['package']['url']` - Full URI to the Splunk package to download (Constructed from above package attributes)
-* `node['splunk']['package']['provider']` - Provider to use to install file (set based on ohai attributes)
 * `node['splunk']['config']['alerts']` - Data bag item used to configure alerts (`nil` - alerts not managed by chef)
 * `node['splunk']['config']['authentication']` - Data bag item used to configure authentication (`nil` - authentication not managed by chef)
 * `node['splunk']['config']['host']` - Hostname to configure the Splunk instance to report as. (EC2 Instance ID or Fully Qualified Domain Name)
@@ -40,12 +39,13 @@ Configurable (with defaults)
 * `node['splunk']['config']['ui_prefs']` - Hash of stanzas used to configure [ui-prefs.conf][] on the search head in a clustered configuration or a standalone instance.
 * `node['splunk']['config']['assumed_index']` - Name of the index to which data is forwarded to by default, when the index is not configured for the input.(`main`)
 * `node['splunk']['bootstrap_shc_member']` - Set this attribute to `true` to bootstrap a member to the Search Head Cluster (SHC). (`false`)
-* `node['splunk']['mgmt_host']` - The host other SHC members use when connecting to the current node. You probably want a wrapper cookbook to override this. (`node['ipaddress']`)
 * `node['splunk']['heavy_forwarder']['use_license_uri']` - Set this attribute to `true` to point the Heavy Forwarder to the license master. (`false`)
 * `node['splunk']['apps']` - An [apps hash](databags.md#apps-hash) of apps to configure locally. (Does not support downloading apps ... yet...)
 * `node['splunk']['data_bag_secret']` - The location of the shared secret file if your encrypted data bags are encrypted via shared secret rather than chef-vault. If this is not specified, and the encrypted data bags are using shared secret encryption then chef looks for a secret at the path specified by the encrypted_data_bag_secret setting in the client.rb file.
 * `node['splunk']['forwarder_site']` - Set this attribute to configure site awareness for your forwarders.(`site0`)
-
+* `node['splunk']['mgmt_host']` - The host other SHC members use when connecting to the current node. You probably want a wrapper cookbook to override this. By default `node['splunk']['mgmt_interface']` is now used, but to support existing configurations this attribute is still available and takes precedence when set. (`nil`)
+* `node['splunk']['mgmt_interface']` - The network interface this node should use for communicating with other members of a SHC. (`node['network']['default_interface']`)
+* `node['splunk']['windows_password']` - This should be the name of a data bag item key where your windows password for the `Splunk` user is stored.
 
 Non-configurable (defaults)
 ----------------------------

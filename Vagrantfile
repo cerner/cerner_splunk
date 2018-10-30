@@ -3,7 +3,7 @@
 
 Vagrant.require_version '>= 1.4.1'
 
-%w[vagrant-ohai vagrant-omnibus].each do |plugin|
+%w[vagrant-omnibus].each do |plugin|
   fail "Missing #{plugin}. Please install it!" unless Vagrant.has_plugin? plugin
 end
 
@@ -44,7 +44,7 @@ fail 'Non-unique hostnames' if @network.collect { |_, v| v[:hostname] }.uniq!
 fail 'Non-unique ports' if @network.collect { |_, v| v[:ports].keys }.flat_map { |v| v }.uniq!
 
 def default_omnibus(config)
-  config.omnibus.chef_version = '12'
+  config.omnibus.chef_version = 14
 end
 
 def network(config, name, splunk_password = true)
@@ -76,7 +76,6 @@ end
 
 Vagrant.configure('2') do |config|
   config.vm.box = 'bento/centos-6.7'
-  config.ohai.primary_nic = 'eth1'
 
   if Vagrant.has_plugin? 'vagrant-berkshelf'
     config.berkshelf.enabled = false
@@ -352,7 +351,7 @@ Vagrant.configure('2') do |config|
     default_omnibus config
     # config below prevents the installation of latest Chef on the box.
     # Reference: https://github.com/chef/vagrant-omnibus/issues/118
-    config.omnibus.install_url = 'https://packages.chef.io/files/stable/chef/12.18.31/windows/2012r2/chef-client-12.18.31-1-x64.msi'
+    config.omnibus.install_url = 'https://packages.chef.io/files/stable/chef/14.5.27/windows/2012r2/chef-client-14.5.27-1-x64.msi'
     cfg.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', 1024]
     end

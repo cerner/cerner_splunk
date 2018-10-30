@@ -55,23 +55,41 @@ remote_file splunk_file do
   only_if(&manifest_missing)
 end
 
-package node['splunk']['package']['base_name'] do
-  source splunk_file
-  version "#{node['splunk']['package']['version']}-#{node['splunk']['package']['build']}"
-  provider node['splunk']['package']['provider']
-  only_if(&manifest_missing)
-  if platform_family?('windows')
+if platform_family? 'rhel', 'fedora', 'amazon'
+  rpm_package node['splunk']['package']['base_name'] do
+    source splunk_file
+    version "#{node['splunk']['package']['version']}-#{node['splunk']['package']['build']}"
+    only_if(&manifest_missing)
+  end
+elsif platform_family? 'debian'
+  dpkg_package node['splunk']['package']['base_name'] do
+    source splunk_file
+    version "#{node['splunk']['package']['version']}-#{node['splunk']['package']['build']}"
+    only_if(&manifest_missing)
+  end
+elsif platform_family? 'windows'
+  windows_package node['splunk']['package']['base_name'] do
+    source splunk_file
+    version "#{node['splunk']['package']['version']}-#{node['splunk']['package']['build']}"
+    only_if(&manifest_missing)
     # installing as the system user by default as Splunk has difficulties with being a limited user
     options %(AGREETOLICENSE=Yes SERVICESTARTTYPE=auto LAUNCHSPLUNK=0 INSTALLDIR="#{node['splunk']['home'].tr('/', '\\')}")
   end
+else
+  fail 'unsupported platform'
 end
 
 include_recipe 'cerner_splunk::_configure_secret'
+
+windows_password = CernerSplunk::DataBag.load(node['splunk']['windows_password'], secret: node['splunk']['data_bag_secret'])
 
 execute 'splunk-first-run' do
   command "#{node['splunk']['cmd']} help commands --accept-license --answer-yes --no-prompt"
   user node['splunk']['user']
   group node['splunk']['group']
+  if Gem::Version.new(Chef::VERSION) >= Gem::Version.new('12.19.33')
+    password windows_password if platform_family?('windows')
+  end
   only_if { ::File.exist? "#{node['splunk']['home']}/ftr" }
 end
 
