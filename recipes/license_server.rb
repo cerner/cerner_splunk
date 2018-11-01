@@ -72,11 +72,11 @@ end
 b = ruby_block 'license cleanup' do
   block do
     existing_directory = Dir.glob("#{node['splunk']['home']}/etc/licenses/*")
+    existing_directory.each do |dir|
+      FileUtils.rm_rf(dir) unless dir.end_with?(type)
+      Chef::Log.info("ruby_block[license cleanup] deleted unconfigured license directory #{dir}") unless dir.end_with? type
+    end
     license_groups.each do |type, licenses|
-      existing_directory.each do |dir|
-        FileUtils.rm_rf(dir) unless dir.end_with?(type)
-        Chef::Log.info("ruby_block[license cleanup] deleted unconfigured license directory #{dir}") unless dir.end_with? type
-      end
       existing_files = Dir.glob("#{node['splunk']['home']}/etc/licenses/#{type}/*.lic")
       expected_files = licenses.keys.collect { |name| "#{name}.lic" }
       to_delete = existing_files.delete_if { |x| expected_files.include?(File.basename(x)) }
