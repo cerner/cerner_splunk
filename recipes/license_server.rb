@@ -37,9 +37,10 @@ license_groups = data_bag_item.inject({}) do |hash, (key, value)|
     fail 'Multiple license types are not currently supported' if hash.length > 1
     hash[type][key] = value
   end
-  node.run_state['type'] = type
   hash
 end
+
+node.run_state['license_type'] = license_groups.keys.first
 
 ## Recipes
 include_recipe 'cerner_splunk::_install_server'

@@ -253,7 +253,7 @@ if node['splunk']['node_type'] == :license_server && !license_pools.nil?
       'description' => pool,
       'quota' => pool_max_size,
       'slaves' => pool_config['GUIDs'].join(','),
-      'stack_id' => node.run_state['type']
+      'stack_id' => node.run_state['license_type']
     }
     allotted_pool_size += pool_max_size
   end
