@@ -26,7 +26,7 @@ Getting your logs into Splunk
         * Splunk administrators will also have Chef Roles that can be included in a similar manner as was with Splunk 4, but this is a known anti-pattern, and we recommend getting away from it when you can.
         * You could also maintain the portable role, and have both the cluster role and the portable role on each of your nodes' run lists (which would be required if you cannot modify the environment, or need to override the environment).
 2. Identify the name of the Splunk index(es) to which you will send your logs
-    * If you do not know which index, work with your team, and the Splunk Administrators to identify an existing index or setup a new one.
+    * If you do not know which index, work with your team, and the Splunk Administrators to identify an existing index or set up a new one.
 3. Identify the log files you want Splunk to collect.
     * The Splunk process runs as the `splunk` user and group id, you will need to ensure that the logs are readable by this user.
         * If it helps, you can add the `splunk` user to a group, by adding the group name to an array attribute `node.default[:splunk][:groups]`
