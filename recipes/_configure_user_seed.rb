@@ -14,4 +14,5 @@ input_stanzas['user_info']['PASSWORD'] = 'changeme'
 splunk_template 'system/user-seed.conf' do
   stanzas input_stanzas
   notifies :touch, 'file[splunk-marker]', :immediately
+  sensitive true
 end
