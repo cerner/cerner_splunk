@@ -3,7 +3,7 @@
 # Cookbook Name:: cerner_splunk
 # Recipe:: _configure_user_seed.rb
 #
-# Configures the system inputs.conf file
+# Configures default user and password for spluk 7.2.X
 
 # Translate monitor attributes to generic hash
 input_stanzas = {}
