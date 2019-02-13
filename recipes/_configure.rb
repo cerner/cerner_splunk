@@ -27,6 +27,7 @@ unless node.run_state['cerner_splunk']['configure_apps_only']
   include_recipe 'cerner_splunk::_configure_inputs'
   include_recipe 'cerner_splunk::_configure_outputs'
   include_recipe 'cerner_splunk::_configure_alerts'
+  include_recipe 'cerner_splunk::_configure_user_seed'
 end
 
 include_recipe 'cerner_splunk::_configure_apps'

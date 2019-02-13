@@ -89,6 +89,7 @@ class Chef
         server.conf
         user-prefs.conf
         ui-prefs.conf
+        user-seed.conf
       ].freeze
     end
   end
