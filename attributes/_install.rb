@@ -17,7 +17,6 @@ default['splunk']['package']['version'] = '7.2.4'
 default['splunk']['package']['build'] = '8a94541dcfac'
 
 default['splunk']['package']['base_url'] = 'https://download.splunk.com/products'
-default['splunk']['package']['seed']['passwd'] = 'changeme'
 default['splunk']['package']['platform'] = node['os']
 default['splunk']['package']['file_suffix'] =
   case node['platform_family']

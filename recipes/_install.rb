@@ -83,10 +83,15 @@ include_recipe 'cerner_splunk::_configure_secret'
 
 windows_password = CernerSplunk::DataBag.load(node['splunk']['windows_password'], secret: node['splunk']['data_bag_secret'])
 
+run_command = "#{node['splunk']['cmd']} help commands --accept-license --answer-yes --no-prompt"
+if Gem::Version.new(nsp['version']) >= Gem::Version.new('7.2.0')
+  run_command += " --seed-passwd 'changeme'"
+end
 execute 'splunk-first-run' do
-  command "#{node['splunk']['cmd']}  start  --accept-license --answer-yes --no-prompt --seed-passwd '#{node['splunk']['package']['seed']['passwd']}' "
+  command run_command
   user node['splunk']['user']
   group node['splunk']['group']
+  sensitive true
   if Gem::Version.new(Chef::VERSION) >= Gem::Version.new('12.19.33')
     password windows_password if platform_family?('windows')
   end
