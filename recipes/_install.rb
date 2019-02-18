@@ -87,7 +87,7 @@ run_command = "#{node['splunk']['cmd']} help commands --accept-license --answer-
 if Gem::Version.new(nsp['version']) >= Gem::Version.new('7.2.0')
   run_command += " --seed-passwd 'changeme'"
 end
-#TODO: Use admin_password from databag for splunk-first-run.
+# TODO: Use admin_password from databag for splunk-first-run.
 execute 'splunk-first-run' do
   command run_command
   user node['splunk']['user']
