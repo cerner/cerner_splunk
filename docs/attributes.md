@@ -46,6 +46,7 @@ Configurable (with defaults)
 * `node['splunk']['mgmt_host']` - The host other SHC members use when connecting to the current node. You probably want a wrapper cookbook to override this. By default `node['splunk']['mgmt_interface']` is now used, but to support existing configurations this attribute is still available and takes precedence when set. (`nil`)
 * `node['splunk']['mgmt_interface']` - The network interface this node should use for communicating with other members of a SHC. (`node['network']['default_interface']`)
 * `node['splunk']['windows_password']` - This should be the name of a data bag item key where your windows password for the `Splunk` user is stored.
+* `node['splunk']['enable_smart_store']` - This to enable or disable SmartStore configuration. Default is false (disable smart store)
 
 Non-configurable (defaults)
 ----------------------------

@@ -34,3 +34,5 @@ default['splunk']['heavy_forwarder']['use_license_uri'] = false
 
 # Disable site awareness for multisite clustering.
 default['splunk']['forwarder_site'] = 'site0'
+# Flag for SmartStore
+default['splunk']['enable_smart_store'] = false
