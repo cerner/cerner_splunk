@@ -84,7 +84,7 @@ An Indexes Hash is part of a plaintext data bag item that defines the set of ind
     * `noGeneratePaths` - Do not generate the homePath,coldPath,thawedPath to this index when not present in the config above
     * `noRepFactor` - Do not add 'repFactor = auto' to this index when not present in the config on a cluster master.
 * `['metadata']` - These define ownership / other reference metadata around indexes and their owners (ALPHA!!! CAN CHANGE!!!)
-
+* '_noGenerateTstatsHomePath' - for smartstore enabled indexes tstatsHomePath should be unset.If _noGenerateTstatsHomePath is true in default stanza it means smartstore enabled on all the indexes and on individual indexes smart store can be enabled for per Index. Default is false/nil.
 Roles Hash
 ----------
 A Roles Hash is a contextual (see above) Hash, part of a plaintext data bag item that defines roles for every node in a cluster, and is pointed to by the `node[:splunk][:config][:roles]` attribute (usually set in your environment). A special key of 'shcluster' is used for managing the roles on the search heads in a search head cluster.
