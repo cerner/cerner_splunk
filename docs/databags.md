@@ -80,11 +80,11 @@ An Indexes Hash is part of a plaintext data bag item that defines the set of ind
     * `_directory_name` - The on-disk name of the directory to store the index. Defaults to the index name.
     * `_maxDailyDataSizeMB` - The amount of daily usage this index is expected to consume.  Used to calculate the maxTotalDataSizeMB if maxTotalDataSizeMB has not already been specified for the index.
     * `_dataSizePaddingPercent` - The percentage of padding to apply to the amount of space this index is expected to consume.  Used to calculate the maxTotalDataSizeMB if maxTotalDataSizeMB has not already been specified for the index. Defaults to 10 if no value is specified.
+    * `_noGenerateTstatsHomePath` - Do not generate tstatsHomePath for this index when set to true. Used to disable datamodel acceleration in case of the smartstore enabled indexes. 
 * `['flags']` - These define boolean processing flags per index. All flags are default 'false' but can be set to true. Current flags include:
     * `noGeneratePaths` - Do not generate the homePath,coldPath,thawedPath to this index when not present in the config above
     * `noRepFactor` - Do not add 'repFactor = auto' to this index when not present in the config on a cluster master.
 * `['metadata']` - These define ownership / other reference metadata around indexes and their owners (ALPHA!!! CAN CHANGE!!!)
-* '_noGenerateTstatsHomePath' - for smartstore enabled indexes tstatsHomePath should be unset.If _noGenerateTstatsHomePath is true in default stanza it means smartstore enabled on all the indexes and on individual indexes smart store can be enabled for per Index. Default is false/nil.
 
 Roles Hash
 ----------
