@@ -137,6 +137,7 @@ describe 'cerner_splunk::_configure_indexes' do
       expect(subject).to create_splunk_template('system/indexes.conf').with(expected_attributes)
     end
   end
+  # When _noGenerateTstatsHomePath => true in specific indexes, then writes the indexes.conf file without tstats for only for that indexes
   context 'when _noGenerateTstatsHomePath is set to true' do
     let(:index_config) do
       {
@@ -145,7 +146,7 @@ describe 'cerner_splunk::_configure_indexes' do
             'path' => '/test/path'
           },
           'index_a' => { '_directory_name' => 'foo', '_noGenerateTstatsHomePath' => true },
-          'index_b' => { '_volume' => 'test' , '_noGenerateTstatsHomePath' => true },
+          'index_b' => { '_volume' => 'test', '_noGenerateTstatsHomePath' => true },
           'index_c' => { '_volume' => 'test' }
         }
       }
@@ -170,6 +171,50 @@ describe 'cerner_splunk::_configure_indexes' do
             'homePath' => 'volume:test/index_c/db',
             'thawedPath' => '$SPLUNK_DB/index_c/thaweddb',
             'tstatsHomePath' => 'volume:test/index_c/datamodel_summary'
+          }
+        }
+      }
+
+      expect(subject).to create_splunk_template('system/indexes.conf').with(expected_attributes)
+    end
+  end
+  # when _noGenerateTstatsHomePath => true in default stanza, then writes the indexes.conf file without tstats paths for all indexes
+  context 'when _noGenerateTstatsHomePath is set to true' do
+    let(:index_config) do
+      {
+        'config' => {
+          'default' => {
+            '_noGenerateTstatsHomePath' => true
+          },
+          'volume:test' => {
+            'path' => '/test/path'
+          },
+          'index_a' => { '_directory_name' => 'foo' },
+          'index_b' => { '_volume' => 'test' },
+          'index_c' => { '_volume' => 'test' }
+        }
+      }
+    end
+
+    it 'writes the indexes.conf file without tstats paths' do
+      expected_attributes = {
+        stanzas: {
+          'default' => {},
+          'volume:test' => index_config['config']['volume:test'],
+          'index_a' => {
+            'coldPath' => '$SPLUNK_DB/foo/colddb',
+            'homePath' => '$SPLUNK_DB/foo/db',
+            'thawedPath' => '$SPLUNK_DB/foo/thaweddb'
+          },
+          'index_b' => {
+            'coldPath' => 'volume:test/index_b/colddb',
+            'homePath' => 'volume:test/index_b/db',
+            'thawedPath' => '$SPLUNK_DB/index_b/thaweddb'
+          },
+          'index_c' => {
+            'coldPath' => 'volume:test/index_c/colddb',
+            'homePath' => 'volume:test/index_c/db',
+            'thawedPath' => '$SPLUNK_DB/index_c/thaweddb'
           }
         }
       }
