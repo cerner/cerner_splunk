@@ -137,4 +137,89 @@ describe 'cerner_splunk::_configure_indexes' do
       expect(subject).to create_splunk_template('system/indexes.conf').with(expected_attributes)
     end
   end
+
+  context 'when _noGenerateTstatsHomePath is set to true for specific indexes' do
+    let(:index_config) do
+      {
+        'config' => {
+          'volume:test' => {
+            'path' => '/test/path'
+          },
+          'index_a' => { '_volume' => 'bar', '_noGenerateTstatsHomePath' => true },
+          'index_b' => { '_volume' => 'test', '_noGenerateTstatsHomePath' => true },
+          'index_c' => { '_volume' => 'test' }
+        }
+      }
+    end
+
+    it 'writes the indexes.conf file without tstatsHomePath only for those indexes' do
+      expected_attributes = {
+        stanzas: {
+          'volume:test' => index_config['config']['volume:test'],
+          'index_a' => {
+            'coldPath' => 'volume:bar/index_a/colddb',
+            'homePath' => 'volume:bar/index_a/db',
+            'thawedPath' => '$SPLUNK_DB/index_a/thaweddb'
+          },
+          'index_b' => {
+            'coldPath' => 'volume:test/index_b/colddb',
+            'homePath' => 'volume:test/index_b/db',
+            'thawedPath' => '$SPLUNK_DB/index_b/thaweddb'
+          },
+          'index_c' => {
+            'coldPath' => 'volume:test/index_c/colddb',
+            'homePath' => 'volume:test/index_c/db',
+            'thawedPath' => '$SPLUNK_DB/index_c/thaweddb',
+            'tstatsHomePath' => 'volume:test/index_c/datamodel_summary'
+          }
+        }
+      }
+
+      expect(subject).to create_splunk_template('system/indexes.conf').with(expected_attributes)
+    end
+  end
+
+  context 'when _noGenerateTstatsHomePath is set to true in default stanza' do
+    let(:index_config) do
+      {
+        'config' => {
+          'default' => {
+            '_noGenerateTstatsHomePath' => true
+          },
+          'volume:test' => {
+            'path' => '/test/path'
+          },
+          'index_a' => { '_volume' => 'bar' },
+          'index_b' => { '_volume' => 'test' },
+          'index_c' => { '_volume' => 'test' }
+        }
+      }
+    end
+
+    it 'writes the indexes.conf file without tstats paths for all indexes' do
+      expected_attributes = {
+        stanzas: {
+          'default' => {},
+          'volume:test' => index_config['config']['volume:test'],
+          'index_a' => {
+            'coldPath' => 'volume:bar/index_a/colddb',
+            'homePath' => 'volume:bar/index_a/db',
+            'thawedPath' => '$SPLUNK_DB/index_a/thaweddb'
+          },
+          'index_b' => {
+            'coldPath' => 'volume:test/index_b/colddb',
+            'homePath' => 'volume:test/index_b/db',
+            'thawedPath' => '$SPLUNK_DB/index_b/thaweddb'
+          },
+          'index_c' => {
+            'coldPath' => 'volume:test/index_c/colddb',
+            'homePath' => 'volume:test/index_c/db',
+            'thawedPath' => '$SPLUNK_DB/index_c/thaweddb'
+          }
+        }
+      }
+
+      expect(subject).to create_splunk_template('system/indexes.conf').with(expected_attributes)
+    end
+  end
 end

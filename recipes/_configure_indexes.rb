@@ -38,13 +38,13 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
 
   daily_mb = hash.delete('_maxDailyDataSizeMB')
   padding = hash.delete('_dataSizePaddingPercent')
+  default_config = config.fetch('default', {})
+  # _noGenerateTstatsHomePath is false  by default.
+  no_gentstat = hash.delete('_noGenerateTstatsHomePath') || default_config['_noGenerateTstatsHomePath']
   if %i[index default].include?(stanza_type) && daily_mb && !hash.key?('maxTotalDataSizeMB')
     settings = CernerSplunk.my_cluster_data(node).fetch('settings', {})
     replication_factor = settings['replication_factor'] || 1
     indexer_count = settings['_cerner_splunk_indexer_count'] || 1
-
-    default_config = config.fetch('default', {})
-
     # If the frozen time isn't specified, splunk defaults to 6 years
     frozen_time_in_secs = hash['frozenTimePeriodInSecs'] || default_config['frozenTimePeriodInSecs'] || 188_697_600
     frozen_time_in_days = frozen_time_in_secs / 86_400
@@ -63,7 +63,7 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
       hash['coldPath'] = "#{base_path}/#{dir_name}/colddb" unless hash['coldPath']
       hash['homePath'] = "#{base_path}/#{dir_name}/db" unless hash['homePath']
       hash['thawedPath'] = "$SPLUNK_DB/#{dir_name}/thaweddb" unless hash['thawedPath']
-      hash['tstatsHomePath'] = "#{base_path}/#{dir_name}/datamodel_summary" if volume && !hash['tstatsHomePath']
+      hash['tstatsHomePath'] = "#{base_path}/#{dir_name}/datamodel_summary" if volume && !hash['tstatsHomePath'] && !no_gentstat
     end
     if is_master && !index_flags['noRepFactor']
       hash['repFactor'] = 'auto' unless hash['repFactor']
