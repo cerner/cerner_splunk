@@ -10,7 +10,11 @@ init_file_path = '/etc/init.d/splunk'
 restart_flag = !(File.exist?(init_file_path) && File.readlines(init_file_path).grep(/#{ulimit_command}/).any?)
 
 # We want to always ensure that the boot-start script is in place on non-windows platforms
-execute "#{node['splunk']['cmd']} enable boot-start -user #{node['splunk']['user']}" do
+command = "#{node['splunk']['cmd']} enable boot-start -user #{node['splunk']['user']}"
+if Gem::Version.new(node['splunk']['package']['version']) >= Gem::Version.new('7.2.2')
+  command += ' -systemd-managed 0'
+end
+execute command do
   not_if { platform_family?('windows') }
 end
 
