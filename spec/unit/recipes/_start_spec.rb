@@ -86,7 +86,7 @@ describe 'cerner_splunk::_start' do
     let(:windows) { false }
 
     it 'executes boot-start script' do
-      expect(subject).to run_execute('splunk enable boot-start -user splunk')
+      expect(subject).to run_execute('splunk enable boot-start -user splunk -systemd-managed 0')
     end
 
     it 'inserts ulimit into init.d script' do

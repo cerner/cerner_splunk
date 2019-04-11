@@ -75,7 +75,7 @@ def chef_defaults(chef, name, environment = 'splunk_server')
 end
 
 Vagrant.configure('2') do |config|
-  config.vm.box = 'bento/centos-6.7'
+  config.vm.box = 'bento/centos-7.6'
 
   if Vagrant.has_plugin? 'vagrant-berkshelf'
     config.berkshelf.enabled = false
@@ -86,7 +86,7 @@ Vagrant.configure('2') do |config|
   config.vm.provider :virtualbox do |vb|
     vb.customize ['modifyvm', :id, '--natdnsproxy1', 'off']
     vb.customize ['modifyvm', :id, '--natdnshostresolver1', 'off']
-    vb.customize ['modifyvm', :id, '--memory', 128]
+    vb.customize ['modifyvm', :id, '--memory', 256]
   end
 
   config.vm.define :chef do |cfg|
@@ -167,9 +167,6 @@ Vagrant.configure('2') do |config|
     symbol = "c1_slave#{n}".to_sym
     config.vm.define symbol do |cfg|
       default_omnibus config
-      cfg.vm.provider :virtualbox do |vb|
-        vb.customize ['modifyvm', :id, '--memory', 256]
-      end
       cfg.vm.provision :chef_client do |chef|
         chef_defaults chef, symbol
         chef.add_recipe 'cerner_splunk::cluster_slave'
@@ -193,9 +190,6 @@ Vagrant.configure('2') do |config|
     symbol = "s1_slave#{n}".to_sym
     config.vm.define symbol do |cfg|
       default_omnibus config
-      cfg.vm.provider :virtualbox do |vb|
-        vb.customize ['modifyvm', :id, '--memory', 256]
-      end
       cfg.vm.provision :chef_client do |chef|
         chef_defaults chef, symbol, 'splunk_site1'
         chef.add_recipe 'cerner_splunk::cluster_slave'
@@ -208,9 +202,6 @@ Vagrant.configure('2') do |config|
     symbol = "s2_slave#{n}".to_sym
     config.vm.define symbol do |cfg|
       default_omnibus config
-      cfg.vm.provider :virtualbox do |vb|
-        vb.customize ['modifyvm', :id, '--memory', 256]
-      end
       cfg.vm.provision :chef_client do |chef|
         chef_defaults chef, symbol, 'splunk_site2'
         chef.add_recipe 'cerner_splunk::cluster_slave'
@@ -221,9 +212,6 @@ Vagrant.configure('2') do |config|
 
   config.vm.define :s2_search do |cfg|
     default_omnibus config
-    cfg.vm.provider :virtualbox do |vb|
-      vb.customize ['modifyvm', :id, '--memory', 256]
-    end
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :s2_search, 'splunk_site2'
       chef.add_recipe 'cerner_splunk::search_head'
@@ -233,9 +221,6 @@ Vagrant.configure('2') do |config|
 
   config.vm.define :c1_search do |cfg|
     default_omnibus config
-    cfg.vm.provider :virtualbox do |vb|
-      vb.customize ['modifyvm', :id, '--memory', 256]
-    end
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :c1_search
       chef.add_recipe 'cerner_splunk::search_head'
@@ -247,9 +232,6 @@ Vagrant.configure('2') do |config|
     symbol = "c2_boot#{n}".to_sym
     config.vm.define symbol do |cfg|
       default_omnibus config
-      cfg.vm.provider :virtualbox do |vb|
-        vb.customize ['modifyvm', :id, '--memory', 256]
-      end
       cfg.vm.provision :chef_client do |chef|
         chef_defaults chef, symbol
         chef.add_recipe 'cerner_splunk::shc_search_head'
@@ -265,9 +247,6 @@ Vagrant.configure('2') do |config|
 
   config.vm.define :c2_captain do |cfg|
     default_omnibus config
-    cfg.vm.provider :virtualbox do |vb|
-      vb.customize ['modifyvm', :id, '--memory', 256]
-    end
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :c2_captain
       chef.add_recipe 'cerner_splunk::shc_captain'
@@ -277,9 +256,6 @@ Vagrant.configure('2') do |config|
 
   config.vm.define :c2_deployer do |cfg|
     default_omnibus config
-    cfg.vm.provider :virtualbox do |vb|
-      vb.customize ['modifyvm', :id, '--memory', 256]
-    end
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :c2_deployer
       chef.add_recipe 'cerner_splunk::shc_deployer'
@@ -289,9 +265,6 @@ Vagrant.configure('2') do |config|
 
   config.vm.define :c2_newnode do |cfg|
     default_omnibus config
-    cfg.vm.provider :virtualbox do |vb|
-      vb.customize ['modifyvm', :id, '--memory', 256]
-    end
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :c2_newnode
       chef.add_recipe 'cerner_splunk::shc_search_head'
@@ -301,9 +274,6 @@ Vagrant.configure('2') do |config|
 
   config.vm.define :s_standalone do |cfg|
     default_omnibus config
-    cfg.vm.provider :virtualbox do |vb|
-      vb.customize ['modifyvm', :id, '--memory', 256]
-    end
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :s_standalone, 'splunk_standalone'
       chef.add_recipe 'cerner_splunk::server'
@@ -324,9 +294,6 @@ Vagrant.configure('2') do |config|
   config.vm.define :f_debian do |cfg|
     default_omnibus config
     cfg.vm.box = 'bento/ubuntu-12.04'
-    cfg.vm.provider :virtualbox do |vb|
-      vb.customize ['modifyvm', :id, '--memory', 256]
-    end
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :f_debian, 'splunk_standalone'
       chef.add_recipe 'cerner_splunk'

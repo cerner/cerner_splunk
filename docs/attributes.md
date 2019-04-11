@@ -18,8 +18,8 @@ Configurable (with defaults)
   * `node['splunk']['monitors'][]['type']` - Type of stanza (`monitor`). See [inputs.conf][] for stanzas.
   * `node['splunk']['monitors'][][???]` - Other attributes for an inputs.conf stanza. See [inputs.conf][]
 * `node['splunk']['cleanup']` - Determines whether the recipe should attempt to clean up the old forwarder install (`true`)
-* `node['splunk']['package']['version']` - Major version to install (`7.2.4`)
-* `node['splunk']['package']['build']` - Corresponding build number (`8a94541dcfac`)
+* `node['splunk']['package']['version']` - Major version to install (`7.2.5.1`)
+* `node['splunk']['package']['build']` - Corresponding build number (`962d9a8e1586`)
 * `node['splunk']['package']['base_url']` - Base download path (`https://download.splunk.com/products`)
 * `node['splunk']['package']['base_name']` - Name of the package to install (`splunkforwarder`/`splunk`)
 * `node['splunk']['package']['name']` - Name of the package being installed (`"#{node['splunk']['package']['base_name']}-#{node['splunk']['package']['version']}-#{node['splunk']['package']['build']}"`)
