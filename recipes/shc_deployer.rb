@@ -9,7 +9,7 @@ fail 'Deployer installation not currently supported on windows' if platform_fami
 
 search_heads = CernerSplunk.my_cluster_data(node)['shc_members']
 
-fail 'Search Heads are not configured for sh clustering in the cluster databag' if search_heads.nil? || search_heads.empty?
+fail 'Search Heads are not configured for sh clustering in the cluster databag' if (search_heads.nil? || search_heads.empty?) && (node['splunk']['is_cloud'] == false)
 
 instance_exec :shc_deployer, &CernerSplunk::NODE_TYPE
 
@@ -20,6 +20,7 @@ execute 'apply-shcluster-bundle' do # ~FC009
   environment 'HOME' => node['splunk']['home']
   action :nothing
   sensitive true
+  not_if { node['splunk']['is_cloud'] }
 end
 
 cluster_data = CernerSplunk.my_cluster_data(node) || {}

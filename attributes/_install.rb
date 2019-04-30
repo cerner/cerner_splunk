@@ -15,7 +15,7 @@ default['splunk']['external_config_directory'] =
 
 default['splunk']['package']['version'] = '7.2.5.1'
 default['splunk']['package']['build'] = '962d9a8e1586'
-
+default['splunk']['is_cloud'] = false
 default['splunk']['package']['base_url'] = 'https://download.splunk.com/products'
 default['splunk']['package']['platform'] = node['os']
 default['splunk']['package']['file_suffix'] =

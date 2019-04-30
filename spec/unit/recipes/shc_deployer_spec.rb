@@ -59,7 +59,7 @@ describe 'cerner_splunk::shc_deployer' do
     CernerSplunk.reset
   end
 
-  context 'when the search heads are not specified for sh clustering in the cluster databag' do
+  context 'when the search heads are not specified for sh clustering in the cluster databag and is_cloud is false' do
     let(:cluster_config) do
       {
         'sh_cluster' => []
@@ -140,5 +140,11 @@ describe 'cerner_splunk::shc_deployer' do
 
   it 'includes cerner_splunk::_start recipe' do
     expect(subject).to include_recipe('cerner_splunk::_start')
+  end
+
+  context 'when is_cloud is true' do
+    it 'does not execute apply-shcluster-bundle' do
+      expect(subject).not_to run_execute('apply-shcluster-bundle')
+    end
   end
 end
