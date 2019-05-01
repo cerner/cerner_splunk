@@ -37,7 +37,7 @@ describe 'cerner_splunk::shc_search_head' do
     CernerSplunk.reset
   end
 
-  context 'when the search heads are not specified for sh clustering in the cluster databag' do
+  context 'when the search heads are not specified for sh clustering in the cluster databag and is_cloud is false' do
     let(:cluster_config) do
       {
         'sh_cluster' => []
@@ -61,7 +61,6 @@ describe 'cerner_splunk::shc_search_head' do
   it 'includes cerner_splunk::_start recipe' do
     expect(subject).to include_recipe('cerner_splunk::_start')
   end
-
   context 'when adding a new shc member to an existing cluster' do
     it 'executes add SH to SHC' do
       expect(subject).to add_sh_member('add SH to SHC')

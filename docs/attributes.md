@@ -18,7 +18,7 @@ Configurable (with defaults)
   * `node['splunk']['monitors'][]['type']` - Type of stanza (`monitor`). See [inputs.conf][] for stanzas.
   * `node['splunk']['monitors'][][???]` - Other attributes for an inputs.conf stanza. See [inputs.conf][]
 * `node['splunk']['cleanup']` - Determines whether the recipe should attempt to clean up the old forwarder install (`true`)
-* `node['splunk']['package']['version']` - Major version to install (`7.2.5.1`)
+* `node['splunk']['package']['version']` - Major version to install (`7.2.6`)
 * `node['splunk']['package']['build']` - Corresponding build number (`962d9a8e1586`)
 * `node['splunk']['package']['base_url']` - Base download path (`https://download.splunk.com/products`)
 * `node['splunk']['package']['base_name']` - Name of the package to install (`splunkforwarder`/`splunk`)
@@ -46,6 +46,7 @@ Configurable (with defaults)
 * `node['splunk']['mgmt_host']` - The host other SHC members use when connecting to the current node. You probably want a wrapper cookbook to override this. By default `node['splunk']['mgmt_interface']` is now used, but to support existing configurations this attribute is still available and takes precedence when set. (`nil`)
 * `node['splunk']['mgmt_interface']` - The network interface this node should use for communicating with other members of a SHC. (`node['network']['default_interface']`)
 * `node['splunk']['windows_password']` - This should be the name of a data bag item key where your windows password for the `Splunk` user is stored.
+* `node['splunk']['is_cloud']` - Set this attribute to `true` on cloud instances for Search Head Cluster (SHC). (`false`)
 
 Non-configurable (defaults)
 ----------------------------
