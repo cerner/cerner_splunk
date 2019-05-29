@@ -41,7 +41,10 @@ default['splunk']['boot_start_args'] =
   when 6
     ' -systemd-managed 0'
   when 7
-    ' -systemd-managed 1'
+    ' -systemd-managed 1 -systemd-unit-file-name splunk'
   else
     ' -systemd-managed 0'
   end
+
+# Default systemd file location based on default systemd unit file name
+default['splunk']['systemd_file_location'] = '/etc/systemd/system/multi-user.target.wants/splunk.service'
