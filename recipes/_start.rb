@@ -12,7 +12,7 @@ restart_flag = !(File.exist?(init_file_path) && File.readlines(init_file_path).g
 # We want to always ensure that the boot-start script is in place on non-windows platforms
 command = "#{node['splunk']['cmd']} enable boot-start -user #{node['splunk']['user']}"
 if Gem::Version.new(node['splunk']['package']['version']) >= Gem::Version.new('7.2.2')
-  command += ' -systemd-managed 0'
+  command += node['splunk']['boot_start_args']
 end
 execute command do
   not_if { platform_family?('windows') }

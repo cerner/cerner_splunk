@@ -34,3 +34,6 @@ default['splunk']['heavy_forwarder']['use_license_uri'] = false
 
 # Disable site awareness for multisite clustering.
 default['splunk']['forwarder_site'] = 'site0'
+
+# Give options to set splunk enable boot-start arguments
+default['splunk']['boot_start_args'] = ' -systemd-managed 0'
