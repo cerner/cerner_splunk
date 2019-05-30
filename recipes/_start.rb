@@ -12,10 +12,11 @@ restart_flag = !(File.exist?(init_file_path) && File.readlines(init_file_path).g
 # We want to always ensure that the boot-start script is in place on non-windows platforms
 command = "#{node['splunk']['cmd']} enable boot-start -user #{node['splunk']['user']}"
 if Gem::Version.new(node['splunk']['package']['version']) >= Gem::Version.new('7.2.2')
-  command += ' -systemd-managed 0'
+  command += node['splunk']['boot_start_args']
 end
 execute command do
   not_if { platform_family?('windows') }
+  not_if { File.exist?(node['splunk']['systemd_file_location']) }
 end
 
 ruby_block 'insert ulimit' do
@@ -25,6 +26,7 @@ ruby_block 'insert ulimit' do
     file.write_file
   end
   not_if { platform_family?('windows') }
+  not_if { Gem::Version.new(node['splunk']['package']['version']) >= Gem::Version.new('7.2.2') && node['platform_version'].to_i == 7 }
 end
 
 ruby_block 'restart-splunk-for-ulimit' do
@@ -38,6 +40,14 @@ end
 ruby_block 'start-splunk' do
   block { true }
   notifies :start, 'service[splunk]', :immediately
+end
+
+# Added in because the first time splunk is started using chef and systemd the .pid file is owned by root which causes issues. It is automatically correct when splunk is restarted.
+execute 'correct permissions' do
+  command "chown -RP #{node['splunk']['user']}:#{node['splunk']['group']} #{node['splunk']['home']}"
+  action :run
+  not_if { platform_family?('windows') }
+  only_if { Gem::Version.new(node['splunk']['package']['version']) >= Gem::Version.new('7.2.2') && node['platform_version'].to_i == 7 }
 end
 
 include_recipe 'cerner_splunk::_generate_password'
