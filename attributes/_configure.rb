@@ -37,11 +37,15 @@ default['splunk']['forwarder_site'] = 'site0'
 
 # Give options to set splunk enable boot-start arguments
 default['splunk']['boot_start_args'] =
-  case node['platform_version'].to_i
-  when 6
-    ' -systemd-managed 0'
-  when 7
-    ' -systemd-managed 1 -systemd-unit-file-name splunk'
+  if platform_family? 'rhel', 'fedora', 'amazon'
+    case node['platform_version'].to_i
+    when 6
+      ' -systemd-managed 0'
+    when 7
+      ' -systemd-managed 1 -systemd-unit-file-name splunk'
+    else
+      ' -systemd-managed 0'
+    end
   else
     ' -systemd-managed 0'
   end
