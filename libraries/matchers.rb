@@ -5,6 +5,10 @@ if defined?(ChefSpec)
     ChefSpec::Matchers::ResourceMatcher.new(:splunk_template, :create, resource)
   end
 
+  def create_splunk_logs(resource)
+    ChefSpec::Matchers::ResourceMatcher.new(:splunk_logs, :create, resource)
+  end
+
   def create_splunk_app(resource)
     ChefSpec::Matchers::ResourceMatcher.new(:splunk_app, :create, resource)
   end
