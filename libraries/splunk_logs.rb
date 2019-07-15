@@ -18,7 +18,7 @@ class Chef
         super
         @resource_name = :splunk_logs
         @action = :create
-        @allowed_actions = %i[create remove]
+        @allowed_actions = %i[create]
         @contents = {}
       end
 
@@ -34,7 +34,7 @@ require_relative 'conf'
 class Chef
   class Provider
     # Chef Provider for managing Splunk log config
-    class SplunkLogs < Chef::Provider # rubocop:disable ClassLength
+    class SplunkLogs < Chef::Provider
       provides :splunk_logs if respond_to?(:provides)
 
       def whyrun_supported?
@@ -46,20 +46,7 @@ class Chef
       end
 
       def action_create
-        manage_file("/opt/splunk/etc/log-local.cfg", {"splunkd": new_resource.contents})
-      end
-
-      # uninstall the app by removing the apps directory
-      def action_remove
-        file = Chef::Resource::Template.new("/opt/splunk/etc/log-local.cfg", run_context)
-        file.path("/opt/splunk/etc/log-local.cfg")
-        file.run_action(:delete)
-        new_resource.updated_by_last_action(file.updated_by_last_action?)
-      end
-
-      def delete_file(file_path)
-        download = Chef::Resource::File.new(file_path, run_context)
-        download.run_action(:delete)
+        manage_file("/opt/splunk/etc/log-local.cfg", {"splunkd" => new_resource.contents})
       end
 
       def symbolize_keys(hash)
@@ -96,7 +83,7 @@ class Chef
       # function for dropping either a splunk template generated from a hash
       # or a simple file if the contents are a string. If the content of the file
       # is empty, then the file will be removed
-      def manage_file(path, contents) # rubocop:disable Metrics/PerceivedComplexity
+      def manage_file(path, contents)
         if contents.is_a?(Hash) && !contents.empty?
           file = Chef::Resource::Template.new(path, run_context)
           file.cookbook('cerner_splunk')
