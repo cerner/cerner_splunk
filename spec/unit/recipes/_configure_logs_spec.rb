@@ -26,6 +26,6 @@ describe 'cerner_splunk::_configure_logs' do
         'appender.metrics.maxBackupIndex' => '3'
       }
     }
-    expect(subject).to create_splunk_logs('etc/log-local.cfg').with(expected_attributes)
+    expect(subject).to create_splunk_logs('/etc/log-local.cfg').with(expected_attributes)
   end
 end
