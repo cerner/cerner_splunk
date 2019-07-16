@@ -7,7 +7,7 @@
 
 log_local_contents = node['splunk']['logs']
 
-splunk_logs "#{node['splunk']['home']}/etc/log-local.cfg" do
-  contents log_local_contents
+splunk_template 'etc/log-local.cfg' do
+  stanzas log_local_contents
   notifies :touch, 'file[splunk-marker]', :immediately
 end

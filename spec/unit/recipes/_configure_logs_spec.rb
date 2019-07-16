@@ -12,8 +12,10 @@ describe 'cerner_splunk::_configure_logs' do
 
   let(:logs) do
     {
-      'appender.metrics.maxFileSize' => '10000',
-      'appender.metrics.maxBackupIndex' => '3'
+      'splunkd' => {
+        'appender.metrics.maxFileSize' => '10000',
+        'appender.metrics.maxBackupIndex' => '3'
+      }
     }
   end
 
@@ -21,11 +23,13 @@ describe 'cerner_splunk::_configure_logs' do
 
   it 'installs the app with the expected attributes' do
     expected_attributes = {
-      contents: {
-        'appender.metrics.maxFileSize' => '10000',
-        'appender.metrics.maxBackupIndex' => '3'
+      stanzas: {
+        'splunkd' => {
+          'appender.metrics.maxFileSize' => '10000',
+          'appender.metrics.maxBackupIndex' => '3'
+        }
       }
     }
-    expect(subject).to create_splunk_logs('/etc/log-local.cfg').with(expected_attributes)
+    expect(subject).to create_splunk_template('/etc/log-local.cfg').with(expected_attributes)
   end
 end

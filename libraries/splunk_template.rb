@@ -45,6 +45,8 @@ class Chef
 
         # If resource name is unambiguous, default values
         case name
+        when %r{^etc/(.+\.cfg)$}
+          @path = "etc/#{Regexp.last_match[1]}"
         when %r{^system/(.+\.conf)$}
           @path = "etc/system/local/#{Regexp.last_match[1]}"
         when %r{^shcluster/([^/]+)/(.+\.conf)$}
@@ -85,6 +87,7 @@ class Chef
         authorize.conf
         indexes.conf
         inputs.conf
+        log-local.cfg
         outputs.conf
         server.conf
         user-prefs.conf
