@@ -19,7 +19,12 @@ class Chef
         @resource_name = :splunk_logs
         @action = :create
         @allowed_actions = %i[create]
+        @location = name
         @contents = {}
+      end
+
+      def location(arg = nil)
+        set_or_return(:location, arg, kind_of: String)
       end
 
       def contents(arg = nil)
@@ -46,7 +51,7 @@ class Chef
       end
 
       def action_create
-        manage_file('/opt/splunk/etc/log-local.cfg', 'splunkd' => new_resource.contents)
+        manage_file(new_resource.location, 'splunkd' => new_resource.contents)
       end
 
       def symbolize_keys(hash)
