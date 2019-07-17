@@ -21,7 +21,7 @@ class Chef
 
       provides :splunk_template, (use_provider_resolver ? {} : { on_platforms: :all })
 
-      def initialize(name, run_context = nil) # rubocop:disable Metrics/PerceivedComplexity
+      def initialize(name, run_context = nil) # rubocop:disable Metrics/CyclomaticComplexity
         super
 
         # If there's no run_context, there's nothing we can do here
