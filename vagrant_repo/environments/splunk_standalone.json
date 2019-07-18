@@ -6,6 +6,12 @@
       "apps": {
         "bag": "cerner_splunk/cluster-apps-vagrant:search_head"
       },
+      "logs": {
+        "splunkd": {
+          "appender.metrics.maxFileSize": "10000000",
+          "appender.metrics.maxBackupIndex": "3"
+        }
+      },
       "config": {
         "clusters": [
           "cerner_splunk/cluster-vagrant-site1",

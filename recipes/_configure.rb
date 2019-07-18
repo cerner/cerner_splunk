@@ -22,6 +22,7 @@ unless node.run_state['cerner_splunk']['configure_apps_only']
   end
 
   include_recipe 'cerner_splunk::_configure_server'
+  include_recipe 'cerner_splunk::_configure_logs' unless node['splunk']['logs'].empty?
   include_recipe 'cerner_splunk::_configure_roles'
   include_recipe 'cerner_splunk::_configure_authentication'
   include_recipe 'cerner_splunk::_configure_inputs'

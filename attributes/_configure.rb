@@ -26,6 +26,7 @@ default['splunk']['free_license'] = false
 default['splunk']['main_project_index'] = nil
 default['splunk']['monitors'] = []
 default['splunk']['apps'] = {}
+default['splunk']['logs'] = {}
 
 default['splunk']['config']['assumed_index'] = 'main'
 
