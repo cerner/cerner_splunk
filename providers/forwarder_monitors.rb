@@ -1,11 +1,9 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
 # Provider:: forwarder_monitors
 #
 # Drop in replacement for the existing splunk_forwarder_monitors
-
-use_inline_resources
 
 provides :splunk_forwarder_monitors if respond_to?(:provides)
 provides :cerner_splunk_forwarder_monitors if respond_to?(:provides)

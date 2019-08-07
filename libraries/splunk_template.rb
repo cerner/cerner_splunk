@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
 # File Name:: splunk_template.rb
@@ -76,6 +76,7 @@ class Chef
 
         config_file = ::File.basename(@path)
         return if KNOWN_CONFIG_FILES.include? config_file
+
         message = "#{config_file} is not known to this resource. Check spelling or submit a pull request."
         Chef::Log.warn message unless fail_unknown
         fail Exceptions::ValidationFailed, "#{message}\nKnown files are:\n\t#{KNOWN_CONFIG_FILES.join("\n\t")}" if fail_unknown

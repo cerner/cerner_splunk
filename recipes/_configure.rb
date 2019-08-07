@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
 # Recipe:: _configure
@@ -16,7 +16,7 @@ unless node.run_state['cerner_splunk']['configure_apps_only']
   end
 
   node['splunk']['config']['clusters'].each do |cluster|
-    unless CernerSplunk::DataBag.load(cluster, secret: node['splunk']['data_bag_secret'])
+    unless CernerSplunk::DataBag.load(cluster, secret: node['splunk']['data_bag_secret']) # rubocop:disable Style/IfUnlessModifier
       throw "Unknown databag configured for node['splunk']['config]['clusters'] => '#{cluster}'"
     end
   end

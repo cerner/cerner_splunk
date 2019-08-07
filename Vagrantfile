@@ -92,7 +92,7 @@ Vagrant.configure('2') do |config|
   config.vm.define :chef do |cfg|
     config.omnibus.chef_version = nil
 
-    cfg.vm.provision :shell, inline: 'rpm -q chefdk || curl -L https://omnitruck.chef.io/install.sh | bash -s -- -P chefdk -v 2.5.3'
+    cfg.vm.provision :shell, inline: 'rpm -q chefdk || curl -L https://omnitruck.chef.io/install.sh | bash -s -- -P chefdk -v 4.0.60'
 
     if ENV['KNIFE_ONLY']
       cfg.vm.provision :shell, inline: 'cd /vagrant/vagrant_repo; mv nodes .nodes.bak', privileged: false

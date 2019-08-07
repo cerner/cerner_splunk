@@ -1,10 +1,10 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 require_relative '../spec_helper'
 
 describe 'cerner_splunk::server_install_only' do
   subject do
-    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.8')
+    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.10')
     runner.converge(described_recipe)
   end
 

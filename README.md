@@ -56,7 +56,7 @@ Let's say I'm on the Awesome Team, and I am setting up an Apache server, and wan
 4. I make changes to my chef artifacts:
     * I alter the environment for my nodes:
      ```ruby
-     # coding: UTF-8
+     # frozen_string_literal: true
 
      name 'awesomeness_corporate'
      description 'Node Environment for the Awesome Team Servers in Corporate'
@@ -64,7 +64,7 @@ Let's say I'm on the Awesome Team, and I am setting up an Apache server, and wan
      ```
     * I create a role:
      ```ruby
-      # coding: UTF-8
+      # frozen_string_literal: true
 
       name 'awesomeness_ops'
       description 'Awesome Operations Role'

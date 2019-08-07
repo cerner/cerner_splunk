@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
 # Recipe:: _install
@@ -84,9 +84,8 @@ include_recipe 'cerner_splunk::_configure_secret'
 windows_password = CernerSplunk::DataBag.load(node['splunk']['windows_password'], secret: node['splunk']['data_bag_secret'])
 
 run_command = "#{node['splunk']['cmd']} help commands --accept-license --answer-yes --no-prompt"
-if Gem::Version.new(nsp['version']) >= Gem::Version.new('7.2.0')
-  run_command += " --seed-passwd 'changeme'"
-end
+run_command += " --seed-passwd 'changeme'" if Gem::Version.new(nsp['version']) >= Gem::Version.new('7.2.0')
+
 # TODO: Use admin_password from databag for splunk-first-run.
 execute 'splunk-first-run' do
   command run_command

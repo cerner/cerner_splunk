@@ -1,10 +1,10 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 require_relative '../spec_helper'
 
 describe 'cerner_splunk::_configure_server' do
   subject do
-    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.8') do |node|
+    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.10') do |node|
       node.override['splunk']['config']['clusters'] = clusters
       node.override['splunk']['config']['host'] = node_type.to_s
       node.override['splunk']['node_type'] = node_type
@@ -64,7 +64,7 @@ describe 'cerner_splunk::_configure_server' do
   let(:multisite_bag_configs) do
     {
       'sites' => ['cerner_splunk/multisite_cluster'],
-      'multisite_settings' =>   {
+      'multisite_settings' => {
         'forwarder_site_failover' => 'site1:site2',
         'site_replication_factor' => 'origin:2,total:3',
         'site_search_factor' => 'origin:1,total:2'

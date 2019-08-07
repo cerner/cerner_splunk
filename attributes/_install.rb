@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Put this here to initialize the run state so we don't have to check it everywhere
 node.run_state['cerner_splunk'] ||= {} # ~FC046

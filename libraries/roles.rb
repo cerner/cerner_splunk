@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
 # File Name:: roles.rb
@@ -25,7 +25,7 @@ module CernerSplunk
           when 'capabilities'
             value.each do |cap|
               if cap.start_with? '!'
-                cap[0] = ''
+                cap = cap[1..-1]
                 auth[cap] = 'disabled'
               else
                 auth[cap] = 'enabled'

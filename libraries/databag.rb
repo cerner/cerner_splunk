@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
 # File Name:: databag.rb
@@ -59,6 +59,7 @@ module CernerSplunk #:nodoc:
         nil
       when Array
         fail "Array '#{array}' can only contain Strings or nil" unless array.all? { |i| i.nil? || i.is_a?(String) }
+
         data_bag, bag_item, key = array
         Chef::DataBag.validate_name!(data_bag) if data_bag
         Chef::DataBagItem.validate_id!(bag_item) if bag_item
@@ -95,8 +96,9 @@ module CernerSplunk #:nodoc:
                     ChefVault::Item.load(data_bag, bag_item)
                   end
             key ? bag[key] : bag
-          rescue => e
+          rescue => e # rubocop:disable Style/RescueStandardError
             raise e unless opts[:handle_load_failure]
+
             Chef::Log.warn "Could not load the data bag item referenced by: #{to_value([data_bag, bag_item])}. Details available at debug log level, continuing chef run assuming nil."
             Chef::Log.debug "#{e.class}: #{e}\n#{e.backtrace.join("\n")}" if Chef::Log.level == :debug
             nil
@@ -117,7 +119,7 @@ module CernerSplunk #:nodoc:
         string.strip! if strip
         string = nil if string.empty? && default_empty
       end
-      string ? string : default
+      string || default
     end
 
     # Finds a particular value in a hash by key, Not part of the public API
@@ -125,9 +127,8 @@ module CernerSplunk #:nodoc:
       attempts = [key]
       value = data_bag_item[key]
       while value.is_a? String
-        if attempts.include? value
-          fail "Circular reference resolving key (#{attempts.join(';')})!"
-        end
+        fail "Circular reference resolving key (#{attempts.join(';')})!" if attempts.include? value
+
         attempts << value
         value = data_bag_item[value]
       end

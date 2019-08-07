@@ -1,10 +1,10 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 require_relative '../spec_helper'
 
 describe 'cerner_splunk::_configure_shc_outputs' do
   subject do
-    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.8') do |node|
+    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.10') do |node|
       node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
     end
     runner.converge('cerner_splunk::shc_deployer', described_recipe)

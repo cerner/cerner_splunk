@@ -1,10 +1,14 @@
 AllCops:
-  TargetRubyVersion: 2.1
+  TargetRubyVersion: 2.3
+  Exclude:
+    - 'Vagrantfile'
+    - 'Gemfile'
+    - 'Berksfile'
 
-BlockLength:
+Metrics/BlockLength:
   Enabled: false
 
-LineLength:
+Metrics/LineLength:
   Enabled: false
 
 EachWithObject:
@@ -13,7 +17,7 @@ EachWithObject:
 EmptyWhen:
   Enabled: false
 
-MethodLength:
+Metrics/MethodLength:
   Max: 40
 
 Metrics/AbcSize:
@@ -31,5 +35,5 @@ Style/NumericPredicate:
 Style/TernaryParentheses:
   Enabled: false
 
-Style/VariableNumber:
+Naming/VariableNumber:
   Enabled: false

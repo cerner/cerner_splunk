@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
 # Recipe:: _start
@@ -11,9 +11,8 @@ restart_flag = !(File.exist?(init_file_path) && File.readlines(init_file_path).g
 
 # We want to always ensure that the boot-start script is in place on non-windows platforms
 command = "#{node['splunk']['cmd']} enable boot-start -user #{node['splunk']['user']}"
-if Gem::Version.new(node['splunk']['package']['version']) >= Gem::Version.new('7.2.2')
-  command += node['splunk']['boot_start_args']
-end
+command += node['splunk']['boot_start_args'] if Gem::Version.new(node['splunk']['package']['version']) >= Gem::Version.new('7.2.2')
+
 execute command do
   not_if { platform_family?('windows') }
   not_if { File.exist?(node['splunk']['systemd_file_location']) }

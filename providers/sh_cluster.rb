@@ -1,10 +1,8 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
 # Provider:: sh_cluster
 #
-
-use_inline_resources
 
 action :initialize do
   search_heads = new_resource.search_heads
