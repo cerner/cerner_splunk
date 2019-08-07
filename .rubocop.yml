@@ -4,6 +4,8 @@ AllCops:
     - 'Vagrantfile'
     - 'Gemfile'
     - 'Berksfile'
+    - 'vendor/**/*'
+    - '.git/**/*'
 
 Metrics/BlockLength:
   Enabled: false
