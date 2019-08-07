@@ -1,7 +1,11 @@
 source 'https://rubygems.org'
 
 # Going forward, these should be updated to the latest versions immediately post release
-chefspec_version = '= 8.0.0'
+chefspec_version = if Bundler.current_ruby.on_23?
+                 '= 7.3.4'
+               else
+                 '= 8.0.0'
+               end
 # Don't upgrade until https://github.com/Foodcritic/foodcritic/issues/760 is fixed
 foodcritic_version = '= 12.3.0'
 rubocop_version = '= 0.74.0'
