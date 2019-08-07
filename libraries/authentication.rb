@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
 # File Name:: authentication.rb
@@ -41,7 +41,7 @@ module CernerSplunk
       end
 
       ASSUMPTIONS.each do |key, type|
-        if hash['authType'] != type && hash.key?(key)
+        if hash['authType'] != type && hash.key?(key) # rubocop:disable Style/IfUnlessModifier
           fail "#{key} is only supported with #{type}. authType = #{hash['authType']}"
         end
       end
@@ -56,6 +56,7 @@ module CernerSplunk
           'scriptPath' => hash.delete('scriptPath')
         }
         fail 'scriptPath required for Scripted authentication' unless script['scriptPath']
+
         search_filters = hash.delete('scriptSearchFilters')
         script['scriptSearchFilters'] = search_filters if search_filters
         hash['authSettings'] = 'script'
@@ -63,11 +64,13 @@ module CernerSplunk
         cache_timing = hash.delete('cacheTiming')
         if cache_timing
           fail "Unknown type for cacheTiming: #{cacheTiming.class}" unless cache_timing.is_a?(Hash)
+
           auth_stanzas['cacheTiming'] = cache_timing
         end
       when 'LDAP'
         strategies = hash.delete('LDAP_strategies')
         fail 'LDAP_strategies required for LDAP authentication' unless strategies
+
         strategies = [strategies] unless strategies.is_a? Array
         strategies = strategies.collect do |strategy|
           hash =
@@ -126,6 +129,7 @@ module CernerSplunk
           auth_stanzas["roleMap_#{strategy_name}"] = strategy.delete('roleMap')
 
           fail "Resolved Role Map for Strategy Name #{strategy_name} is empty!!!" if auth_stanzas["roleMap_#{strategy_name}"].empty?
+
           strategy_name
         end.join(',')
       else

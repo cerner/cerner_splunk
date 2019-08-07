@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
 # Recipe:: _configure_indexes
@@ -74,9 +74,7 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
   result
 end
 
-if is_master && index_stanzas['_introspection'].nil?
-  index_stanzas['_introspection'] = { 'repFactor' => 'auto' }
-end
+index_stanzas['_introspection'] = { 'repFactor' => 'auto' } if is_master && index_stanzas['_introspection'].nil?
 
 path = is_master ? 'master-apps/_cluster/indexes.conf' : 'system/indexes.conf'
 

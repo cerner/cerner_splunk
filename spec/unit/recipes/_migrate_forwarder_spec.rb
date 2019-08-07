@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 require_relative '../spec_helper'
 
@@ -11,7 +11,7 @@ describe 'cerner_splunk::_migrate_forwarder' do
   end
 
   let(:platform) { 'centos' }
-  let(:platform_version) { '6.8' }
+  let(:platform_version) { '6.10' }
 
   it 'stops splunk service' do
     expect(subject).to stop_service('splunk').with(service_name: 'splunk')

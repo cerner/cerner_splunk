@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
 # Recipe:: _configure_server
@@ -93,6 +93,7 @@ when :cluster_master
     server_stanzas['general']['site'] = bag['site']
     multisite_configs = CernerSplunk::DataBag.load(bag['multisite'], secret: node['splunk']['data_bag_secret']) || {}
     fail "sites attribute not configured in the multisite cluster databag: #{bag['multisite']}" if multisite_configs['sites'].nil? || multisite_configs['sites'].empty?
+
     available_sites = multisite_configs['sites'].map { |site| CernerSplunk::DataBag.load(site, secret: node['splunk']['data_bag_secret'])['site'] }
     settings = (multisite_configs['multisite_settings'] || {}).reject do |k, _|
       k.start_with?('_cerner_splunk')

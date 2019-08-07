@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
 # Recipe:: shc_search_head
@@ -9,6 +9,7 @@ fail 'Search Head installation not currently supported on windows' if platform_f
 
 search_heads = CernerSplunk.my_cluster_data(node)['shc_members']
 fail 'Search Heads are not configured for sh clustering in the cluster databag' if (search_heads.nil? || search_heads.empty?) && (node['splunk']['is_cloud'] == false)
+
 ## Attributes
 instance_exec :shc_search_head, &CernerSplunk::NODE_TYPE
 

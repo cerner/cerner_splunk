@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 require_relative '../spec_helper'
 
@@ -31,7 +31,7 @@ describe 'cerner_splunk::_install' do
   let(:password_databag) { nil }
 
   let(:platform) { 'centos' }
-  let(:platform_version) { '6.8' }
+  let(:platform_version) { '6.10' }
 
   let(:initd_exists) { nil }
   let(:ui_login_exists) { nil }

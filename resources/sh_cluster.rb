@@ -1,4 +1,4 @@
-# encoding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: odw_cron
 # Resource:: sh_cluster

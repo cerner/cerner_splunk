@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 require_relative '../spec_helper'
 
@@ -19,7 +19,7 @@ end
 
 describe 'cerner_splunk::_configure_outputs' do
   subject do
-    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.8') do |node|
+    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.10') do |node|
       node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster', 'cerner_splunk/indexer_discovery_configs']
       node.override['splunk']['node_type'] = node_type
     end

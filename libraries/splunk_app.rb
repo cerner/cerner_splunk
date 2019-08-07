@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
 # File Name:: splunk_app.rb
@@ -20,6 +20,7 @@ module CernerSplunk
         hashes.each do |hash|
           to_merge = hash[app_name]
           next unless to_merge.is_a? Hash
+
           app_hash.merge!(to_merge, &merger)
         end
 
@@ -197,6 +198,7 @@ class Chef
         return false if expected_version.version && expected_version == installed_version
         # We must not install a prerelease on top of the same released version
         fail "Expecting to install prerelease on top of same released version for #{new_resource.app}" if installed_version.type == :base && expected_version.base == installed_version.base
+
         # Warn (but not fail) if the expected version is not specified. (Optimization for us)
         Chef::Log.warn "Expected version not specified for #{new_resource.app}." unless expected_version.version
         # When in whyrun mode, we want to stop here as the rest requires the tarball to be downloaded (thus changing the node).
@@ -217,7 +219,7 @@ class Chef
 
         install_from_tar filename, expected_version, installed_version
       ensure
-        download.run_action(:delete) if download
+        download&.run_action(:delete)
       end
 
       def validate_downloaded(tarfile)
@@ -227,6 +229,7 @@ class Chef
 
       def should_install?(expected_version, installed_version, tar_version) # rubocop:disable PerceivedComplexity, CyclomaticComplexity
         fail "Downloaded tarball for #{new_resource.app} does not contain a version in app.conf!" unless tar_version.version
+
         # If we specify an expected version (see warning in should download), the tar version must match exactly OR the expected version is the base version of the (prerelease) tar version
         if expected_version.version && tar_version != expected_version
           fail "Expected version #{expected_version} does not match tar version #{tar_version} for #{new_resource.app}" unless expected_version.type == :base && tar_version.base == expected_version.base
@@ -235,6 +238,7 @@ class Chef
         return false if tar_version == installed_version
         # We must not install a prerelease on top of the same released version
         fail "Attempting to install prerelease on top of same released version for #{new_resource.app}" if installed_version.type == :base && installed_version.base == tar_version.base
+
         true
       end
 
@@ -273,7 +277,7 @@ class Chef
 
         new_resource.updated_by_last_action true
       ensure
-        tarfile.close if tarfile
+        tarfile&.close
       end
 
       def manage_lookups
@@ -281,6 +285,7 @@ class Chef
         lookups.each do |file_name, url|
           if url && !url.empty?
             fail "Unsupported lookup file format for #{file_name} in the app #{new_resource.app}" unless file_name =~ /\.(?:csv\.gz|csv|kmz)$/i
+
             download_file ::File.join(new_resource.lookup_dir, file_name), url
           else
             delete_file ::File.join(new_resource.lookup_dir, file_name)
@@ -292,9 +297,7 @@ class Chef
         permissions = new_resource.permissions
         permissions.each do |stanza, hash|
           hash.each do |key, values|
-            if values.is_a?(Hash)
-              permissions[stanza][key] = values.map { |right, role| "#{right} : [ #{[*role].join(', ')} ]" }.join(', ')
-            end
+            permissions[stanza][key] = values.map { |right, role| "#{right} : [ #{[*role].join(', ')} ]" }.join(', ') if values.is_a?(Hash)
           end
         end
         manage_file(new_resource.perms_file, permissions)
@@ -325,6 +328,7 @@ class Chef
 
       def insert_procs(filename, contents)
         return contents unless contents.is_a? Hash
+
         contents.inject({}) do |retval, (stanza, attributes)|
           retval[stanza] = attributes.inject({}) do |stanzavals, (key, value)|
             stanzavals[key] =

@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
 # Recipe:: license_server
@@ -16,9 +16,7 @@ instance_exec :license_server, &CernerSplunk::NODE_TYPE
 
 bag = CernerSplunk::DataBag.load node['splunk']['config']['licenses'], secret: node['splunk']['data_bag_secret']
 
-unless bag
-  throw "Unknown databag configured for node['splunk']['config']['licenses']"
-end
+throw "Unknown databag configured for node['splunk']['config']['licenses']" unless bag
 
 data_bag_item = bag.to_hash
 total_available_license_quota = 0
@@ -31,9 +29,10 @@ license_groups = data_bag_item.inject({}) do |hash, (key, value)|
     type = "#{type}_#{Digest::SHA256.hexdigest(sourcetypes).upcase}" if type == 'fixed-sourcetype'
     quota = doc.at_xpath('/license/payload/quota/text()').to_s.to_i
     expiration_time = doc.at_xpath('/license/payload/expiration_time/text()').to_s.to_i
-    total_available_license_quota += quota if (type == 'enterprise' || type == "fixed-sourcetype_#{Digest::SHA256.hexdigest(sourcetypes).upcase}") && expiration_time > Time.now.to_i
+    total_available_license_quota += quota if (['enterprise', "fixed-sourcetype_#{Digest::SHA256.hexdigest(sourcetypes).upcase}"].include? type) && expiration_time > Time.now.to_i
     hash[type] ||= {}
     fail 'Multiple license types are not currently supported' if hash.length > 1
+
     hash[type][key] = value
   end
   hash
@@ -69,11 +68,12 @@ license_groups.each do |type, keys|
   end
 end
 
-b = ruby_block 'license cleanup' do
+b = ruby_block 'license cleanup' do # ~FC014
   block do
     existing_directory = Dir.glob("#{node['splunk']['home']}/etc/licenses/*")
     existing_directory.each do |dir|
       next if license_groups.keys.include? File.basename(dir)
+
       Chef::Log.info("ruby_block[license cleanup] deleted unconfigured license directory #{dir}")
       FileUtils.rm_rf(dir)
     end

@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
 # File Name:: conf_template.rb
@@ -12,6 +12,7 @@ module CernerSplunk
         message_suffix = " evaluating #{label}" unless label.nil?
         while value.is_a? Proc
           fail "Proc depth exceeded#{message_suffix}" if depth <= 0
+
           value = value.call(arguments)
           depth -= 1
         end
@@ -24,6 +25,7 @@ module CernerSplunk
           label = "Stanza #{stanza}"
           stanza_value = CernerSplunk::ConfTemplate.collapse_proc stanza_value, label: label, arguments: { stanza: stanza }
           fail "Unexpected value (#{stanza_value.class} '#{stanza_value}') for #{label}" unless stanza_value.nil? || stanza_value.is_a?(Hash)
+
           if stanza_value.is_a? Hash
             file_data[stanza] = stanza_value.inject({}) do |result, (attribute, value)|
               label = "Attribute #{attribute}, Stanza #{stanza}"
@@ -37,7 +39,7 @@ module CernerSplunk
       end
 
       # Compose two procs... I should monkey patch this in, but changing core ruby just seems wrong
-      def self.compose(g, f)
+      def self.compose(g, f) # rubocop:disable Naming/UncommunicativeMethodParamName
         proc { |*a| g[*f[*a]] }
       end
 
@@ -47,7 +49,7 @@ module CernerSplunk
           @reader = CernerSplunk::Conf::Reader.new filename
         end
 
-        def [](x)
+        def [](x) # rubocop:disable Naming/UncommunicativeMethodParamName
           data[x]
         end
 

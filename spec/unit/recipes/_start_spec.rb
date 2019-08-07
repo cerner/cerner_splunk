@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 require_relative '../spec_helper'
 
@@ -29,7 +29,7 @@ describe 'cerner_splunk::_start' do
   let(:password_databag) { nil }
 
   let(:platform) { 'centos' }
-  let(:platform_version) { '6.8' }
+  let(:platform_version) { '6.10' }
 
   let(:lines) { [] }
   let(:exists) { nil }
@@ -81,8 +81,6 @@ describe 'cerner_splunk::_start' do
   end
 
   context 'when platform is not windows' do
-    let(:platform) { 'centos' }
-    let(:platform_version) { '6.9' }
     let(:windows) { false }
 
     it 'executes boot-start script' do

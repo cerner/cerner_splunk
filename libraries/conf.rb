@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
 # File Name:: conf.rb
@@ -6,12 +6,13 @@
 module CernerSplunk
   # Utilities for working with splunk configuration files
   module Conf
-    STANZA_START ||= /^\s*\[(?<stanza_name>[^\]]+)\].*$/
-    COMMENT_LINE ||= /^\s*#.*$/
-    KEY_VALUE_PAIR ||= /^(?<key>[^=]+)=(?<value>.*)$/
+    STANZA_START ||= /^\s*\[(?<stanza_name>[^\]]+)\].*$/.freeze
+    COMMENT_LINE ||= /^\s*#.*$/.freeze
+    KEY_VALUE_PAIR ||= /^(?<key>[^=]+)=(?<value>.*)$/.freeze
 
     def self.parse_string(conf)
       return {} if conf.nil?
+
       parse StringIO.open(conf, 'r:UTF-8')
     end
 
@@ -45,10 +46,11 @@ module CernerSplunk
 
       def read
         return {} unless File.exist?(@filename)
+
         file = File.open(@filename, 'r:UTF-8')
         CernerSplunk::Conf.parse file
       ensure
-        file.close if file
+        file&.close
       end
     end
   end

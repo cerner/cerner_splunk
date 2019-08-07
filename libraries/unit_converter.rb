@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
 # File Name:: unit_converter.rb
@@ -7,7 +7,7 @@
 #
 module CernerSplunk
   SIZE_SCALE ||= %w[KB MB GB TB].freeze
-  REGEX ||= /(?i)^\s*+(\d++(?>\.\d+)?+)\s*+([kmgt](?>i?+b)?+|b?+)\s*+$/
+  REGEX ||= /(?i)^\s*+(\d++(?>\.\d+)?+)\s*+([kmgt](?>i?+b)?+|b?+)\s*+$/.freeze
   POWER ||= { '' => 0, 'B' => 0, 'K' => 1, 'M' => 2, 'G' => 3, 'T' => 4 }.freeze
   # Methods converts file sizes in KB, MB, GB and TB into Bytes.
   def self.convert_to_bytes(string)

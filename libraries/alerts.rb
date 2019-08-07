@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
 # File Name:: alerts.rb
@@ -29,6 +29,7 @@ module CernerSplunk
       if email_settings['auth_password']
         password = CernerSplunk::DataBag.load email_settings['auth_password'], default: default_coords, secret: node['splunk']['data_bag_secret']
         fail 'Password must be a String' unless password.is_a?(String)
+
         email_settings['auth_password'] = password
       end
       alert_stanzas

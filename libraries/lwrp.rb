@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
 # File Name:: lwrp.rb
@@ -40,7 +40,7 @@ module CernerSplunk
     # Extension of the Resource DSL, defines an attribute that can be set upfront or can be calculated at convergence time.
     module DelayableAttribute
       def delayable_attribute(attr_name, validation = {}) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
-        class_eval(<<-SHIM, __FILE__, __LINE__)
+        class_eval(<<-SHIM, __FILE__, __LINE__ + 1)
           def #{attr_name}(arg=nil,&block)
             _set_or_return_#{attr_name}(arg,block)
           end

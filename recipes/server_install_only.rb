@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Cookbook Name:: cerner_splunk
 # Recipe:: server_install_only
 #

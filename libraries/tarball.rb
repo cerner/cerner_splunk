@@ -1,4 +1,4 @@
-# coding: UTF-8
+# frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
 # File Name:: tarball.rb
@@ -46,6 +46,7 @@ module CernerSplunk
       target_path = @prefix.nil? ? name : "#{@prefix}/#{name}"
       iterate file: proc { |path, entry| data << entry.read if path == target_path }, other: proc {}
       fail "Multiple entries for #{target_path} found in #{@file_name}" if data.size > 1
+
       data.first
     end
 
@@ -132,8 +133,8 @@ module CernerSplunk
         when 'K' # LongSymLink
           long_link = entry.read.strip
         else
-          path = long_path && long_path.start_with?(entry.full_name) ? long_path : entry.full_name
-          linkname = long_link && long_link.start_with?(entry.header.linkname) ? long_link : entry.header.linkname
+          path = long_path&.start_with?(entry.full_name) ? long_path : entry.full_name
+          linkname = long_link&.start_with?(entry.header.linkname) ? long_link : entry.header.linkname
 
           # Determine which callback to invoke based on the typeflag
           callback = callbacks[:file] if entry.header.typeflag == '0'
@@ -173,7 +174,8 @@ module CernerSplunk
 
       def call(*)
         return if @pid != $PID
-        @data.drop(1).reverse_each { |io| io.close if io }
+
+        @data.drop(1).reverse_each { |io| io&.close }
       end
     end
   end

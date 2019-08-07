@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 name             'cerner_splunk_test'
 maintainer       'Operations Infrastructure Team - Cerner Innovation, Inc.'
 maintainer_email 'DL_Population_Health_IP_OpsInfra@cerner.com'
