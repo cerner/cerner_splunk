@@ -30,10 +30,6 @@ describe 'cerner_splunk::_start' do
 
   let(:platform) { 'centos' }
   let(:platform_version) { '6.10' }
-
-  let(:lines) { [] }
-  let(:exists) { nil }
-
   let(:windows) { nil }
 
   before do
@@ -41,14 +37,6 @@ describe 'cerner_splunk::_start' do
     stub_data_bag_item('cerner_splunk', 'cluster').and_return(cluster_config)
     stub_data_bag_item('cerner_splunk', 'indexes').and_return({})
     allow(Chef::Recipe).to receive(:platform_family?).with('windows').and_return(windows)
-
-    allow(File).to receive(:exist?).and_call_original
-    allow(File).to receive(:exist?).with('/etc/init.d/splunk').and_return(exists)
-    allow(File).to receive(:readlines).and_call_original
-    allow(File).to receive(:readlines).with('/etc/init.d/splunk').and_return(lines)
-
-    # Stub alt separator for windows in Ruby 1.9.3
-    stub_const('::File::ALT_SEPARATOR', '|')
   end
 
   after do
@@ -68,78 +56,119 @@ describe 'cerner_splunk::_start' do
     end
 
     it 'does not execute boot-start script' do
-      expect(subject).to_not run_execute('splunk enable boot-start -user splunk')
+      expect(subject).not_to run_execute('splunk enable boot-start -user splunk')
     end
 
     it 'does not insert ulimit into init.d script' do
-      expect(subject).to_not run_ruby_block('insert ulimit')
+      expect(subject).not_to run_ruby_block('update-initd-file')
     end
 
-    it 'does not run restart-splunk-for-ulimit ruby block' do
-      expect(subject).not_to run_ruby_block('restart-splunk-for-ulimit')
+    it 'does not run restart-splunk-for-initd-ulimit ruby block' do
+      expect(subject).not_to run_ruby_block('restart-splunk-for-initd-ulimit')
     end
   end
 
   context 'when platform is not windows' do
     let(:windows) { false }
+    let(:initd_exists) { [false, false] }
+    let(:systemd_exists) { [false, false] }
+    let(:lines) { [] }
 
-    it 'executes boot-start script' do
-      expect(subject).to run_execute('splunk enable boot-start -user splunk -systemd-managed 0')
+    before do
+      allow(File).to receive(:exist?).and_call_original
+      allow(File).to receive(:exist?).with('/etc/init.d/splunk').exactly(2).times.and_return(initd_exists[0], initd_exists[1])
+      allow(File).to receive(:exist?).with('/etc/systemd/system/splunk.service').exactly(3).times.and_return(systemd_exists[0], systemd_exists[1], systemd_exists[1])
+
+      allow(File).to receive(:readlines).and_call_original
+      allow(File).to receive(:readlines).with('/etc/init.d/splunk').and_return(lines)
     end
 
-    it 'inserts ulimit into init.d script' do
-      expect(subject).to run_ruby_block('insert ulimit')
-    end
+    context 'and platform version is 6.x' do
+      let(:platform_version) { '6.10' }
 
-    context 'when init.d script does not exist' do
-      let(:exists) { false }
-
-      it 'notifies the touch restart-marker resource' do
-        expect(subject).to run_ruby_block('restart-splunk-for-ulimit')
-        expect(subject.ruby_block('restart-splunk-for-ulimit')).to notify('file[splunk-marker]').to(:touch).immediately
+      it 'executes boot-start script for initd' do
+        expect(subject).to run_execute('splunk enable boot-start -user splunk -systemd-managed 0')
       end
-    end
 
-    context 'when init.d script does exist' do
-      let(:exists) { true }
-
-      context 'when ulimit is not present in init.d script' do
-        let(:lines) { ['line 1', 'line 2'] }
+      context 'when init.d script does not exist' do
+        let(:initd_exists) { [false, true] }
 
         it 'inserts ulimit into init.d script' do
-          expect(subject).to run_ruby_block('insert ulimit')
+          expect(subject).to run_ruby_block('update-initd-file')
         end
 
         it 'notifies the touch restart-marker resource' do
-          expect(subject).to run_ruby_block('restart-splunk-for-ulimit')
-          expect(subject.ruby_block('restart-splunk-for-ulimit')).to notify('file[splunk-marker]').to(:touch).immediately
+          expect(subject).to run_ruby_block('restart-splunk-for-initd-ulimit')
+          expect(subject.ruby_block('restart-splunk-for-initd-ulimit')).to notify('file[splunk-marker]').to(:touch).immediately
         end
       end
 
-      context 'when ulimit is present in init.d script' do
-        context 'when ulimit command is same as the one to be added' do
-          let(:lines) { ['line 1', 'ulimit -n 8192'] }
+      context 'when init.d script does exist' do
+        let(:initd_exists) { [true, true] }
 
-          it 'inserts ulimit into init.d script' do
-            expect(subject).to run_ruby_block('insert ulimit')
-          end
+        it 'inserts ulimit into init.d script' do
+          expect(subject).to run_ruby_block('update-initd-file')
+        end
 
-          it 'does not run restart-splunk-for-ulimit ruby block' do
-            expect(subject).not_to run_ruby_block('restart-splunk-for-ulimit')
+        context 'when ulimit is not present in init.d script beforehand' do
+          let(:lines) { ['line 1', 'line 2'] }
+
+          it 'notifies the touch restart-marker resource' do
+            expect(subject).to run_ruby_block('restart-splunk-for-initd-ulimit')
+            expect(subject.ruby_block('restart-splunk-for-initd-ulimit')).to notify('file[splunk-marker]').to(:touch).immediately
           end
         end
 
-        context 'when ulimit command is different than the one to be added' do
-          let(:lines) { ['line 1', 'ulimit -n 1234'] }
+        context 'when ulimit is present in init.d script' do
+          context 'and ulimit command is same as the one to be added' do
+            let(:lines) { ['line 1', 'ulimit -n 8192'] }
 
-          it 'inserts ulimit into init.d script' do
-            expect(subject).to run_ruby_block('insert ulimit')
+            it 'does not run restart-splunk-for-initd-ulimit ruby block' do
+              expect(subject).not_to run_ruby_block('restart-splunk-for-initd-ulimit')
+            end
           end
 
-          it 'notifies the touch restart-marker resource' do
-            expect(subject).to run_ruby_block('restart-splunk-for-ulimit')
-            expect(subject.ruby_block('restart-splunk-for-ulimit')).to notify('file[splunk-marker]').to(:touch).immediately
+          context 'and ulimit command is different than the one to be added' do
+            let(:lines) { ['line 1', 'ulimit -n 1234'] }
+
+            it 'notifies the touch restart-marker resource' do
+              expect(subject).to run_ruby_block('restart-splunk-for-initd-ulimit')
+              expect(subject.ruby_block('restart-splunk-for-initd-ulimit')).to notify('file[splunk-marker]').to(:touch).immediately
+            end
           end
+        end
+      end
+    end
+
+    context 'and platform version is 7.x' do
+      let(:platform_version) { '7.6.1810' }
+
+      context 'when systemd script does not exist' do
+        let(:systemd_exists) { [false, true] }
+
+        it 'executes boot-start script for systemd' do
+          expect(subject).to run_execute('splunk enable boot-start -user splunk -systemd-managed 1 -systemd-unit-file-name splunk')
+        end
+
+        it 'modifies the systemd file' do
+          expect(subject).to edit_filter_lines('update-systemd-file')
+        end
+
+        it 'executes systemctl reload' do
+          expect(subject.filter_lines('update-systemd-file')).to notify('execute[reload-systemctl]').to(:run).immediately
+        end
+      end
+
+      context 'when systemd script already exists' do
+        let(:systemd_exists) { [true, true] }
+
+        it 'does not execute boot-start script for systemd' do
+          expect(subject).not_to run_execute('splunk enable boot-start -user splunk -systemd-managed 1 -systemd-unit-file-name splunk')
+        end
+
+        it 'modifies the systemd file' do
+          expect(subject).to edit_filter_lines('update-systemd-file')
+          expect(subject.filter_lines('update-systemd-file')).to notify('execute[reload-systemctl]').to(:run).immediately
         end
       end
     end

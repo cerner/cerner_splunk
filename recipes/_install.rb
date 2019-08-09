@@ -24,6 +24,15 @@ manifest_missing = proc { ::Dir.glob("#{node['splunk']['home']}/#{node['splunk']
 
 include_recipe 'cerner_splunk::_restart_marker'
 
+# Under systemd, starting or restarting the service allows the chef run to continue
+# before Splunk is finished initializing.  Need to wait a bit to let it fully start
+# before we run any other commands.
+execute 'sleep-10' do
+  command 'sleep 10'
+  action :nothing
+  only_if { ::File.exist? node['splunk']['systemd_file_location'] }
+end
+
 # Actions
 # This service definition is used for ensuring splunk is started during the run and to stop splunk service
 service 'splunk' do
@@ -31,6 +40,7 @@ service 'splunk' do
   action :nothing
   supports status: true, start: true, stop: true
   notifies :delete, 'file[splunk-marker]', :immediately
+  notifies :run, 'execute[sleep-10]', :immediately
 end
 
 # This service definition is used for restarting splunk when the run is over
@@ -40,6 +50,7 @@ service 'splunk-restart' do
   supports status: true, restart: true
   only_if { ::File.exist? CernerSplunk.restart_marker_file }
   notifies :delete, 'file[splunk-marker]', :immediately
+  notifies :run, 'execute[sleep-10]', :immediately
 end
 
 ruby_block 'splunk-delayed-restart' do
@@ -68,12 +79,14 @@ elsif platform_family? 'debian'
     only_if(&manifest_missing)
   end
 elsif platform_family? 'windows'
+  # installing as the system user by default as Splunk has difficulties with being a limited user
+  flags = %(AGREETOLICENSE=Yes SERVICESTARTTYPE=auto LAUNCHSPLUNK=0 INSTALLDIR="#{node['splunk']['home'].tr('/', '\\')}")
+  flags += ' SPLUNKPASSWORD=changeme' if Gem::Version.new(nsp['version']) >= Gem::Version.new('7.1.0')
   windows_package node['splunk']['package']['base_name'] do
     source splunk_file
     version "#{node['splunk']['package']['version']}-#{node['splunk']['package']['build']}"
     only_if(&manifest_missing)
-    # installing as the system user by default as Splunk has difficulties with being a limited user
-    options %(AGREETOLICENSE=Yes SERVICESTARTTYPE=auto LAUNCHSPLUNK=0 INSTALLDIR="#{node['splunk']['home'].tr('/', '\\')}")
+    options flags
   end
 else
   fail 'unsupported platform'
