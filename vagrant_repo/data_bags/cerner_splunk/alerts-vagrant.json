@@ -16,7 +16,6 @@
     "search_head": {
       "bag": ":base",
       "email": {
-        "reportServerEnabled":false
       }
     },
     "shcluster": "search_head"
@@ -25,7 +24,6 @@
     "email": {
       "mailserver": "smtprr.cerner.com",
       "from": "splunk-dev@cerner.com",
-      "reportServerEnabled":true,
       "subject": "Vagrant Splunk Alert: $name$",
       "inline":1
     }

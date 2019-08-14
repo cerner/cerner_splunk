@@ -34,14 +34,13 @@ describe 'cerner_splunk::_configure_shc_alerts' do
       'shcluster' => {
         'bag' => ':base',
         'email' => {
-          'reportServerEnabled' => false
+          'from' => 'splunk@test.com'
         }
       },
       'base' => {
         'email' => {
           'mailserver' => 'smtprr.example.com',
-          'from' => 'splunk@example.com',
-          'reportServerEnabled' => true
+          'from' => 'splunk@example.com'
         }
       }
     }
@@ -64,8 +63,7 @@ describe 'cerner_splunk::_configure_shc_alerts' do
       stanzas: {
         'email' => {
           'mailserver' => 'smtprr.example.com',
-          'from' => 'splunk@example.com',
-          'reportServerEnabled' => false
+          'from' => 'splunk@test.com'
         }
       }
     }

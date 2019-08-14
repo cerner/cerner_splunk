@@ -18,20 +18,37 @@ execute command do
   not_if { File.exist?(node['splunk']['systemd_file_location']) }
 end
 
-ruby_block 'insert ulimit' do
+ruby_block 'update-initd-file' do
   block do
     file = Chef::Util::FileEdit.new(init_file_path)
     file.insert_line_after_match(/^RETVAL=\d$/, ulimit_command)
+    file.insert_line_after_match(/^#{ulimit_command}$/, "USER=#{node['splunk']['user']}")
+    file.search_file_replace(%r{"[$\w\/]+\/bin\/splunk" start --no-prompt --answer-yes}, "su - ${USER} -c '\\0'")
+    file.search_file_replace(%r{"[$\w\/]+\/bin\/splunk" (stop|restart|status)}, "su - ${USER} -c '\\0'")
     file.write_file
   end
-  not_if { platform_family?('windows') }
-  not_if { Gem::Version.new(node['splunk']['package']['version']) >= Gem::Version.new('7.2.2') && node['platform_version'].to_i == 7 }
+  only_if { File.exist?(init_file_path) }
 end
 
-ruby_block 'restart-splunk-for-ulimit' do
+ruby_block 'restart-splunk-for-initd-ulimit' do
   block { true }
   notifies :touch, 'file[splunk-marker]', :immediately
-  only_if { !platform_family?('windows') && restart_flag }
+  only_if { !platform_family?('windows') && restart_flag && !File.exist?(node['splunk']['systemd_file_location']) }
+end
+
+execute 'reload-systemctl' do
+  command 'systemctl daemon-reload'
+  action :nothing
+end
+
+filter_lines 'update-systemd-file' do
+  path node['splunk']['systemd_file_location']
+  filters([
+            { stanza: ['Service', { KillMode: 'mixed', KillSignal: 'SIGINT', TimeoutStopSec: '10min' }] }
+          ])
+  sensitive false
+  only_if { File.exist?(node['splunk']['systemd_file_location']) }
+  notifies :run, 'execute[reload-systemctl]', :immediately
 end
 
 # We then start splunk. In the future, the other resource should be here instead of this clumsy notification
@@ -41,12 +58,12 @@ ruby_block 'start-splunk' do
   notifies :start, 'service[splunk]', :immediately
 end
 
-# Added in because the first time splunk is started using chef and systemd the .pid file is owned by root which causes issues. It is automatically correct when splunk is restarted.
-execute 'correct permissions' do
-  command "chown -RP #{node['splunk']['user']}:#{node['splunk']['group']} #{node['splunk']['home']}"
-  action :run
-  not_if { platform_family?('windows') }
-  only_if { Gem::Version.new(node['splunk']['package']['version']) >= Gem::Version.new('7.2.2') && node['platform_version'].to_i == 7 }
+# The first time splunk is started on linux using chef the .pid file is owned by root which causes issues.
+pid_file = "#{node['splunk']['home']}/var/run/splunk/splunkd.pid"
+file pid_file do
+  owner node['splunk']['user']
+  group node['splunk']['group']
+  only_if { File.exist? pid_file }
 end
 
 include_recipe 'cerner_splunk::_generate_password'

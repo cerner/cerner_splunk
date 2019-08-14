@@ -26,3 +26,4 @@ gem 'chefspec', chefspec_version
 gem 'cucumber-core', '~> 3.2'
 gem 'foodcritic', foodcritic_version
 gem 'rubocop', rubocop_version
+gem 'ffi-libarchive'
