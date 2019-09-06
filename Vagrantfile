@@ -120,6 +120,7 @@ Vagrant.configure('2') do |config|
       rm -rf "$HOME/app_service/*"
       cd /vagrant/vagrant_repo/files
       cp -R lookups "$HOME/app_service/"
+      cp test_app.tgz "$HOME/app_service/"
       cd /vagrant/vagrant_repo/apps
       timestamp=`date -u +%Y%m%d%H%M%S`
       for D in *; do
@@ -276,6 +277,7 @@ Vagrant.configure('2') do |config|
     default_omnibus config
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :s_standalone, 'splunk_standalone'
+      chef.add_recipe 'cerner_splunk_test::install_libarchive'
       chef.add_recipe 'cerner_splunk::server'
     end
     network cfg, :s_standalone

@@ -7,6 +7,8 @@
 
 require 'chef/provider'
 require 'chef/resource'
+require 'fileutils'
+require 'mixlib/archive'
 
 module CernerSplunk
   # Utilities to use with the splunk_app resource/provider
@@ -222,9 +224,9 @@ class Chef
         download&.run_action(:delete)
       end
 
-      def validate_downloaded(tarfile)
-        fail "Downloaded tarball from '#{new_resource.url}' does not contain an app named '#{new_resource.app}'" if tarfile.num_files == 0
-        fail "Downloaded tarball for '#{new_resource.app}' has local entries" unless tarfile.count { |p, _| p.match %r{^[^/]+/local/.+} } == 0
+      def validate_downloaded(temp_app_dir)
+        fail "Downloaded tarball from '#{new_resource.url}' does not contain an app named '#{new_resource.app}'" if Dir[::File.join(temp_app_dir, '**', '*')].count { |file| ::File.file?(file) } == 0
+        fail "Downloaded tarball for '#{new_resource.app}' has local entries" unless Dir[::File.join(temp_app_dir, 'local', '**', '*')].count { |file| ::File.file?(file) } == 0
       end
 
       def should_install?(expected_version, installed_version, tar_version) # rubocop:disable PerceivedComplexity, CyclomaticComplexity
@@ -243,11 +245,13 @@ class Chef
       end
 
       def install_from_tar(filename, expected_version, installed_version)
-        tarfile = CernerSplunk::TarBall.new(filename, prefix: new_resource.app, user: node['splunk']['user'], group: node['splunk']['group'])
+        temp_app_dir = "#{Chef::Config[:file_cache_path]}/#{new_resource.app}"
+        Mixlib::Archive.new(filename).extract(Chef::Config[:file_cache_path])
 
-        validate_downloaded tarfile
+        validate_downloaded temp_app_dir
+        FileUtils.chown node['splunk']['user'], node['splunk']['group'], Dir.glob(::File.join(temp_app_dir, '**', '*')) unless platform_family?('windows')
 
-        app_conf = CernerSplunk::Conf.parse_string tarfile.get_file('default/app.conf')
+        app_conf = CernerSplunk::Conf.parse_string IO.read(::File.join(temp_app_dir, 'default/app.conf'))
         tar_version = CernerSplunk::AppVersion.new((app_conf['launcher'] || {})['version'])
 
         return unless should_install? expected_version, installed_version, tar_version
@@ -261,7 +265,7 @@ class Chef
         # Move existing app out of the way
         ::File.rename new_resource.root_dir, old_dir_path if ::File.exist? new_resource.root_dir
         # Extract tarball to app directory
-        tarfile.extract new_resource.apps_dir
+        ::File.rename temp_app_dir, new_resource.root_dir
 
         # Restore all potential user defined content
         create_app_directories
@@ -276,8 +280,6 @@ class Chef
         old_dir.run_action :delete
 
         new_resource.updated_by_last_action true
-      ensure
-        tarfile&.close
       end
 
       def manage_lookups

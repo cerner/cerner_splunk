@@ -43,6 +43,12 @@
         "version" : "1.0"
       }
     },
+    "test_app": {
+      "download": {
+        "url" : "http://33.33.33.33:5000/test_app.tgz",
+        "version" : "1.0"
+      }
+    },
     "awesome_splunk_app": {
       "files": {
         "app.conf": {
