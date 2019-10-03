@@ -4,11 +4,11 @@ source 'https://rubygems.org'
 chefspec_version = if Bundler.current_ruby.on_23?
                  '= 7.3.4'
                else
-                 '= 8.0.0'
+                 '= 8.0.1'
                end
 # Don't upgrade until https://github.com/Foodcritic/foodcritic/issues/760 is fixed
 foodcritic_version = '= 12.3.0'
-rubocop_version = '= 0.74.0'
+rubocop_version = '= 0.75.0'
 chef_vault_version = '> 3.0'
 
 chef_version = if Bundler.current_ruby.on_23?
@@ -16,6 +16,11 @@ chef_version = if Bundler.current_ruby.on_23?
                else
                  '= 14.13.11'
                end
+
+if Bundler.current_ruby.on_23?
+    # The latest version of faraday is not compatible with older versions of berkshelf
+    gem 'faraday', '< 0.16.0'
+end
 
 gem 'berkshelf'
 gem 'chef', chef_version
