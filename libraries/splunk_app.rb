@@ -249,7 +249,7 @@ class Chef
         Mixlib::Archive.new(filename).extract(Chef::Config[:file_cache_path])
 
         validate_downloaded temp_app_dir
-        FileUtils.chown node['splunk']['user'], node['splunk']['group'], Dir.glob(::File.join(temp_app_dir, '**', '*')) unless platform_family?('windows')
+        FileUtils.chown_R node['splunk']['user'], node['splunk']['group'], temp_app_dir unless platform_family?('windows')
 
         app_conf = CernerSplunk::Conf.parse_string IO.read(::File.join(temp_app_dir, 'default/app.conf'))
         tar_version = CernerSplunk::AppVersion.new((app_conf['launcher'] || {})['version'])
@@ -263,16 +263,16 @@ class Chef
         old_dir.run_action :delete
 
         # Move existing app out of the way
-        ::File.rename new_resource.root_dir, old_dir_path if ::File.exist? new_resource.root_dir
+        FileUtils.mv new_resource.root_dir, old_dir_path if ::File.exist? new_resource.root_dir
         # Extract tarball to app directory
-        ::File.rename temp_app_dir, new_resource.root_dir
+        FileUtils.mv temp_app_dir, new_resource.root_dir
 
         # Restore all potential user defined content
         create_app_directories
         if ::File.exist? old_dir_path
           ::Dir.chdir old_dir_path do
             ::Dir['local/*', 'lookups/*', 'metadata/local.meta'].each do |f|
-              ::File.rename "#{old_dir_path}/#{f}", "#{new_resource.root_dir}/#{f}"
+              FileUtils.mv "#{old_dir_path}/#{f}", "#{new_resource.root_dir}/#{f}"
             end
           end
         end
