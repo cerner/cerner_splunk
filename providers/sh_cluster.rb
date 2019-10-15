@@ -34,6 +34,7 @@ end
 
 action :remove do
   admin_password = new_resource.admin_password
+  management_host = CernerSplunk.management_host(node)
 
   execute 'remove search head' do # ~FC009
     command "#{node['splunk']['cmd']} remove shcluster-member -auth admin:#{admin_password}"

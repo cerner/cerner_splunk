@@ -259,6 +259,7 @@ Vagrant.configure('2') do |config|
     default_omnibus config
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :c2_deployer
+      chef.add_recipe 'cerner_splunk_test::install_libarchive'
       chef.add_recipe 'cerner_splunk::shc_deployer'
     end
     network cfg, :c2_deployer
@@ -269,6 +270,8 @@ Vagrant.configure('2') do |config|
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :c2_newnode
       chef.add_recipe 'cerner_splunk::shc_search_head'
+      # Comment out the above line and uncomment the one below and re-provision in order to test the remove recipe.
+      #chef.add_recipe 'cerner_splunk::shc_remove_search_head'
     end
     network cfg, :c2_newnode
   end
