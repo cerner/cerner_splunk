@@ -32,7 +32,7 @@ describe 'cerner_splunk_sh_cluster:add' do
 
   before do
     allow(ChefVault::Item).to receive(:data_bag_item_type).with('cerner_splunk', 'cluster').and_return(:normal)
-    stub_data_bag_item("cerner_splunk", "cluster").and_return(cluster_config)
+    stub_data_bag_item('cerner_splunk', 'cluster').and_return(cluster_config)
     stub_data_bag_item('cerner_splunk', 'indexes').and_return({})
     stub_command('/opt/splunk/bin/splunk list shcluster-members -auth admin:changeme | grep 10.0.0.2').and_return(existing_member)
   end
@@ -90,7 +90,7 @@ describe 'cerner_splunk_sh_cluster:remove' do
 
   before do
     allow(ChefVault::Item).to receive(:data_bag_item_type).with('cerner_splunk', 'cluster').and_return(:normal)
-    stub_data_bag_item("cerner_splunk", "cluster").and_return(cluster_config)
+    stub_data_bag_item('cerner_splunk', 'cluster').and_return(cluster_config)
     stub_data_bag_item('cerner_splunk', 'indexes').and_return({})
     stub_command('/opt/splunk/bin/splunk list shcluster-members -auth admin:changeme | grep 10.0.0.2').and_return(existing_member)
   end
@@ -148,7 +148,7 @@ describe 'cerner_splunk_sh_cluster:initialize' do
 
   before do
     allow(ChefVault::Item).to receive(:data_bag_item_type).with('cerner_splunk', 'cluster').and_return(:normal)
-    stub_data_bag_item("cerner_splunk", "cluster").and_return(cluster_config)
+    stub_data_bag_item('cerner_splunk', 'cluster').and_return(cluster_config)
     stub_data_bag_item('cerner_splunk', 'indexes').and_return({})
     stub_command('/opt/splunk/bin/splunk list shcluster-members -auth admin:changeme | grep is_captain:1').and_return(captain_exist)
   end
