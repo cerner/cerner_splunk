@@ -2,15 +2,15 @@
 
 require_relative '../spec_helper'
 
-describe 'cerner_splunk::shc_search_head' do
+describe 'cerner_splunk_sh_cluster:add' do
   subject do
-    runner = ChefSpec::SoloRunner.new(step_into: ['cerner_splunk_sh_cluster']) do |node|
-      node.set['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
-      node.set['splunk']['cmd'] = '/opt/splunk/bin/splunk'
-      node.set['splunk']['package']['base_name'] = 'base_name'
-      node.set['splunk']['package']['download_group'] = 'download_group'
+    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.10', step_into: ['cerner_splunk_sh_cluster']) do |node|
+      node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
+      node.override['splunk']['cmd'] = '/opt/splunk/bin/splunk'
+      node.override['splunk']['package']['base_name'] = 'base_name'
+      node.override['splunk']['package']['download_group'] = 'download_group'
     end
-    runner.converge('cerner_splunk::_install', described_recipe)
+    runner.converge('cerner_splunk::_install', 'cerner_splunk::shc_search_head')
   end
 
   let(:cluster_config) do
@@ -31,9 +31,10 @@ describe 'cerner_splunk::shc_search_head' do
   end
 
   before do
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'cluster').and_return(cluster_config)
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'indexes').and_return({})
-    stub_command('/opt/splunk/bin/splunk list shcluster-members -auth admin:changeme | grep 127.0.0.1').and_return(existing_member)
+    allow(ChefVault::Item).to receive(:data_bag_item_type).with('cerner_splunk', 'cluster').and_return(:normal)
+    stub_data_bag_item("cerner_splunk", "cluster").and_return(cluster_config)
+    stub_data_bag_item('cerner_splunk', 'indexes').and_return({})
+    stub_command('/opt/splunk/bin/splunk list shcluster-members -auth admin:changeme | grep 10.0.0.2').and_return(existing_member)
   end
 
   after do
@@ -57,15 +58,15 @@ describe 'cerner_splunk::shc_search_head' do
   end
 end
 
-describe 'cerner_splunk::shc_remove_search_head' do
+describe 'cerner_splunk_sh_cluster:remove' do
   subject do
-    runner = ChefSpec::SoloRunner.new(step_into: ['cerner_splunk_sh_cluster']) do |node|
-      node.set['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
-      node.set['splunk']['cmd'] = '/opt/splunk/bin/splunk'
-      node.set['splunk']['package']['base_name'] = 'base_name'
-      node.set['splunk']['package']['download_group'] = 'download_group'
+    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.10', step_into: ['cerner_splunk_sh_cluster']) do |node|
+      node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
+      node.override['splunk']['cmd'] = '/opt/splunk/bin/splunk'
+      node.override['splunk']['package']['base_name'] = 'base_name'
+      node.override['splunk']['package']['download_group'] = 'download_group'
     end
-    runner.converge('cerner_splunk::_install', described_recipe)
+    runner.converge('cerner_splunk::_install', 'cerner_splunk::shc_remove_search_head')
   end
 
   let(:cluster_config) do
@@ -88,9 +89,10 @@ describe 'cerner_splunk::shc_remove_search_head' do
   let(:existing_member) { nil }
 
   before do
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'cluster').and_return(cluster_config)
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'indexes').and_return({})
-    stub_command('/opt/splunk/bin/splunk list shcluster-members -auth admin:changeme | grep 127.0.0.1').and_return(existing_member)
+    allow(ChefVault::Item).to receive(:data_bag_item_type).with('cerner_splunk', 'cluster').and_return(:normal)
+    stub_data_bag_item("cerner_splunk", "cluster").and_return(cluster_config)
+    stub_data_bag_item('cerner_splunk', 'indexes').and_return({})
+    stub_command('/opt/splunk/bin/splunk list shcluster-members -auth admin:changeme | grep 10.0.0.2').and_return(existing_member)
   end
 
   after do
@@ -114,15 +116,15 @@ describe 'cerner_splunk::shc_remove_search_head' do
   end
 end
 
-describe 'cerner_splunk::shc_captain' do
+describe 'cerner_splunk_sh_cluster:initialize' do
   subject do
-    runner = ChefSpec::SoloRunner.new(step_into: ['cerner_splunk_sh_cluster']) do |node|
-      node.set['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
-      node.set['splunk']['cmd'] = '/opt/splunk/bin/splunk'
-      node.set['splunk']['package']['base_name'] = 'base_name'
-      node.set['splunk']['package']['download_group'] = 'download_group'
+    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.10', step_into: ['cerner_splunk_sh_cluster']) do |node|
+      node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
+      node.override['splunk']['cmd'] = '/opt/splunk/bin/splunk'
+      node.override['splunk']['package']['base_name'] = 'base_name'
+      node.override['splunk']['package']['download_group'] = 'download_group'
     end
-    runner.converge('cerner_splunk::_install', described_recipe)
+    runner.converge('cerner_splunk::_install', 'cerner_splunk::shc_captain')
   end
 
   let(:cluster_config) do
@@ -145,8 +147,9 @@ describe 'cerner_splunk::shc_captain' do
   let(:captain_exist) { nil }
 
   before do
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'cluster').and_return(cluster_config)
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'indexes').and_return({})
+    allow(ChefVault::Item).to receive(:data_bag_item_type).with('cerner_splunk', 'cluster').and_return(:normal)
+    stub_data_bag_item("cerner_splunk", "cluster").and_return(cluster_config)
+    stub_data_bag_item('cerner_splunk', 'indexes').and_return({})
     stub_command('/opt/splunk/bin/splunk list shcluster-members -auth admin:changeme | grep is_captain:1').and_return(captain_exist)
   end
 
