@@ -215,6 +215,7 @@ Vagrant.configure('2') do |config|
     default_omnibus config
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :s2_search, 'splunk_site2'
+      chef.add_recipe 'cerner_splunk_test::install_libarchive'
       chef.add_recipe 'cerner_splunk::search_head'
     end
     network cfg, :s2_search
@@ -224,6 +225,7 @@ Vagrant.configure('2') do |config|
     default_omnibus config
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :c1_search
+      chef.add_recipe 'cerner_splunk_test::install_libarchive'
       chef.add_recipe 'cerner_splunk::search_head'
     end
     network cfg, :c1_search
@@ -290,6 +292,7 @@ Vagrant.configure('2') do |config|
     default_omnibus config
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :f_default, 'splunk_standalone'
+      chef.add_recipe 'cerner_splunk_test::install_libarchive'
       chef.add_recipe 'cerner_splunk'
       chef.add_recipe 'cerner_splunk_test'
     end
@@ -298,9 +301,10 @@ Vagrant.configure('2') do |config|
 
   config.vm.define :f_debian do |cfg|
     default_omnibus config
-    cfg.vm.box = 'bento/ubuntu-12.04'
+    cfg.vm.box = 'bento/ubuntu-16.04'
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :f_debian, 'splunk_standalone'
+      chef.add_recipe 'cerner_splunk_test::install_libarchive'
       chef.add_recipe 'cerner_splunk'
     end
     network cfg, :f_debian
@@ -310,6 +314,7 @@ Vagrant.configure('2') do |config|
     default_omnibus config
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :f_heavy, 'splunk_standalone'
+      chef.add_recipe 'cerner_splunk_test::install_libarchive'
       chef.add_recipe 'cerner_splunk::heavy_forwarder'
     end
     network cfg, :f_heavy
