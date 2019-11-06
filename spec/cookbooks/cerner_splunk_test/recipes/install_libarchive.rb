@@ -11,7 +11,17 @@ execute 'remove files' do
   command 'rm -rf /opt/chef/embedded/lib/libarchive.so*'
 end
 
-package 'libarchive-devel' do
+if node['platform_family'] == 'debian'
+  libarchive_package = 'libarchive-dev'
+
+  execute 'apt-get update' do
+    command 'apt-get update'
+  end
+else
+  libarchive_package = 'libarchive-devel'
+end
+
+package libarchive_package do
   action :install
 end
 
