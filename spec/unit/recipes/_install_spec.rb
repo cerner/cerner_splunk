@@ -36,6 +36,8 @@ describe 'cerner_splunk::_install' do
   let(:initd_exists) { nil }
   let(:ui_login_exists) { nil }
   let(:ftr_exists) { nil }
+  let(:splunk_launch_exists) { nil }
+  let(:splunk_launch_content) { '' }
   let(:glob) { [] }
 
   let(:windows) { nil }
@@ -53,6 +55,10 @@ describe 'cerner_splunk::_install' do
     allow(File).to receive(:exist?).with('/etc/init.d/splunk').and_return(initd_exists)
     allow(File).to receive(:exist?).with('/opt/splunkforwarder/etc/.ui_login').and_return(ui_login_exists)
     allow(File).to receive(:exist?).with('/opt/splunkforwarder/ftr').and_return(ftr_exists)
+    allow(File).to receive(:exist?).with('/opt/splunkforwarder/etc/splunk-launch.conf').and_return(splunk_launch_exists)
+
+    allow(File).to receive(:read).and_call_original
+    allow(File).to receive(:read).with('/opt/splunkforwarder/etc/splunk-launch.conf').and_return(splunk_launch_content)
 
     allow(Dir).to receive(:glob).and_call_original
     allow(Dir).to receive(:glob).with('/opt/splunkforwarder/splunkforwarder-7.3.3-7af3758d0d5e-*').and_return(glob)
@@ -218,6 +224,36 @@ describe 'cerner_splunk::_install' do
 
     it 'touches .ui_login file' do
       expect(subject).to touch_file('/opt/splunkforwarder/etc/.ui_login')
+    end
+  end
+
+  context 'when ftr file and splunk-launch.conf exist' do
+    let(:splunk_launch_exists) { true }
+    let(:splunk_launch_content) { "SPLUNK_HOME=/opt/splunkforwarder\nSPLUNK_OS_USER=root\n" }
+    let(:ftr_exists) { true }
+
+    it 'edits splunk-launch.conf SPLUNK_OS_USER' do
+      expect(subject).to create_file('/opt/splunkforwarder/etc/splunk-launch.conf').with_content(
+        "SPLUNK_HOME=/opt/splunkforwarder\nSPLUNK_OS_USER=splunk\n"
+      )
+    end
+  end
+
+  context 'when ftr file does not exist and splunk-launch.conf exists' do
+    let(:splunk_launch_exists) { true }
+    let(:ftr_exists) { false }
+
+    it 'does not edit splunk-launch.conf' do
+      expect(subject).to_not create_file('/opt/splunkforwarder/etc/splunk-launch.conf')
+    end
+  end
+
+  context 'when ftr file and splunk-launch.conf do not exist' do
+    let(:splunk_launch_exists) { false }
+    let(:ftr_exists) { true }
+
+    it 'does not edit splunk-launch.conf' do
+      expect(subject).to_not create_file('/opt/splunkforwarder/etc/splunk-launch.conf')
     end
   end
 

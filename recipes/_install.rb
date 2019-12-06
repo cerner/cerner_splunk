@@ -99,6 +99,12 @@ windows_password = CernerSplunk::DataBag.load(node['splunk']['windows_password']
 run_command = "#{node['splunk']['cmd']} help commands --accept-license --answer-yes --no-prompt"
 run_command += " --seed-passwd 'changeme'" if Gem::Version.new(nsp['version']) >= Gem::Version.new('7.2.0')
 
+# Ensure the SPLUNK_OS_USER matches node['splunk']['user'] to prevent setuid failures if splunk-launch.conf exists
+file "#{node['splunk']['home']}/etc/splunk-launch.conf" do
+  content(lazy { ::File.read("#{node['splunk']['home']}/etc/splunk-launch.conf").gsub(/^SPLUNK_OS_USER=.*/, "SPLUNK_OS_USER=#{node['splunk']['user']}") })
+  only_if { ::File.exist?("#{node['splunk']['home']}/ftr") && ::File.exist?("#{node['splunk']['home']}/etc/splunk-launch.conf") }
+end
+
 # TODO: Use admin_password from databag for splunk-first-run.
 execute 'splunk-first-run' do
   command run_command
