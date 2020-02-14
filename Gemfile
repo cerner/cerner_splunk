@@ -14,7 +14,7 @@ chef_vault_version = '> 3.0'
 chef_version = if Bundler.current_ruby.on_23?
                  '= 12.18.31'
                else
-                 '= 14.13.11'
+                 '= 15.8.23'
                end
 
 if Bundler.current_ruby.on_23?
