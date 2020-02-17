@@ -47,6 +47,10 @@ def default_omnibus(config)
   config.omnibus.chef_version = 15
 end
 
+def accept_chef_license(chef)
+  chef.arguments = "--chef-license accept"
+end
+
 def network(config, name, splunk_password = true)
   net = @network.delete(name)
   throw "Unknown or duplicate config #{name}" unless net
@@ -150,7 +154,7 @@ Vagrant.configure('2') do |config|
     default_omnibus(cfg)
 
     cfg.vm.provision :chef_client do |chef|
-      chef.arguments = "--chef-license accept"
+      accept_chef_license(chef)
       chef_defaults chef, :s_license, 'splunk_license'
       chef.add_recipe 'cerner_splunk::license_server'
     end
@@ -161,7 +165,7 @@ Vagrant.configure('2') do |config|
     default_omnibus(cfg)
 
     cfg.vm.provision :chef_client do |chef|
-      chef.arguments = "--chef-license accept"
+      accept_chef_license(chef)
       chef_defaults chef, :c1_master
       chef.add_recipe 'cerner_splunk::cluster_master'
     end
@@ -175,7 +179,7 @@ Vagrant.configure('2') do |config|
       default_omnibus(cfg)
 
       cfg.vm.provision :chef_client do |chef|
-        chef.arguments = "--chef-license accept"
+        accept_chef_license(chef)
         chef_defaults chef, symbol
         chef.add_recipe 'cerner_splunk::cluster_slave'
         # Uncomment the line below to set predefined GUIDs on the cluster slaves (for playing with license pooling)
@@ -189,7 +193,7 @@ Vagrant.configure('2') do |config|
     default_omnibus(cfg)
 
     cfg.vm.provision :chef_client do |chef|
-      chef.arguments = "--chef-license accept"
+      accept_chef_license(chef)
       chef_defaults chef, :s1_master, 'splunk_site1'
       chef.add_recipe 'cerner_splunk::cluster_master'
     end
@@ -202,7 +206,7 @@ Vagrant.configure('2') do |config|
       default_omnibus(cfg)
 
       cfg.vm.provision :chef_client do |chef|
-        chef.arguments = "--chef-license accept"
+        accept_chef_license(chef)
         chef_defaults chef, symbol, 'splunk_site1'
         chef.add_recipe 'cerner_splunk::cluster_slave'
       end
@@ -216,7 +220,7 @@ Vagrant.configure('2') do |config|
       default_omnibus(cfg)
 
       cfg.vm.provision :chef_client do |chef|
-        chef.arguments = "--chef-license accept"
+        accept_chef_license(chef)
         chef_defaults chef, symbol, 'splunk_site2'
         chef.add_recipe 'cerner_splunk::cluster_slave'
       end
@@ -228,7 +232,7 @@ Vagrant.configure('2') do |config|
     default_omnibus(cfg)
 
     cfg.vm.provision :chef_client do |chef|
-      chef.arguments = "--chef-license accept"
+      accept_chef_license(chef)
       chef_defaults chef, :s2_search, 'splunk_site2'
       chef.add_recipe 'cerner_splunk_test::install_libarchive'
       chef.add_recipe 'cerner_splunk::search_head'
@@ -240,7 +244,7 @@ Vagrant.configure('2') do |config|
     default_omnibus(cfg)
 
     cfg.vm.provision :chef_client do |chef|
-      chef.arguments = "--chef-license accept"
+      accept_chef_license(chef)
       chef_defaults chef, :c1_search
       chef.add_recipe 'cerner_splunk_test::install_libarchive'
       chef.add_recipe 'cerner_splunk::search_head'
@@ -254,7 +258,7 @@ Vagrant.configure('2') do |config|
       default_omnibus(cfg)
 
       cfg.vm.provision :chef_client do |chef|
-        chef.arguments = "--chef-license accept"
+        accept_chef_license(chef)
         chef_defaults chef, symbol
         chef.add_recipe 'cerner_splunk::shc_search_head'
         chef.json = {
@@ -271,7 +275,7 @@ Vagrant.configure('2') do |config|
     default_omnibus(cfg)
 
     cfg.vm.provision :chef_client do |chef|
-      chef.arguments = "--chef-license accept"
+      accept_chef_license(chef)
       chef_defaults chef, :c2_captain
       chef.add_recipe 'cerner_splunk::shc_captain'
     end
@@ -282,7 +286,7 @@ Vagrant.configure('2') do |config|
     default_omnibus(cfg)
 
     cfg.vm.provision :chef_client do |chef|
-      chef.arguments = "--chef-license accept"
+      accept_chef_license(chef)
       chef_defaults chef, :c2_deployer
       chef.add_recipe 'cerner_splunk_test::install_libarchive'
       chef.add_recipe 'cerner_splunk::shc_deployer'
@@ -294,7 +298,7 @@ Vagrant.configure('2') do |config|
     default_omnibus(cfg)
 
     cfg.vm.provision :chef_client do |chef|
-      chef.arguments = "--chef-license accept"
+      accept_chef_license(chef)
       chef_defaults chef, :c2_newnode
       chef.add_recipe 'cerner_splunk::shc_search_head'
       # Comment out the above line and uncomment the one below and re-provision in order to test the remove recipe.
@@ -307,7 +311,7 @@ Vagrant.configure('2') do |config|
     default_omnibus(cfg)
 
     cfg.vm.provision :chef_client do |chef|
-      chef.arguments = "--chef-license accept"
+      accept_chef_license(chef)
       chef_defaults chef, :s_standalone, 'splunk_standalone'
       chef.add_recipe 'cerner_splunk_test::install_libarchive'
       chef.add_recipe 'cerner_splunk::server'
@@ -319,7 +323,7 @@ Vagrant.configure('2') do |config|
     default_omnibus(cfg)
 
     cfg.vm.provision :chef_client do |chef|
-      chef.arguments = "--chef-license accept"
+      accept_chef_license(chef)
       chef_defaults chef, :f_default, 'splunk_standalone'
       chef.add_recipe 'cerner_splunk_test::install_libarchive'
       chef.add_recipe 'cerner_splunk'
@@ -333,7 +337,7 @@ Vagrant.configure('2') do |config|
 
     cfg.vm.box = 'bento/ubuntu-16.04'
     cfg.vm.provision :chef_client do |chef|
-      chef.arguments = "--chef-license accept"
+      accept_chef_license(chef)
       chef_defaults chef, :f_debian, 'splunk_standalone'
       chef.add_recipe 'cerner_splunk_test::install_libarchive'
       chef.add_recipe 'cerner_splunk'
@@ -345,7 +349,7 @@ Vagrant.configure('2') do |config|
     default_omnibus(cfg)
 
     cfg.vm.provision :chef_client do |chef|
-      chef.arguments = "--chef-license accept"
+      accept_chef_license(chef)
       chef_defaults chef, :f_heavy, 'splunk_standalone'
       chef.add_recipe 'cerner_splunk_test::install_libarchive'
       chef.add_recipe 'cerner_splunk::heavy_forwarder'
@@ -367,7 +371,7 @@ Vagrant.configure('2') do |config|
       vb.customize ['modifyvm', :id, '--memory', 1024]
     end
     cfg.vm.provision :chef_client do |chef|
-      chef.arguments = "--chef-license accept"
+      accept_chef_license(chef)
       chef_defaults chef, :f_win2012r2, 'splunk_standalone'
       chef.add_role 'splunk_monitors_windows'
       chef.add_recipe 'cerner_splunk'
