@@ -110,7 +110,7 @@ Vagrant.configure('2') do |config|
       export PATH=$PATH:/opt/chefdk/bin:/opt/chefdk/embedded/bin
       nohup chef-zero -H 0.0.0.0 -p 4000 2>&1 > /dev/null &
       cd /vagrant/vagrant_repo
-      gem install bundler:2.0.2
+      gem install bundler
       knife upload .
       berks install -b ../Berksfile
       berks upload -b ../Berksfile --no-freeze
