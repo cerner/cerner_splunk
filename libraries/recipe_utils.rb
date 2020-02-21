@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # Cookbook Name:: cerner_splunk
-# File Name:: recipe.rb
+# File Name:: recipe_utils.rb
 #
-# This recipe contains utilities to help with Splunk Recipes.
+# This library contains utilities to help with Splunk Recipes.
 
 require_relative 'databag'
 

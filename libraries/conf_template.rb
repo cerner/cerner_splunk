@@ -39,7 +39,7 @@ module CernerSplunk
       end
 
       # Compose two procs... I should monkey patch this in, but changing core ruby just seems wrong
-      def self.compose(g, f) # rubocop:disable Naming/UncommunicativeMethodParamName
+      def self.compose(g, f) # rubocop:disable Naming/MethodParameterName
         proc { |*a| g[*f[*a]] }
       end
 
@@ -49,7 +49,7 @@ module CernerSplunk
           @reader = CernerSplunk::Conf::Reader.new filename
         end
 
-        def [](x) # rubocop:disable Naming/UncommunicativeMethodParamName
+        def [](x) # rubocop:disable Naming/MethodParameterName
           data[x]
         end
 

@@ -4,12 +4,13 @@ source 'https://rubygems.org'
 chefspec_version = if Bundler.current_ruby.on_23?
                  '= 7.3.4'
                else
-                 '= 8.0.1'
+                 '= 9.1.0'
                end
-# Don't upgrade until https://github.com/Foodcritic/foodcritic/issues/760 is fixed
-foodcritic_version = '= 12.3.0'
-rubocop_version = '= 0.75.0'
-chef_vault_version = '> 3.0'
+
+foodcritic_version = '= 16.2.0'
+rubocop_version = '= 0.80.0'
+# chef-vault 4.x drops support for ruby 2.3
+chef_vault_version = '~> 3.0'
 
 chef_version = if Bundler.current_ruby.on_23?
                  '= 12.18.31'
@@ -29,8 +30,6 @@ gem 'chef', chef_version
 gem 'chef-sugar'
 gem 'chef-vault', chef_vault_version
 gem 'chefspec', chefspec_version
-# https://github.com/cucumber/cucumber-ruby-core/issues/160
-gem 'cucumber-core', '~> 3.2'
 gem 'foodcritic', foodcritic_version
 gem 'rubocop', rubocop_version
 gem 'ffi-libarchive'

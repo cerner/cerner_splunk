@@ -53,7 +53,7 @@ module CernerSplunk #:nodoc:
     # Converts an array of the form [data_bag,bag_item,key] to a string of the form "(data_bag/)bag_item(:key)"
     # If provided nil, will return nil
     # Inverse of to_a
-    def self.to_value(array, _options = {}) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
+    def self.to_value(array, _options = {}) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       case array
       when nil
         nil
@@ -75,7 +75,7 @@ module CernerSplunk #:nodoc:
 
     # Loads a data_bag item / based on the string
     # If provided nil or a string that doesn't resolve to a data_bag + item at least will return nil
-    def self.load(string, options = {}) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
+    def self.load(string, options = {}) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       opts = {
         pick_context: nil,
         handle_load_failure: false
