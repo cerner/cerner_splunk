@@ -132,7 +132,7 @@ describe 'cerner_splunk::_install' do
 
     context 'when platform is debian' do
       let(:platform) { 'ubuntu' }
-      let(:platform_version) { '14.04' }
+      let(:platform_version) { '18.04' }
 
       it 'installs downloaded splunk package and notifies splunk-first-run' do
         expected_attrs = {

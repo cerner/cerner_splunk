@@ -10,13 +10,10 @@ AllCops:
 Metrics/BlockLength:
   Enabled: false
 
-Metrics/LineLength:
+Layout/LineLength:
   Enabled: false
 
-EachWithObject:
-  Enabled: false
-
-EmptyWhen:
+Lint/EmptyWhen:
   Enabled: false
 
 Metrics/MethodLength:
@@ -25,8 +22,17 @@ Metrics/MethodLength:
 Metrics/AbcSize:
   Enabled: false
 
-Style/BracesAroundHashParameters:
-  EnforcedStyle: context_dependent
+Style/EachWithObject:
+  Enabled: false
+
+Style/HashEachMethods:
+  Enabled: true
+
+Style/HashTransformKeys:
+  Enabled: true
+
+Style/HashTransformValues:
+  Enabled: true
 
 Style/SignalException:
   EnforcedStyle: semantic

@@ -9,7 +9,7 @@
 # extend CernerSplunk::LWRP::(module) unless defined? (method name)
 
 require_relative 'databag'
-require_relative 'recipe'
+require_relative 'recipe_utils'
 
 module CernerSplunk
   # Methods involved with augmenting the LWRP syntax / writing recipies
@@ -39,7 +39,7 @@ module CernerSplunk
     #
     # Extension of the Resource DSL, defines an attribute that can be set upfront or can be calculated at convergence time.
     module DelayableAttribute
-      def delayable_attribute(attr_name, validation = {}) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
+      def delayable_attribute(attr_name, validation = {}) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
         class_eval(<<-SHIM, __FILE__, __LINE__ + 1)
           def #{attr_name}(arg=nil,&block)
             _set_or_return_#{attr_name}(arg,block)

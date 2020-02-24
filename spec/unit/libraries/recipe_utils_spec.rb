@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../spec_helper'
-require 'recipe'
+require 'recipe_utils'
 require 'splunk_app'
 
 describe 'CernerSplunk' do

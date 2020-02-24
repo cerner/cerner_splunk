@@ -8,7 +8,7 @@ require_relative 'databag'
 module CernerSplunk
   # Module contains functions to configure roles in a Splunk system
   module Roles
-    def self.configure_roles(hash) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity, MethodLength
+    def self.configure_roles(hash) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity, Metrics/MethodLength
       user_prefs = {}
       authorize = {}
 

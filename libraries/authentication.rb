@@ -18,7 +18,7 @@ module CernerSplunk
 
   # Module contains functions to configure authentication in a Splunk system
   module Authentication
-    def self.configure_authentication(node, hash) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity, MethodLength
+    def self.configure_authentication(node, hash) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity, Metrics/MethodLength
       hash = hash.clone
       auth_stanzas = { 'authentication' => hash }
       fail 'authSettings is managed by chef. Don\'t set it yourself!' if hash.key?('authSettings')

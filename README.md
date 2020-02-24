@@ -12,6 +12,7 @@ Requirements
 * Red Hat Enterprise / CentOS 6.7+ / CentOS 7.0+ / Windows Server 2008+ (forwarder only) or Ubuntu LTS 12.04+
 * Chef 12+
 * Chef 14+
+* Chef 15+
 
 Getting your logs into Splunk
 -----------------------------
