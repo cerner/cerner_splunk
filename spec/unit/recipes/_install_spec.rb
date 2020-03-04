@@ -11,7 +11,6 @@ describe 'cerner_splunk::_install' do
       node.override['splunk']['package']['download_group'] = 'universalforwarder'
       node.override['splunk']['package']['file_suffix'] = '.txt'
       node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
-      node.override['splunk']['windows_password'] = password_databag
     end
     runner.converge(described_recipe)
   end

@@ -45,7 +45,6 @@ Configurable (with defaults)
 * `node['splunk']['forwarder_site']` - Set this attribute to configure site awareness for your forwarders.(`site0`)
 * `node['splunk']['mgmt_host']` - The host other SHC members use when connecting to the current node. You probably want a wrapper cookbook to override this. By default `node['splunk']['mgmt_interface']` is now used, but to support existing configurations this attribute is still available and takes precedence when set. (`nil`)
 * `node['splunk']['mgmt_interface']` - The network interface this node should use for communicating with other members of a SHC. (`node['network']['default_interface']`)
-* `node['splunk']['windows_password']` - This should be the name of a data bag item key where your windows password for the `Splunk` user is stored.
 * `node['splunk']['is_cloud']` - Set this attribute to `true` on cloud instances for Search Head Cluster (SHC). (`false`)
 * `node['splunk']['boot_start_args']` - Set splunk enabled boot-start arguments here. (` -systemd-managed 0`)
 * `node['splunk']['logs']` - Specify the contents of log-local.cfg, to override the default settings of Splunk's internal logging.

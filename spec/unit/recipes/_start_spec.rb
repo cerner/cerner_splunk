@@ -8,7 +8,6 @@ describe 'cerner_splunk::_start' do
       node.override['splunk']['cmd'] = 'splunk'
       node.override['splunk']['user'] = 'splunk'
       node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
-      node.override['splunk']['windows_password'] = password_databag
     end
     # Have to include forwarder recipe so that _start recipe can send notifications to services
     runner.converge('cerner_splunk::forwarder', described_recipe)
