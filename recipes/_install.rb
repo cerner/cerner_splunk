@@ -100,7 +100,7 @@ run_command = "#{node['splunk']['cmd']} help commands --accept-license --answer-
 run_command += " --seed-passwd 'changeme'" if Gem::Version.new(nsp['version']) >= Gem::Version.new('7.2.0')
 
 # For windows, we accept the license during msi install so the ftr file will never be there.
-if !platform_family?('windows')
+unless platform_family?('windows')
   execute 'splunk-first-run' do
     command run_command
     user node['splunk']['user']
