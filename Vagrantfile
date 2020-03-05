@@ -1,11 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-Vagrant.require_version '>= 1.4.1'
-
-%w[vagrant-omnibus].each do |plugin|
-  fail "Missing #{plugin}. Please install it!" unless Vagrant.has_plugin? plugin
-end
+Vagrant.require_version '>= 2.2.5'
 
 @network = {
   chef:         { ip: '33.33.33.33', hostname: 'chef', ports: { 4000 => 4000 } },
@@ -43,10 +39,6 @@ fail 'Non-unique hostnames' if @network.collect { |_, v| v[:hostname] }.uniq!
 
 fail 'Non-unique ports' if @network.collect { |_, v| v[:ports].keys }.flat_map { |v| v }.uniq!
 
-def default_omnibus(config)
-  config.omnibus.chef_version = 15
-end
-
 def network(config, name, splunk_password = true)
   net = @network.delete(name)
   throw "Unknown or duplicate config #{name}" unless net
@@ -63,6 +55,7 @@ def network(config, name, splunk_password = true)
 end
 
 def chef_defaults(chef, name, environment = 'splunk_server')
+  chef.version = '15'
   chef.arguments = "--chef-license accept"
   chef.environment = environment
   chef.chef_server_url = "http://#{@chefip}:4000/"
@@ -91,9 +84,7 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :chef do |cfg|
-    cfg.omnibus.chef_version = nil
-
-    cfg.vm.provision :shell, inline: 'rpm -q chefdk || curl -L https://omnitruck.chef.io/install.sh | bash -s -- -P chefdk -v 4.0.60'
+    cfg.vm.provision :shell, inline: 'rpm -q chefdk || curl -L https://omnitruck.chef.io/install.sh | bash -s -- -P chefdk -v 4.7.73'
 
     if ENV['KNIFE_ONLY']
       cfg.vm.provision :shell, inline: 'cd /vagrant/vagrant_repo; mv nodes .nodes.bak', privileged: false
@@ -148,8 +139,6 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :s_license do |cfg|
-    default_omnibus(cfg)
-
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :s_license, 'splunk_license'
       chef.add_recipe 'cerner_splunk::license_server'
@@ -158,8 +147,6 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :c1_master do |cfg|
-    default_omnibus(cfg)
-
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :c1_master
       chef.add_recipe 'cerner_splunk::cluster_master'
@@ -171,8 +158,6 @@ Vagrant.configure('2') do |config|
   (1..3).each do |n|
     symbol = "c1_slave#{n}".to_sym
     config.vm.define symbol do |cfg|
-      default_omnibus(cfg)
-
       cfg.vm.provision :chef_client do |chef|
 
         chef_defaults chef, symbol
@@ -185,8 +170,6 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :s1_master do |cfg|
-    default_omnibus(cfg)
-
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :s1_master, 'splunk_site1'
       chef.add_recipe 'cerner_splunk::cluster_master'
@@ -197,8 +180,6 @@ Vagrant.configure('2') do |config|
   (1..3).each do |n|
     symbol = "s1_slave#{n}".to_sym
     config.vm.define symbol do |cfg|
-      default_omnibus(cfg)
-
       cfg.vm.provision :chef_client do |chef|
 
         chef_defaults chef, symbol, 'splunk_site1'
@@ -211,8 +192,6 @@ Vagrant.configure('2') do |config|
   (1..2).each do |n|
     symbol = "s2_slave#{n}".to_sym
     config.vm.define symbol do |cfg|
-      default_omnibus(cfg)
-
       cfg.vm.provision :chef_client do |chef|
 
         chef_defaults chef, symbol, 'splunk_site2'
@@ -223,8 +202,6 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :s2_search do |cfg|
-    default_omnibus(cfg)
-
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :s2_search, 'splunk_site2'
       chef.add_recipe 'cerner_splunk_test::install_libarchive'
@@ -234,8 +211,6 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :c1_search do |cfg|
-    default_omnibus(cfg)
-
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :c1_search
       chef.add_recipe 'cerner_splunk_test::install_libarchive'
@@ -247,8 +222,6 @@ Vagrant.configure('2') do |config|
   (1..2).each do |n|
     symbol = "c2_boot#{n}".to_sym
     config.vm.define symbol do |cfg|
-      default_omnibus(cfg)
-
       cfg.vm.provision :chef_client do |chef|
 
         chef_defaults chef, symbol
@@ -264,8 +237,6 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :c2_captain do |cfg|
-    default_omnibus(cfg)
-
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :c2_captain
       chef.add_recipe 'cerner_splunk::shc_captain'
@@ -274,8 +245,6 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :c2_deployer do |cfg|
-    default_omnibus(cfg)
-
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :c2_deployer
       chef.add_recipe 'cerner_splunk_test::install_libarchive'
@@ -285,8 +254,6 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :c2_newnode do |cfg|
-    default_omnibus(cfg)
-
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :c2_newnode
       chef.add_recipe 'cerner_splunk::shc_search_head'
@@ -297,8 +264,6 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :s_standalone do |cfg|
-    default_omnibus(cfg)
-
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :s_standalone, 'splunk_standalone'
       chef.add_recipe 'cerner_splunk_test::install_libarchive'
@@ -308,8 +273,6 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :f_default do |cfg|
-    default_omnibus(cfg)
-
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :f_default, 'splunk_standalone'
       chef.add_recipe 'cerner_splunk_test::install_libarchive'
@@ -320,9 +283,8 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :f_debian do |cfg|
-    default_omnibus(cfg)
-
     cfg.vm.box = 'bento/ubuntu-16.04'
+
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :f_debian, 'splunk_standalone'
       chef.add_recipe 'cerner_splunk_test::install_libarchive'
@@ -332,8 +294,6 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :f_heavy do |cfg|
-    default_omnibus(cfg)
-
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :f_heavy, 'splunk_standalone'
       chef.add_recipe 'cerner_splunk_test::install_libarchive'
@@ -343,22 +303,13 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :f_win2012r2 do |cfg|
-    default_omnibus(cfg)
-
     cfg.vm.box = 'opentable/win-2012r2-standard-amd64-nocm'
-    # Without the line below here or in the box, vagrant-omnibus breaks on windows.
-    # Reference: https://github.com/chef/vagrant-omnibus/issues/90#issuecomment-51816397
-    cfg.vm.guest = :windows
-    # config below prevents the installation of latest Chef on the box.
-    # Reference: https://github.com/chef/vagrant-omnibus/issues/118
-    # TODO: figure out how to install chef 15 on a windows box
-    cfg.omnibus.install_url = 'https://packages.chef.io/files/stable/chef/14.5.27/windows/2012r2/chef-client-14.5.27-1-x64.msi'
+
     cfg.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', 1024]
     end
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :f_win2012r2, 'splunk_standalone'
-      chef.arguments = ''
       chef.add_role 'splunk_monitors_windows'
       chef.add_recipe 'cerner_splunk_test::install_libarchive'
       chef.add_recipe 'cerner_splunk'
