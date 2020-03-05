@@ -9,6 +9,7 @@
 # So remove it and install the package ourselves.
 execute 'remove files' do
   command 'rm -rf /opt/chef/embedded/lib/libarchive.so*'
+  not_if { platform_family?('windows') }
 end
 
 if node['platform_family'] == 'debian'
@@ -23,6 +24,7 @@ end
 
 package libarchive_package do
   action :install
+  not_if { platform_family?('windows') }
 end
 
 chef_gem 'ffi-libarchive' do

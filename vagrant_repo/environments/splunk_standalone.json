@@ -29,8 +29,7 @@
         }
       },
       "data_bag_secret": "/vagrant/vagrant_repo/alternative_encrypted_data_bag_secret",
-      "mgmt_interface": "eth1",
-      "windows_password": "cerner_splunk/passwords:winpass"
+      "mgmt_interface": "eth1"
     }
   }
 }

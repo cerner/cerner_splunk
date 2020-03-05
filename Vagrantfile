@@ -351,13 +351,16 @@ Vagrant.configure('2') do |config|
     cfg.vm.guest = :windows
     # config below prevents the installation of latest Chef on the box.
     # Reference: https://github.com/chef/vagrant-omnibus/issues/118
-    config.omnibus.install_url = 'https://packages.chef.io/files/stable/chef/14.5.27/windows/2012r2/chef-client-14.5.27-1-x64.msi'
+    # TODO: figure out how to install chef 15 on a windows box
+    cfg.omnibus.install_url = 'https://packages.chef.io/files/stable/chef/14.5.27/windows/2012r2/chef-client-14.5.27-1-x64.msi'
     cfg.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', 1024]
     end
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :f_win2012r2, 'splunk_standalone'
+      chef.arguments = ''
       chef.add_role 'splunk_monitors_windows'
+      chef.add_recipe 'cerner_splunk_test::install_libarchive'
       chef.add_recipe 'cerner_splunk'
     end
     network cfg, :f_win2012r2, false

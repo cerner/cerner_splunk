@@ -81,6 +81,7 @@ elsif platform_family? 'debian'
 elsif platform_family? 'windows'
   # installing as the system user by default as Splunk has difficulties with being a limited user
   flags = %(AGREETOLICENSE=Yes SERVICESTARTTYPE=auto LAUNCHSPLUNK=0 INSTALLDIR="#{node['splunk']['home'].tr('/', '\\')}")
+  # TODO: Use admin_password from databag for splunk-first-run.
   flags += ' SPLUNKPASSWORD=changeme' if Gem::Version.new(nsp['version']) >= Gem::Version.new('7.1.0')
   windows_package node['splunk']['package']['base_name'] do
     source splunk_file
@@ -94,20 +95,18 @@ end
 
 include_recipe 'cerner_splunk::_configure_secret'
 
-windows_password = CernerSplunk::DataBag.load(node['splunk']['windows_password'], secret: node['splunk']['data_bag_secret'])
-
 run_command = "#{node['splunk']['cmd']} help commands --accept-license --answer-yes --no-prompt"
+# TODO: Use admin_password from databag for splunk-first-run.
 run_command += " --seed-passwd 'changeme'" if Gem::Version.new(nsp['version']) >= Gem::Version.new('7.2.0')
 
-# TODO: Use admin_password from databag for splunk-first-run.
-execute 'splunk-first-run' do
-  command run_command
-  user node['splunk']['user']
-  group node['splunk']['group']
-  if Gem::Version.new(Chef::VERSION) >= Gem::Version.new('12.19.33')
-    password windows_password if platform_family?('windows')
+# For windows, we accept the license during msi install so the ftr file will never be there.
+unless platform_family?('windows')
+  execute 'splunk-first-run' do
+    command run_command
+    user node['splunk']['user']
+    group node['splunk']['group']
+    only_if { File.exist?("#{node['splunk']['home']}/ftr") }
   end
-  only_if { ::File.exist? "#{node['splunk']['home']}/ftr" }
 end
 
 ruby_block 'read splunk.secret' do
