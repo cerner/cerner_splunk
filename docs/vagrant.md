@@ -27,7 +27,7 @@ c2_boot1 and c2_boot2 are the bootstrap nodes and are provisioned first. c2_capt
 
 # Spinning up Multisite Cluster in Vagrant
 
-<code>vagrant up /s1_.\*/ /s2_.\*/</code>
+`vagrant up /s1_.*/ /s2_.*/`
 
 Docs Navigation
 ===============
