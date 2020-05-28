@@ -44,6 +44,7 @@ execute 'reload-systemctl' do
 end
 
 # This is only necessary in versions before 8.0. After that they fixed the boot-start command to set these properties correctly.
+# FIXME: This resource runs every time and appears as though it made modifications, even when it doesn't.
 filter_lines 'update-systemd-file' do
   path node['splunk']['systemd_file_location']
   filters([

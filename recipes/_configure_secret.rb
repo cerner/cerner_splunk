@@ -20,10 +20,15 @@ fail 'Configured splunk secret must resolve to a String' unless secret.is_a?(Str
 
 secret_path = ::File.join(node['splunk']['home'], 'etc', 'auth', 'splunk.secret')
 
-ruby_block 'Check splunk.secret file' do
+r_b = ruby_block 'Check splunk.secret file' do
   block do
     CernerSplunk.validate_secret_file(secret_path, secret)
   end
+end
+
+# Hack to not always notify with a ruby_block
+def r_b.updated_by_last_action?
+  false
 end
 
 file 'splunk.secret' do

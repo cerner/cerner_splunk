@@ -21,17 +21,19 @@ new_password ||= SecureRandom.hex(36)
 
 node.run_state['cerner_splunk']['admin-password'] = old_password
 
+ruby_block 'update admin password in run_state' do
+  block do
+    node.run_state['cerner_splunk']['admin-password'] = new_password
+  end
+  action :nothing
+end
+
 execute 'change-admin-password' do # ~FC009
   command "#{node['splunk']['cmd']} edit user admin -password #{new_password} -roles admin -auth admin:#{old_password}"
   environment 'HOME' => node['splunk']['home']
   sensitive true
   not_if { new_password == old_password }
-end
-
-ruby_block 'update admin password in run_state' do
-  block do
-    node.run_state['cerner_splunk']['admin-password'] = new_password
-  end
+  notifies :run, 'ruby_block[update admin password in run_state]', :immediately
 end
 
 if platform_family?('windows')
