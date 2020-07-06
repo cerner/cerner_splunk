@@ -13,8 +13,6 @@ addons:
     packages:
       - libarchive-dev
 script:
-- bundle exec rubocop --version
 - bundle exec rubocop
-- bundle exec foodcritic --version
 - bundle exec foodcritic -f any .
 - bundle exec rspec
