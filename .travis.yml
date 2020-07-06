@@ -1,6 +1,6 @@
 branches:
   except:
-    - master
+    - main
 language: ruby
 cache: bundler
 sudo: false
