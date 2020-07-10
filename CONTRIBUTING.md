@@ -21,7 +21,7 @@
 3. The pull request is merged 
     1. Manually, not using github issues so a fast forward of stable can be done
     2. The annotated tag is created of the reviewed release text
-    3. Master is set to the annotated tag
+    3. Main is set to the annotated tag
 4. Release to supermarket 
 5. Cleanup
     1. The issue and existing milestone is closed
