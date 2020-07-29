@@ -4,6 +4,8 @@
 # Provider:: sh_cluster
 #
 
+provides :sh_cluster if respond_to?(:provides)
+
 action :initialize do
   search_heads = new_resource.search_heads
   admin_password = new_resource.admin_password
