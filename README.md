@@ -13,6 +13,7 @@ Requirements
 * Chef 12+
 * Chef 14+
 * Chef 15+
+* Chef 16+
 
 Getting your logs into Splunk
 -----------------------------
