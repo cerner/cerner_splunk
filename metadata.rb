@@ -11,7 +11,7 @@ version          '2.39.0'
 source_url       'https://github.com/cerner/cerner_splunk'
 issues_url       'https://github.com/cerner/cerner_splunk/issues'
 
-chef_version     '>= 12.7'
+chef_version     '>= 12.7', '< 17'
 
 depends          'chef-vault', '~> 3.0'
 depends          'ulimit', '~> 1.0'
