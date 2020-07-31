@@ -16,8 +16,10 @@ chef_version = if Bundler.current_ruby.on_23?
                  '= 12.18.31'
                elsif Bundler.current_ruby.on_25?
                  '= 14.13.11'
-               else
+               elsif Bundler.current_ruby.on_26?
                  '= 15.8.23'
+               else
+                 '= 16.3.45'
                end
 
 if Bundler.current_ruby.on_23?

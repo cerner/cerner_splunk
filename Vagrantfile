@@ -55,7 +55,7 @@ def network(config, name, splunk_password = true)
 end
 
 def chef_defaults(chef, name, environment = 'splunk_server')
-  chef.version = '15'
+  chef.version = '16'
   chef.arguments = "--chef-license accept"
   chef.environment = environment
   chef.chef_server_url = "http://#{@chefip}:4000/"
