@@ -13,7 +13,7 @@ issues_url       'https://github.com/cerner/cerner_splunk/issues'
 
 chef_version     '>= 12.7', '< 17'
 
-depends          'chef-vault', '~> 3.0'
+depends          'chef-vault', '> 3.0'
 depends          'ulimit', '~> 1.0'
 depends          'line', '~> 2.0'
 
