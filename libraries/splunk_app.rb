@@ -325,7 +325,7 @@ class Chef
         proc_sym = data['proc'].to_sym
         data = symbolize_keys(data).reject { |k, _| k == :proc }
         arguments = context.merge data
-        source_module.send proc_sym, **arguments
+        source_module.send proc_sym, arguments
       end
 
       def insert_procs(filename, contents)
