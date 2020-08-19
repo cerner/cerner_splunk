@@ -8,7 +8,7 @@
 require_relative 'databag'
 
 # Module for the cookbook
-module CernerSplunk
+module CernerSplunk # rubocop:disable Metrics/ModuleLength
   # This lambda is used to ensure that only one of a set of recipes is on the run_list
   # Call it on each recipe with 'instance_exec :whatever_type, &CernerSplunk::NODE_TYPE'
   NODE_TYPE ||= lambda do |symbol|
@@ -33,7 +33,7 @@ module CernerSplunk
   # If the cluster is a site in the multisite cluster, return data after merging with the multisite data bag item
   def self.my_cluster_data(node)
     @my_cluster_data ||= CernerSplunk::DataBag.load(node['splunk']['config']['clusters'].first, secret: node['splunk']['data_bag_secret'])
-    return @my_cluster_data if @my_cluster_data.nil?
+    return @my_cluster_data if @my_cluster_data.nil? || @my_cluster_data['multisite'].nil?
 
     @multisite_bag_data ||= CernerSplunk::DataBag.load(@my_cluster_data['multisite'], secret: node['splunk']['data_bag_secret']) || {}
     CernerSplunk::SplunkApp.merge_hashes({ cluster_configs: @multisite_bag_data.to_h }, { cluster_configs: @my_cluster_data.to_h })[:cluster_configs]
@@ -48,7 +48,13 @@ module CernerSplunk
   def self.all_clusters_data(node)
     unless @all_cluster_data
       _head, *others = node['splunk']['config']['clusters']
-      @all_cluster_data = [my_cluster_data(node)] + others.collect { |x| CernerSplunk::DataBag.load(x, secret: node['splunk']['data_bag_secret']) }
+      @all_cluster_data = [my_cluster_data(node)] + others.collect do |cluster|
+        cluster_data = CernerSplunk::DataBag.load(cluster, secret: node['splunk']['data_bag_secret'])
+        next cluster_data if cluster_data.nil? || cluster_data['multisite'].nil?
+
+        multisite_data = CernerSplunk::DataBag.load(cluster_data['multisite'], secret: node['splunk']['data_bag_secret'])
+        CernerSplunk::SplunkApp.merge_hashes({ cluster_configs: multisite_data.to_h }, { cluster_configs: cluster_data.to_h })[:cluster_configs]
+      end
     end
     @all_cluster_data
   end

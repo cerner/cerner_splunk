@@ -95,6 +95,143 @@ describe 'CernerSplunk' do
     end
   end
 
+  describe '.all_clusters_data' do
+    before do
+      allow(ChefVault::Item).to receive(:data_bag_item_type).and_return(:vault)
+      allow(ChefVault::Item).to receive(:load).with('cerner_splunk', 'cluster_bag1').and_return(cluster_configs1)
+      allow(ChefVault::Item).to receive(:load).with('cerner_splunk', 'multisite_bag1').and_return(multisite_configs1)
+      allow(ChefVault::Item).to receive(:load).with('cerner_splunk', 'cluster_bag2').and_return(cluster_configs2)
+      allow(ChefVault::Item).to receive(:load).with('cerner_splunk', 'multisite_bag2').and_return(multisite_configs2)
+    end
+
+    after do
+      CernerSplunk.reset
+    end
+
+    let(:clusters) { ['cerner_splunk/cluster_bag1', 'cerner_splunk/cluster_bag2'] }
+    let(:node) { { 'splunk' => { 'config' => { 'clusters' => clusters } } } }
+    let(:cluster_configs1) { { 'site' => 'site1', 'multisite' => 'cerner_splunk/multisite_bag1' } }
+    let(:multisite_configs1) { { 'sites' => ['cerner_splunk/cluster_bag1'], 'master_uri' => 'https://33.33.33.11:8089', 'settings' => { 'pass4SymmKey' => 'my_key' } } }
+    let(:cluster_configs2) { { 'site' => 'site2', 'multisite' => 'cerner_splunk/multisite_bag2' } }
+    let(:multisite_configs2) { { 'sites' => ['cerner_splunk/cluster_bag2'], 'master_uri' => 'https://33.33.33.22:8089', 'settings' => { 'pass4SymmKey' => 'my_other_key' } } }
+
+    subject { CernerSplunk.all_clusters_data(node) }
+
+    context 'when there is only a single cluster' do
+      let(:clusters) { ['cerner_splunk/cluster_bag1'] }
+
+      it 'returns the cluster data' do
+        expected_attributes = [
+          {
+            'sites' => ['cerner_splunk/cluster_bag1'],
+            'master_uri' => 'https://33.33.33.11:8089',
+            'site' => 'site1',
+            'multisite' => 'cerner_splunk/multisite_bag1',
+            'settings' => {
+              'pass4SymmKey' => 'my_key'
+            }
+          }
+        ]
+        expect(subject).to eq(expected_attributes)
+      end
+    end
+
+    context 'when there are multiple multisite clusters' do
+      it 'returns the multisite data for all clusters' do
+        expected_attributes = [
+          {
+            'sites' => ['cerner_splunk/cluster_bag1'],
+            'master_uri' => 'https://33.33.33.11:8089',
+            'site' => 'site1',
+            'multisite' => 'cerner_splunk/multisite_bag1',
+            'settings' => {
+              'pass4SymmKey' => 'my_key'
+            }
+          },
+          {
+            'sites' => ['cerner_splunk/cluster_bag2'],
+            'master_uri' => 'https://33.33.33.22:8089',
+            'site' => 'site2',
+            'multisite' => 'cerner_splunk/multisite_bag2',
+            'settings' => {
+              'pass4SymmKey' => 'my_other_key'
+            }
+          }
+        ]
+        expect(subject).to eq(expected_attributes)
+      end
+    end
+
+    context 'when there is a multisite cluster and a single site cluster' do
+      let(:cluster_configs2) { { 'master_uri' => 'https://33.33.33.33:8089', 'settings' => { 'pass4SymmKey' => 'my_other_key' } } }
+
+      it 'returns the multi and single site cluster attributes for all clusters' do
+        expected_attributes = [
+          {
+            'sites' => ['cerner_splunk/cluster_bag1'],
+            'master_uri' => 'https://33.33.33.11:8089',
+            'site' => 'site1',
+            'multisite' => 'cerner_splunk/multisite_bag1',
+            'settings' => {
+              'pass4SymmKey' => 'my_key'
+            }
+          },
+          {
+            'master_uri' => 'https://33.33.33.33:8089',
+            'settings' => {
+              'pass4SymmKey' => 'my_other_key'
+            }
+          }
+        ]
+        expect(subject).to eq(expected_attributes)
+      end
+    end
+
+    context 'when there is a non-existent data bag configured' do
+      let(:cluster_configs1) { nil }
+
+      context 'as the first item in the array' do
+        let(:clusters) { ['cerner_splunk/cluster_bag1', 'cerner_splunk/cluster_bag2'] }
+
+        it 'handles the invalid cluster' do
+          expected_attributes = [
+            nil,
+            {
+              'sites' => ['cerner_splunk/cluster_bag2'],
+              'master_uri' => 'https://33.33.33.22:8089',
+              'site' => 'site2',
+              'multisite' => 'cerner_splunk/multisite_bag2',
+              'settings' => {
+                'pass4SymmKey' => 'my_other_key'
+              }
+            }
+          ]
+          expect(subject).to eq(expected_attributes)
+        end
+      end
+
+      context 'as the second item in the array' do
+        let(:clusters) { ['cerner_splunk/cluster_bag2', 'cerner_splunk/cluster_bag1'] }
+
+        it 'handles the invalid cluster' do
+          expected_attributes = [
+            {
+              'sites' => ['cerner_splunk/cluster_bag2'],
+              'master_uri' => 'https://33.33.33.22:8089',
+              'site' => 'site2',
+              'multisite' => 'cerner_splunk/multisite_bag2',
+              'settings' => {
+                'pass4SymmKey' => 'my_other_key'
+              }
+            },
+            nil
+          ]
+          expect(subject).to eq(expected_attributes)
+        end
+      end
+    end
+  end
+
   describe '.multisite_cluster?' do
     let(:cluster) { 'site1' }
     let(:multisite) { {} }
