@@ -4,11 +4,12 @@ source 'https://rubygems.org'
 chefspec_version = if Bundler.current_ruby.on_23?
                  '= 7.3.4'
                else
-                 '= 9.1.0'
+                 '= 9.2.1'
                end
 
-foodcritic_version = '= 16.2.0'
-rubocop_version = '= 0.80.0'
+foodcritic_version = '= 16.3.0'
+# rubocop 0.82 drops support for ruby 2.3
+rubocop_version = '= 0.81.0'
 # chef-vault 4.x drops support for ruby 2.3
 chef_vault_version = '~> 3.0'
 

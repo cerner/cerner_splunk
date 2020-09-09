@@ -119,7 +119,7 @@ describe 'cerner_splunk::_install' do
 
     context 'when platform is rhel' do
       let(:platform) { 'centos' }
-      let(:platform_version) { '6.9' }
+      let(:platform_version) { '7.7.1908' }
 
       it 'installs downloaded splunk package and notifies splunk-first-run' do
         expected_attrs = {

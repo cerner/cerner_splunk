@@ -16,6 +16,12 @@ Layout/LineLength:
 Lint/EmptyWhen:
   Enabled: false
 
+Lint/RaiseException:
+  Enabled: true
+
+Lint/StructNewOverride:
+  Enabled: true
+
 Metrics/MethodLength:
   Max: 40
 
