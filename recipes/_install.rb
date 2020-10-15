@@ -15,7 +15,7 @@ node.default['splunk']['package']['name'] = "#{nsp['base_name']}-#{nsp['version'
 node.default['splunk']['package']['file_name'] = "#{nsp['name']}#{nsp['file_suffix']}"
 node.default['splunk']['package']['url'] =
   "#{nsp['base_url']}/#{nsp['download_group']}/releases/#{nsp['version']}/#{nsp['platform']}/#{nsp['file_name']}"
-node.default['splunk']['home'] = CernerSplunk.splunk_home(node['platform_family'], node['kernel']['machine'], nsp['base_name'])
+node.default['splunk']['home'] = CernerSplunk.splunk_home(node['platform_family'], node['kernel']['machine'], CernerSplunk.installed_package_name(node['platform_family'], node['splunk']['package']['base_name']))
 node.default['splunk']['cmd'] = CernerSplunk.splunk_command(node)
 
 service = CernerSplunk.splunk_service_name(node['platform_family'], nsp['base_name'])
@@ -83,9 +83,9 @@ elsif platform_family? 'windows'
   flags = %(AGREETOLICENSE=Yes SERVICESTARTTYPE=auto LAUNCHSPLUNK=0 INSTALLDIR="#{node['splunk']['home'].tr('/', '\\')}")
   # TODO: Use admin_password from databag for splunk-first-run.
   flags += ' SPLUNKPASSWORD=changeme' if Gem::Version.new(nsp['version']) >= Gem::Version.new('7.1.0')
-  windows_package node['splunk']['package']['base_name'] do
-    source splunk_file
-    version "#{node['splunk']['package']['version']}-#{node['splunk']['package']['build']}"
+  windows_package CernerSplunk.installed_package_name(node['platform_family'], node['splunk']['package']['base_name']) do
+    source node['splunk']['package']['url']
+    version node['splunk']['package']['version']
     only_if(&manifest_missing)
     options flags
   end
