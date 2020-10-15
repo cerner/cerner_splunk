@@ -84,7 +84,7 @@ elsif platform_family? 'windows'
   # TODO: Use admin_password from databag for splunk-first-run.
   flags += ' SPLUNKPASSWORD=changeme' if Gem::Version.new(nsp['version']) >= Gem::Version.new('7.1.0')
   windows_package CernerSplunk.installed_package_name(node['platform_family'], node['splunk']['package']['base_name']) do
-    source node['splunk']['package']['url']
+    source splunk_file
     version node['splunk']['package']['version']
     only_if(&manifest_missing)
     options flags
