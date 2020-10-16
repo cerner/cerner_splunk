@@ -111,9 +111,9 @@ describe 'cerner_splunk::_install' do
       it 'installs downloaded splunk package' do
         expected_attrs = {
           source: splunk_filepath,
-          options: %(AGREETOLICENSE=Yes SERVICESTARTTYPE=auto LAUNCHSPLUNK=0 INSTALLDIR="test\\splunkforwarder" SPLUNKPASSWORD=changeme)
+          options: %(AGREETOLICENSE=Yes SERVICESTARTTYPE=auto LAUNCHSPLUNK=0 INSTALLDIR="test\\UniversalForwarder" SPLUNKPASSWORD=changeme)
         }
-        expect(subject).to install_windows_package('splunkforwarder').with(expected_attrs)
+        expect(subject).to install_windows_package('UniversalForwarder').with(expected_attrs)
       end
     end
 
