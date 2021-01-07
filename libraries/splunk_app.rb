@@ -318,7 +318,7 @@ class Chef
       end
 
       def symbolize_keys(hash)
-        Hash[hash.map { |k, v| [k.to_sym, v] }]
+        Hash[hash.transform_keys(&:to_sym)]
       end
 
       def hash_to_proc(source_module, data, context = {})
