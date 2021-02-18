@@ -108,9 +108,6 @@ describe 'cerner_splunk::_configure_server' do
   let(:expected_attributes) do
     {
       'general' => expected_general_stanza,
-      'sslConfig' => {
-        'sslPassword' => 'fake_password'
-      },
       'license' => {
         'master_uri' => 'self',
         'active_group' => expected_active_group

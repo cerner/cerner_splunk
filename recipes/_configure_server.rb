@@ -9,7 +9,6 @@ server_stanzas = {
   'general' => {
     'serverName' => node['splunk']['config']['host']
   },
-  'sslConfig' => {}
 }
 
 SLAVE_ONLY_CONFIGS = %w[
