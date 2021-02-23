@@ -39,7 +39,7 @@ encrypt_noxor_password = CernerSplunk::ConfTemplate::Transform.splunk_encrypt no
 # default pass4SymmKey value is 'changeme'
 server_stanzas['general']['pass4SymmKey'] = CernerSplunk::ConfTemplate.compose encrypt_password, CernerSplunk::ConfTemplate::Value.constant(value: 'changeme')
 # default sslPassword value is 'password'
-server_stanzas['sslConfig']['sslPassword'] = CernerSplunk::ConfTemplate.compose encrypt_noxor_password, CernerSplunk::ConfTemplate::Value.constant(value: node['splunk']['sslConfig']['sslPassword'])
+server_stanzas['sslConfig']['sslPassword'] = CernerSplunk::ConfTemplate.compose encrypt_noxor_password, CernerSplunk::ConfTemplate::Value.constant(value: node['splunk']['config']['sslPassword'])
 
 case node['splunk']['node_type']
 when :forwarder
