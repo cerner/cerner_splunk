@@ -41,7 +41,7 @@ describe 'cerner_splunk::_migrate_forwarder' do
 
   context 'when platform family is linux' do
     let(:platform) { 'centos' }
-    let(:platform_version) { '7.7.1908' }
+    let(:platform_version) { '8' }
 
     it 'deletes the splunk home directory' do
       expect(subject).to delete_directory('/opt/splunkforwarder')
