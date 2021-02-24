@@ -14,7 +14,7 @@ end
 
 execute 'add powertools repo' do
   command 'yum config-manager --set-enabled powertools'
-  only_if { platform?('centos') && platform_version >= 8}
+  only_if { platform?('centos') && platform_version >= 8 }
 end
 
 if node['platform_family'] == 'debian'
