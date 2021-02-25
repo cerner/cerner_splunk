@@ -69,7 +69,7 @@ def chef_defaults(chef, name, environment = 'splunk_server')
 end
 
 Vagrant.configure('2') do |config|
-  config.vm.box = 'bento/centos-7.7'
+  config.vm.box = 'bento/centos-8.3'
 
   if Vagrant.has_plugin? 'vagrant-berkshelf'
     config.berkshelf.enabled = false
