@@ -53,3 +53,5 @@ default['splunk']['boot_start_args'] =
 
 # Default systemd file location based on default systemd unit file name
 default['splunk']['systemd_file_location'] = '/etc/systemd/system/splunk.service'
+
+default['splunk']['config']['sslPassword'] = 'password'
