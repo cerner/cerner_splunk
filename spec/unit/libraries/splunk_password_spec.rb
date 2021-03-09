@@ -6,11 +6,11 @@ require 'rc4'
 
 describe 'CernerSplunk::splunk_password' do
   let(:splunk_secret) { 'qYFEHts8G0E/ABbp' }
-  let(:password) { 'password' }
+  let(:password) { 'password' || '$1$password' || '$7$password' }
 
   describe '.splunk_encrypt_password' do
     context 'when the password has already been encrypted' do
-      let(:password) { '$1$RhLQiUyG3Qc7' }
+      let(:password) { '$1$RhLQiUyG3Qc7' || '$1$password' || '$7$password' }
 
       it 'does not re-encrypt it again' do
         encrypted = CernerSplunk.splunk_encrypt_password(password, splunk_secret)

@@ -12,8 +12,7 @@ module CernerSplunk
   # parameter xor controls the XOR logic.
   def self.splunk_encrypt_password(plain_text, splunk_secret, xor = true)
     # Prevent double encrypting values
-    return plain_text if plain_text.start_with? '$1$'
-    return plain_text if plain_text.start_with? '$7$'
+    return plain_text if plain_text.start_with? '$1$', '$7$'
 
     rc4key = splunk_secret.strip[0..15]
 
