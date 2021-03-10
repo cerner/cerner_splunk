@@ -10,8 +10,24 @@ describe 'CernerSplunk::splunk_password' do
 
   describe '.splunk_encrypt_password' do
     context 'when the password has already been encrypted' do
-      let(:password) { '$1$RhLQiUyG3Qc7' || '$1$password' || '$7$password' }
+      let(:password) { '$1$RhLQiUyG3Qc7' }
 
+      it 'does not re-encrypt it again' do
+        encrypted = CernerSplunk.splunk_encrypt_password(password, splunk_secret)
+        expect(encrypted).to eq(password)
+      end
+    end
+    context 'when the password has already been encrypted' do
+      let(:password) { '$1$password' }
+  
+      it 'does not re-encrypt it again' do
+        encrypted = CernerSplunk.splunk_encrypt_password(password, splunk_secret)
+        expect(encrypted).to eq(password)
+      end
+    end
+    context 'when the password has already been encrypted' do
+      let(:password) { '$7$password' }
+    
       it 'does not re-encrypt it again' do
         encrypted = CernerSplunk.splunk_encrypt_password(password, splunk_secret)
         expect(encrypted).to eq(password)
