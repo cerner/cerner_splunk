@@ -119,6 +119,27 @@ module CernerSplunk # rubocop:disable Metrics/ModuleLength
     Dir.exist?(splunk_home(node['platform_family'], node['kernel']['machine'], opposite_package_name))
   end
 
+  # Returns Boolean for whether a Splunk artifact is already installed.
+  def self.splunk_installed?(node)
+    Dir.exist?(splunk_home(node['platform_family'], node['kernel']['machine'], node['splunk']['package']['base_name']))
+  end
+
+  # Determine if we need to use the splunk start command instead of systemctl
+  # https://docs.splunk.com/Documentation/Splunk/8.1.3/Admin/RunSplunkassystemdservice#Upgrade_considerations_for_systemd
+  def self.use_splunk_start_command?(node, previous_splunk_version) # rubocop:disable Metrics/CyclomaticComplexity
+    return false unless ::File.exist?(node['splunk']['systemd_file_location'])
+    return false if previous_splunk_version.nil?
+
+    previous_version = Gem::Version.new(previous_splunk_version)
+    current_version = Gem::Version.new(node['splunk']['package']['version'])
+
+    return true if previous_version <= Gem::Version.new('7.4.0') && current_version >= Gem::Version.new('8.0.0')
+
+    return true if previous_version < Gem::Version.new('8.1.0') && current_version >= Gem::Version.new('8.1.0')
+
+    false
+  end
+
   # Returns the Splunk service name based on platform and package name
   def self.splunk_service_name(platform_family, package_base_name)
     if platform_family == 'windows'

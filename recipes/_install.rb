@@ -22,6 +22,12 @@ service = CernerSplunk.splunk_service_name(node['platform_family'], nsp['base_na
 
 manifest_missing = proc { ::Dir.glob("#{node['splunk']['home']}/#{node['splunk']['package']['name']}-*").empty? }
 
+if CernerSplunk.splunk_installed?(node)
+  splunk_version_file = File.join CernerSplunk.splunk_home(node['platform_family'], node['kernel']['machine'], node['splunk']['package']['base_name']), 'etc', 'splunk.version'
+  # The first line of the file should be "VERSION=x.y.z\n"
+  previous_splunk_version = File.readlines(splunk_version_file).first[8..12]
+end
+
 include_recipe 'cerner_splunk::_restart_marker'
 
 # Under systemd, starting or restarting the service allows the chef run to continue
@@ -35,10 +41,12 @@ end
 
 # Actions
 # This service definition is used for ensuring splunk is started during the run and to stop splunk service
+splunk_start_command = "#{File.join CernerSplunk.splunk_home(node['platform_family'], node['kernel']['machine'], node['splunk']['package']['base_name']), 'bin', 'splunk'} start"
 service 'splunk' do
   service_name service
   action :nothing
   supports status: true, start: true, stop: true
+  start_command splunk_start_command if CernerSplunk.use_splunk_start_command? node, previous_splunk_version
   notifies :delete, 'file[splunk-marker]', :immediately
   notifies :run, 'execute[sleep-10]', :immediately
 end
@@ -95,12 +103,12 @@ end
 
 include_recipe 'cerner_splunk::_configure_secret'
 
-run_command = "#{node['splunk']['cmd']} help commands --accept-license --answer-yes --no-prompt"
-# TODO: Use admin_password from databag for splunk-first-run.
-run_command += " --seed-passwd 'changeme'" if Gem::Version.new(nsp['version']) >= Gem::Version.new('7.2.0')
-
 # For windows, we accept the license during msi install so the ftr file will never be there.
 unless platform_family?('windows')
+  run_command = "#{node['splunk']['cmd']} help commands --accept-license --answer-yes --no-prompt"
+  # TODO: Use admin_password from databag for splunk-first-run.
+  run_command += " --seed-passwd 'changeme'" if Gem::Version.new(nsp['version']) >= Gem::Version.new('7.2.0')
+
   execute 'splunk-first-run' do
     command run_command
     user node['splunk']['user']
