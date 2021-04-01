@@ -133,7 +133,7 @@ module CernerSplunk # rubocop:disable Metrics/ModuleLength
     previous_version = Gem::Version.new(previous_splunk_version)
     current_version = Gem::Version.new(node['splunk']['package']['version'])
 
-    return true if previous_version <= Gem::Version.new('7.4.0') && current_version >= Gem::Version.new('8.0.0')
+    return true if previous_version < Gem::Version.new('8.0.0') && current_version >= Gem::Version.new('8.0.0')
 
     return true if previous_version < Gem::Version.new('8.1.0') && current_version >= Gem::Version.new('8.1.0')
 

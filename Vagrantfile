@@ -303,7 +303,7 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :f_win2012r2 do |cfg|
-    cfg.vm.box = 'opentable/win-2012r2-standard-amd64-nocm'
+    cfg.vm.box = 'mwrock/Windows2012R2'
 
     cfg.vm.provider :virtualbox do |vb|
       vb.customize ['modifyvm', :id, '--memory', 1024]
