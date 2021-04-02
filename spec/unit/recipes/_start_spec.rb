@@ -8,10 +8,13 @@ describe 'cerner_splunk::_start' do
       node.override['splunk']['cmd'] = 'splunk'
       node.override['splunk']['user'] = 'splunk'
       node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
+      node.override['splunk']['package']['version'] = package_version
     end
     # Have to include forwarder recipe so that _start recipe can send notifications to services
     runner.converge('cerner_splunk::forwarder', described_recipe)
   end
+
+  let(:package_version) { '8.1.3' }
 
   let(:cluster_config) do
     {
@@ -76,7 +79,7 @@ describe 'cerner_splunk::_start' do
     before do
       allow(File).to receive(:exist?).and_call_original
       allow(File).to receive(:exist?).with('/etc/init.d/splunk').exactly(2).times.and_return(initd_exists[0], initd_exists[1])
-      allow(File).to receive(:exist?).with('/etc/systemd/system/splunk.service').exactly(3).times.and_return(systemd_exists[0], systemd_exists[1], systemd_exists[1])
+      allow(File).to receive(:exist?).with('/etc/systemd/system/splunk.service').exactly(4).times.and_return(systemd_exists[0], systemd_exists[0], systemd_exists[1], systemd_exists[1])
 
       allow(File).to receive(:readlines).and_call_original
       allow(File).to receive(:readlines).with('/etc/init.d/splunk').and_return(lines)
@@ -86,7 +89,7 @@ describe 'cerner_splunk::_start' do
       let(:platform_version) { '6.10' }
 
       it 'executes boot-start script for initd' do
-        expect(subject).to run_execute('splunk enable boot-start -user splunk -systemd-managed 0')
+        expect(subject).to run_execute('splunk enable boot-start -user splunk -group splunk -systemd-managed 0')
       end
 
       context 'when init.d script does not exist' do
@@ -142,32 +145,66 @@ describe 'cerner_splunk::_start' do
     context 'and platform version is 7.x' do
       let(:platform_version) { '7.6.1810' }
 
-      context 'when systemd script does not exist' do
-        let(:systemd_exists) { [false, true] }
+      context 'and the splunk version is less than 8.0.0' do
+        let(:package_version) { '7.3.9' }
 
-        it 'executes boot-start script for systemd' do
-          expect(subject).to run_execute('splunk enable boot-start -user splunk -systemd-managed 1 -systemd-unit-file-name splunk')
+        context 'when systemd script does not exist' do
+          let(:systemd_exists) { [false, true] }
+
+          it 'executes boot-start script for systemd' do
+            expect(subject).to run_execute('splunk enable boot-start -user splunk -group splunk -systemd-managed 1 -systemd-unit-file-name splunk')
+          end
+
+          it 'modifies the systemd file' do
+            expect(subject).to edit_filter_lines('update-systemd-file')
+          end
+
+          it 'executes systemctl reload' do
+            expect(subject.filter_lines('update-systemd-file')).to notify('execute[reload-systemctl]').to(:run).immediately
+          end
         end
 
-        it 'modifies the systemd file' do
-          expect(subject).to edit_filter_lines('update-systemd-file')
-        end
+        context 'when systemd script already exists' do
+          let(:systemd_exists) { [true, true] }
 
-        it 'executes systemctl reload' do
-          expect(subject.filter_lines('update-systemd-file')).to notify('execute[reload-systemctl]').to(:run).immediately
+          it 'does not execute boot-start script for systemd' do
+            expect(subject).not_to run_execute('splunk enable boot-start -user splunk -group splunk -systemd-managed 1 -systemd-unit-file-name splunk')
+          end
+
+          it 'modifies the systemd file' do
+            expect(subject).to edit_filter_lines('update-systemd-file')
+            expect(subject.filter_lines('update-systemd-file')).to notify('execute[reload-systemctl]').to(:run).immediately
+          end
         end
       end
 
-      context 'when systemd script already exists' do
-        let(:systemd_exists) { [true, true] }
+      context 'and the splunk version is greater than 8.0.0' do
+        context 'when systemd script does not exist' do
+          let(:systemd_exists) { [false, true] }
 
-        it 'does not execute boot-start script for systemd' do
-          expect(subject).not_to run_execute('splunk enable boot-start -user splunk -systemd-managed 1 -systemd-unit-file-name splunk')
+          it 'executes boot-start script for systemd' do
+            expect(subject).to run_execute('splunk enable boot-start -user splunk -group splunk -systemd-managed 1 -systemd-unit-file-name splunk')
+          end
+
+          it 'does not modify the systemd file' do
+            expect(subject).not_to edit_filter_lines('update-systemd-file')
+          end
+
+          it 'executes systemctl reload' do
+            expect(subject.filter_lines('update-systemd-file')).to notify('execute[reload-systemctl]').to(:run).immediately
+          end
         end
 
-        it 'modifies the systemd file' do
-          expect(subject).to edit_filter_lines('update-systemd-file')
-          expect(subject.filter_lines('update-systemd-file')).to notify('execute[reload-systemctl]').to(:run).immediately
+        context 'when systemd script already exists' do
+          let(:systemd_exists) { [true, true] }
+
+          it 'does not execute boot-start script for systemd' do
+            expect(subject).not_to run_execute('splunk enable boot-start -user splunk -group splunk -systemd-managed 1 -systemd-unit-file-name splunk')
+          end
+
+          it 'does not modify the systemd file' do
+            expect(subject).not_to edit_filter_lines('update-systemd-file')
+          end
         end
       end
     end
