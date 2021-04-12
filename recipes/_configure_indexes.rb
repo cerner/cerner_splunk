@@ -39,7 +39,7 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
   daily_mb = hash.delete('_maxDailyDataSizeMB')
   padding = hash.delete('_dataSizePaddingPercent')
   default_config = config.fetch('default', {})
-  s2_enabled_index = hash.delete('_is_S2Index')
+  s2_enabled_index = hash.delete('_is_s2Index')
   # _noGenerateTstatsHomePath is false  by default.
   no_gentstat = hash.delete('_noGenerateTstatsHomePath') || default_config['_noGenerateTstatsHomePath']
   if %i[index default].include?(stanza_type) && daily_mb && !hash.key?('maxTotalDataSizeMB')

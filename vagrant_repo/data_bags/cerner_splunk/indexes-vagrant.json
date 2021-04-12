@@ -25,7 +25,7 @@
     "opsinfra" : { "_volume": "foo" },
     "pop_health" : { "_volume": "bar" , "_maxDailyDataSizeMB": 50 },
     "bobs_index_emporium": {},
-    "calculated_max_total": { "_maxDailyDataSizeMB": 50 , "_is_S2Index": true },
+    "calculated_max_total": { "_maxDailyDataSizeMB": 50 , "_is_s2Index": true },
     "summary": { "maxTotalDataSizeMB": 500000 }
   },
   "flags": {
