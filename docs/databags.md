@@ -82,7 +82,7 @@ An Indexes Hash is part of a plaintext data bag item that defines the set of ind
     if maxTotalDataSizeMB or maxGlobalDataSizeMB has not already been specified for the index.
     * `_dataSizePaddingPercent` - The percentage of padding to apply to the amount of space this index is expected to consume.  Used to calculate the maxTotalDataSizeMB if maxTotalDataSizeMB has not already been specified for the index. Defaults to 10 if no value is specified.
     * `_noGenerateTstatsHomePath` - Do not generate tstatsHomePath for this index when set to true. Used to disable datamodel acceleration in case of the smartstore enabled indexes.
-    * `_is_S2Index` - This is set to true for smart store enabled indexes.  
+    * `_is_s2Index` - This is set to true for smart store enabled indexes, to calculate maxGlobalDataSizeMB in case of _maxDailyDataSizeMB specified.
 * `['flags']` - These define boolean processing flags per index. All flags are default 'false' but can be set to true. Current flags include:
     * `noGeneratePaths` - Do not generate the homePath,coldPath,thawedPath to this index when not present in the config above
     * `noRepFactor` - Do not add 'repFactor = auto' to this index when not present in the config on a cluster master.

@@ -55,5 +55,3 @@ default['splunk']['boot_start_args'] =
 default['splunk']['systemd_file_location'] = '/etc/systemd/system/splunk.service'
 
 default['splunk']['config']['sslPassword'] = 'password'
-
-#default['splunk']['is_smartstore_enabled'] = false
