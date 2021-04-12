@@ -1,3 +1,0 @@
-cookbook "ntp", "<= 1.0.0"
-cookbook "mysql"
-cookbook "nginx", "< 0.101.2"
