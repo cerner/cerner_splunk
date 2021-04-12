@@ -161,7 +161,7 @@ describe 'cerner_splunk::_configure_indexes' do
       }
     end
 
-    it 'writes the indexes.conf file without tstatsHomePath and maxGlobalDataSizeMB only for those indexes' do
+    it 'writes the indexes.conf file without tstatsHomePath and with maxGlobalDataSizeMB only for those indexes' do
       expected_attributes = {
         stanzas: {
           'volume:test' => index_config['config']['volume:test'],
@@ -211,7 +211,7 @@ describe 'cerner_splunk::_configure_indexes' do
       }
     end
 
-    it 'writes the indexes.conf file without tstats paths for all indexes' do
+    it 'writes the indexes.conf file without tstats paths for all indexes and calculates maxGlobalDataSizeMB ' do
       expected_attributes = {
         stanzas: {
           'default' => {},
