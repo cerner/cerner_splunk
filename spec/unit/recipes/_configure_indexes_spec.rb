@@ -168,7 +168,7 @@ describe 'cerner_splunk::_configure_indexes' do
           'index_a' => {
             'coldPath' => 'volume:bar/index_a/colddb',
             'homePath' => 'volume:bar/index_a/db',
-            'thawedPath' => '$SPLUNK_DB/index_a/thaweddb'
+            'thawedPath' => '$SPLUNK_DB/index_a/thaweddb',
             'maxGlobalDataSizeMB' => 1000
           },
           'index_b' => {
