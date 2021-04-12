@@ -39,6 +39,7 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
   daily_mb = hash.delete('_maxDailyDataSizeMB')
   padding = hash.delete('_dataSizePaddingPercent')
   default_config = config.fetch('default', {})
+  s2_enabled_index = hash.delete('_is_S2Index')
   # _noGenerateTstatsHomePath is false  by default.
   no_gentstat = hash.delete('_noGenerateTstatsHomePath') || default_config['_noGenerateTstatsHomePath']
   if %i[index default].include?(stanza_type) && daily_mb && !hash.key?('maxTotalDataSizeMB')
@@ -51,8 +52,12 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
 
     padding ||= default_config['_dataSizePaddingPercent']
     padding = padding.nil? ? 1.1 : 1 + (padding / 100.0)
-
-    hash['maxTotalDataSizeMB'] = (daily_mb * padding * frozen_time_in_days * replication_factor).to_i / indexer_count
+    # For smartstore enabled indexes only .
+    if s2_enabled_index == true
+      hash['maxGlobalDataSizeMB'] = (daily_mb * padding * frozen_time_in_days * replication_factor).to_i / indexer_count
+    else
+      hash['maxTotalDataSizeMB'] = (daily_mb * padding * frozen_time_in_days * replication_factor).to_i / indexer_count
+    end
   end
 
   if stanza_type == :index

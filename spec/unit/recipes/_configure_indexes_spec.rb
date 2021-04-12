@@ -138,21 +138,30 @@ describe 'cerner_splunk::_configure_indexes' do
     end
   end
 
-  context 'when _noGenerateTstatsHomePath is set to true for specific indexes' do
+  context 'when _noGenerateTstatsHomePath is set to true and _is_S2Index is set to true for specific indexes' do
     let(:index_config) do
       {
         'config' => {
           'volume:test' => {
             'path' => '/test/path'
           },
-          'index_a' => { '_volume' => 'bar', '_noGenerateTstatsHomePath' => true },
-          'index_b' => { '_volume' => 'test', '_noGenerateTstatsHomePath' => true },
+          'index_a' => {
+            '_volume' => 'bar',
+            '_noGenerateTstatsHomePath' => true ,
+            '_is_S2Index' => true ,
+            '_maxDailyDataSizeMB' => 100
+          },
+          'index_b' => {
+            '_volume' => 'test',
+            '_noGenerateTstatsHomePath' => true,
+            '_maxDailyDataSizeMB' => 25
+           },
           'index_c' => { '_volume' => 'test' }
         }
       }
     end
 
-    it 'writes the indexes.conf file without tstatsHomePath only for those indexes' do
+    it 'writes the indexes.conf file without tstatsHomePath and maxGlobalDataSizeMB only for those indexes' do
       expected_attributes = {
         stanzas: {
           'volume:test' => index_config['config']['volume:test'],
@@ -160,11 +169,13 @@ describe 'cerner_splunk::_configure_indexes' do
             'coldPath' => 'volume:bar/index_a/colddb',
             'homePath' => 'volume:bar/index_a/db',
             'thawedPath' => '$SPLUNK_DB/index_a/thaweddb'
+            'maxGlobalDataSizeMB' => 1000
           },
           'index_b' => {
             'coldPath' => 'volume:test/index_b/colddb',
             'homePath' => 'volume:test/index_b/db',
-            'thawedPath' => '$SPLUNK_DB/index_b/thaweddb'
+            'thawedPath' => '$SPLUNK_DB/index_b/thaweddb',
+            'maxTotalDataSizeMB' => 550
           },
           'index_c' => {
             'coldPath' => 'volume:test/index_c/colddb',
@@ -179,17 +190,21 @@ describe 'cerner_splunk::_configure_indexes' do
     end
   end
 
-  context 'when _noGenerateTstatsHomePath is set to true in default stanza' do
+  context 'when _noGenerateTstatsHomePath and _is_S2Index is set to true in default stanza' do
     let(:index_config) do
       {
         'config' => {
           'default' => {
-            '_noGenerateTstatsHomePath' => true
+            '_noGenerateTstatsHomePath' => true ,
+            '_is_S2Index' => true
           },
           'volume:test' => {
             'path' => '/test/path'
           },
-          'index_a' => { '_volume' => 'bar' },
+          'index_a' => {
+            '_volume' => 'bar',
+            '_maxDailyDataSizeMB' => 25
+          },
           'index_b' => { '_volume' => 'test' },
           'index_c' => { '_volume' => 'test' }
         }
@@ -204,7 +219,9 @@ describe 'cerner_splunk::_configure_indexes' do
           'index_a' => {
             'coldPath' => 'volume:bar/index_a/colddb',
             'homePath' => 'volume:bar/index_a/db',
-            'thawedPath' => '$SPLUNK_DB/index_a/thaweddb'
+            'thawedPath' => '$SPLUNK_DB/index_a/thaweddb',
+            'maxGlobalDataSizeMB' => 550
+            
           },
           'index_b' => {
             'coldPath' => 'volume:test/index_b/colddb',
