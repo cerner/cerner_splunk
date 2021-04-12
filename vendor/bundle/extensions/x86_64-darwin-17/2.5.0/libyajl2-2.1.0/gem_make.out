@@ -1,0 +1,19 @@
+current directory: /Users/sb065394/Desktop/CernerWorks/Smartstore-SPLUNK-2259/cerner_splunk/vendor/bundle/gems/libyajl2-2.1.0/ext/libyajl2
+/usr/local/rvm/rubies/ruby-2.5.3/bin/ruby -I /usr/local/rvm/rubies/ruby-2.5.3/lib/ruby/site_ruby/2.5.0 -r ./siteconf20210412-29485-1x7sstf.rb extconf.rb
+creating Makefile
+/Users/sb065394/Desktop/CernerWorks/Smartstore-SPLUNK-2259/cerner_splunk/vendor/bundle/gems/libyajl2-2.1.0/ext/libyajl2
+
+current directory: /Users/sb065394/Desktop/CernerWorks/Smartstore-SPLUNK-2259/cerner_splunk/vendor/bundle/gems/libyajl2-2.1.0/ext/libyajl2
+make "DESTDIR=" clean
+make: *** No rule to make target `clean'.  Stop.
+
+current directory: /Users/sb065394/Desktop/CernerWorks/Smartstore-SPLUNK-2259/cerner_splunk/vendor/bundle/gems/libyajl2-2.1.0/ext/libyajl2
+make "DESTDIR="
+make: Nothing to be done for `all'.
+
+current directory: /Users/sb065394/Desktop/CernerWorks/Smartstore-SPLUNK-2259/cerner_splunk/vendor/bundle/gems/libyajl2-2.1.0/ext/libyajl2
+make "DESTDIR=" install
+mkdir -p /Users/sb065394/Desktop/CernerWorks/Smartstore-SPLUNK-2259/cerner_splunk/vendor/bundle/gems/libyajl2-2.1.0/lib/libyajl2/vendored-libyajl2/lib
+cp libyajl.bundle /Users/sb065394/Desktop/CernerWorks/Smartstore-SPLUNK-2259/cerner_splunk/vendor/bundle/gems/libyajl2-2.1.0/lib/libyajl2/vendored-libyajl2/lib/libyajl.bundle
+mkdir -p /Users/sb065394/Desktop/CernerWorks/Smartstore-SPLUNK-2259/cerner_splunk/vendor/bundle/gems/libyajl2-2.1.0/lib/libyajl2/vendored-libyajl2/include/yajl
+cp yajl/*.h /Users/sb065394/Desktop/CernerWorks/Smartstore-SPLUNK-2259/cerner_splunk/vendor/bundle/gems/libyajl2-2.1.0/lib/libyajl2/vendored-libyajl2/include/yajl

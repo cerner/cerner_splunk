@@ -1,0 +1,111 @@
+#!/usr/bin/env ruby
+
+# Trap interrupts to quit cleanly.
+Signal.trap("INT") { exit 1 }
+
+require "rubygems"
+$:.unshift(File.expand_path(File.join(File.dirname(__FILE__), "..", "lib")))
+
+require "chef_zero/log"
+require "chef_zero/dist"
+require "chef_zero/version"
+require "chef_zero/server"
+require "chef_zero/data_store/raw_file_store"
+require "optparse"
+
+def parse_port(port)
+  array = []
+  port.split(",").each do |part|
+    a, b = part.split("-", 2)
+    if b
+      array = array.concat(a.to_i.upto(b.to_i).to_a)
+    else
+      array = array.concat([a.to_i])
+    end
+  end
+  array
+end
+
+options = {}
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: #{ChefZero::Dist::CLIENT} [ARGS]"
+
+  opts.on("-H", "--host HOST", "Host to bind to (default: 127.0.0.1)") do |value|
+    options[:host] ||= []
+    options[:host] << value
+  end
+
+  opts.on("-p", "--port PORT", "Port to listen on (e.g. 8889, or 8500-8600 or 8885,8888)") do |value|
+    options[:port] ||= []
+    options[:port] += parse_port(value)
+  end
+
+  opts.on("--[no-]generate-keys", "Whether to generate actual keys or fake it (faster).  Default: false.") do |value|
+    options[:generate_real_keys] = value
+  end
+
+  opts.on("-d", "--daemon", "Run as a daemon process") do |value|
+    options[:daemon] = value
+  end
+
+  opts.on("-l", "--log-level LEVEL", "Set the output log level") do |value|
+    options[:log_level] = value
+  end
+
+  opts.on("--log-file FILE", "Log to a file") do |value|
+    options[:log_file] = value
+  end
+
+  opts.on("--enterprise", "Whether to run in enterprise mode") do |value|
+    options[:single_org] = nil
+    options[:osc_compat] = false
+  end
+
+  opts.on("--multi-org", "Whether to run in multi-org mode") do |value|
+    options[:single_org] = nil
+  end
+
+  opts.on("--file-store PATH", "Persist data to files at the given path") do |value|
+    options[:data_store] = ChefZero::DataStore::RawFileStore.new(value)
+  end
+
+  opts.on("--[no-]ssl", "Use SSL with self-signed certificate(Auto generate before every run).  Default: false.") do |value|
+    options[:ssl] = value
+  end
+
+  opts.on_tail("-h", "--help", "Show this message") do
+    puts opts
+    exit
+  end
+
+  opts.on_tail("--version", "Show version") do
+    puts ChefZero::VERSION
+    exit
+  end
+end.parse!
+
+if options[:data_store]
+  options[:data_store] = ChefZero::DataStore::DefaultFacade.new(options[:data_store], options[:single_org], false)
+end
+
+if options[:log_file]
+  ChefZero::Log.init(options[:log_file])
+end
+
+server = ChefZero::Server.new(options)
+
+if options[:daemon]
+  if Process.respond_to?(:daemon)
+    Process.daemon(true)
+    server.start(true)
+  else
+    if ENV["OS"] == "Windows_NT"
+      abort "Daemonization is not supported on Windows. Running 'start #{ChefZero::Dist::CLIENT}' will fork the process."
+    else
+      abort "Process.daemon requires Ruby >= 1.9"
+    end
+  end
+else
+  server.start(true)
+end

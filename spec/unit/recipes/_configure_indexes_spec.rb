@@ -147,15 +147,15 @@ describe 'cerner_splunk::_configure_indexes' do
           },
           'index_a' => {
             '_volume' => 'bar',
-            '_noGenerateTstatsHomePath' => true ,
-            '_is_s2Index' => true ,
+            '_noGenerateTstatsHomePath' => true,
+            '_is_s2Index' => true,
             '_maxDailyDataSizeMB' => 100
           },
           'index_b' => {
             '_volume' => 'test',
             '_noGenerateTstatsHomePath' => true,
             '_maxDailyDataSizeMB' => 25
-           },
+          },
           'index_c' => { '_volume' => 'test' }
         }
       }
@@ -195,7 +195,7 @@ describe 'cerner_splunk::_configure_indexes' do
       {
         'config' => {
           'default' => {
-            '_noGenerateTstatsHomePath' => true ,
+            '_noGenerateTstatsHomePath' => true,
             '_is_s2Index' => true
           },
           'volume:test' => {
