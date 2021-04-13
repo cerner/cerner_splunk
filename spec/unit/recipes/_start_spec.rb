@@ -146,13 +146,13 @@ describe 'cerner_splunk::_start' do
       let(:platform_version) { '7.6.1810' }
 
       context 'and the splunk version is less than 8.0.0' do
-        let(:package_version) { '7.3.9' }
+        let(:package_version) { '7.2.10' }
 
         context 'when systemd script does not exist' do
           let(:systemd_exists) { [false, true] }
 
           it 'executes boot-start script for systemd' do
-            expect(subject).to run_execute('splunk enable boot-start -user splunk -group splunk -systemd-managed 1 -systemd-unit-file-name splunk')
+            expect(subject).to run_execute('splunk enable boot-start -user splunk -systemd-managed 1 -systemd-unit-file-name splunk')
           end
 
           it 'modifies the systemd file' do

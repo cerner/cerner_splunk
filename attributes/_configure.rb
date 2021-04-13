@@ -41,14 +41,14 @@ default['splunk']['boot_start_args'] =
   if platform_family? 'rhel', 'fedora', 'amazon'
     case node['platform_version'].to_i
     when 6
-      ' -systemd-managed 0'
+      '-systemd-managed 0'
     when 7
-      ' -systemd-managed 1 -systemd-unit-file-name splunk'
+      '-systemd-managed 1 -systemd-unit-file-name splunk'
     else
-      ' -systemd-managed 0'
+      '-systemd-managed 0'
     end
   else
-    ' -systemd-managed 0'
+    '-systemd-managed 0'
   end
 
 # Default systemd file location based on default systemd unit file name
