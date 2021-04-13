@@ -143,7 +143,7 @@ describe 'cerner_splunk::_start' do
     end
 
     context 'and platform version is 7.x' do
-      let(:platform_version) { '7.6.1810' }
+      let(:platform_version) { '7.8.2003' }
 
       context 'and the splunk version is less than 8.0.0' do
         let(:package_version) { '7.2.10' }
