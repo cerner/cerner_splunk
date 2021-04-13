@@ -42,7 +42,7 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
   s2_enabled_index = hash.delete('_is_s2Index') || default_config['_is_s2Index']
   # _noGenerateTstatsHomePath is false  by default.
   no_gentstat = hash.delete('_noGenerateTstatsHomePath') || default_config['_noGenerateTstatsHomePath']
-  if %i[index default].include?(stanza_type) && daily_mb && !hash.key?('maxTotalDataSizeMB')
+  if %i[index default].include?(stanza_type) && daily_mb && !hash.key?('maxTotalDataSizeMB') && !hash.key?('maxGlobalDataSizeMB')
     settings = CernerSplunk.my_cluster_data(node).fetch('settings', {})
     replication_factor = settings['replication_factor'] || 1
     indexer_count = settings['_cerner_splunk_indexer_count'] || 1
