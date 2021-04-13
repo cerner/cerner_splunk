@@ -39,7 +39,7 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
   daily_mb = hash.delete('_maxDailyDataSizeMB')
   padding = hash.delete('_dataSizePaddingPercent')
   default_config = config.fetch('default', {})
-  s2_enabled_index = hash.delete('_is_s2Index')
+  s2_enabled_index = hash.delete('_is_s2Index') || default_config['_is_s2Index']
   # _noGenerateTstatsHomePath is false  by default.
   no_gentstat = hash.delete('_noGenerateTstatsHomePath') || default_config['_noGenerateTstatsHomePath']
   if %i[index default].include?(stanza_type) && daily_mb && !hash.key?('maxTotalDataSizeMB')
@@ -54,7 +54,7 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
     padding = padding.nil? ? 1.1 : 1 + (padding / 100.0)
     # For smartstore enabled indexes only .
     if s2_enabled_index == true
-      hash['maxGlobalDataSizeMB'] = (daily_mb * padding * frozen_time_in_days * replication_factor).to_i / indexer_count
+      hash['maxGlobalDataSizeMB'] = (daily_mb * padding * frozen_time_in_days).to_i
     else
       hash['maxTotalDataSizeMB'] = (daily_mb * padding * frozen_time_in_days * replication_factor).to_i / indexer_count
     end
@@ -70,6 +70,7 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
       hash['thawedPath'] = "$SPLUNK_DB/#{dir_name}/thaweddb" unless hash['thawedPath']
       hash['tstatsHomePath'] = "#{base_path}/#{dir_name}/datamodel_summary" if volume && !hash['tstatsHomePath'] && !no_gentstat
     end
+
     if is_master && !index_flags['noRepFactor']
       hash['repFactor'] = 'auto' unless hash['repFactor']
     end
