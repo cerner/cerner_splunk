@@ -249,7 +249,7 @@ describe 'cerner_splunk::_configure_indexes' do
       expected_attributes = {
         stanzas: {
           'default' => {
-            'maxGlobalDataSizeMB' => 240240
+            'maxGlobalDataSizeMB' => 240_240
           },
           'index_a' => {
             'maxGlobalDataSizeMB' => 240_240
