@@ -138,16 +138,16 @@ describe 'cerner_splunk::_configure_indexes' do
     end
   end
 
-  context 'when _noGenerateTstatsHomePath is set to true for specific indexes' do
+  context 'when _noGenerateTstatsHomePath is set to true or remotePath is set for specific indexes' do
     let(:index_config) do
       {
         'config' => {
           'volume:test' => {
             'path' => '/test/path'
           },
-          'index_a' => { '_volume' => 'bar', '_noGenerateTstatsHomePath' => true },
+          'index_a' => { '_volume' => 'bar' },
           'index_b' => { '_volume' => 'test', '_noGenerateTstatsHomePath' => true },
-          'index_c' => { '_volume' => 'test' }
+          'index_c' => { '_volume' => 'test', 'remotePath' => 'volume:remote_store/$_index_name' }
         }
       }
     end
@@ -159,7 +159,8 @@ describe 'cerner_splunk::_configure_indexes' do
           'index_a' => {
             'coldPath' => 'volume:bar/index_a/colddb',
             'homePath' => 'volume:bar/index_a/db',
-            'thawedPath' => '$SPLUNK_DB/index_a/thaweddb'
+            'thawedPath' => '$SPLUNK_DB/index_a/thaweddb',
+            'tstatsHomePath' => 'volume:bar/index_a/datamodel_summary'
           },
           'index_b' => {
             'coldPath' => 'volume:test/index_b/colddb',
@@ -170,7 +171,7 @@ describe 'cerner_splunk::_configure_indexes' do
             'coldPath' => 'volume:test/index_c/colddb',
             'homePath' => 'volume:test/index_c/db',
             'thawedPath' => '$SPLUNK_DB/index_c/thaweddb',
-            'tstatsHomePath' => 'volume:test/index_c/datamodel_summary'
+            'remotePath' => 'volume:remote_store/$_index_name'
           }
         }
       }
@@ -179,12 +180,13 @@ describe 'cerner_splunk::_configure_indexes' do
     end
   end
 
-  context 'when _noGenerateTstatsHomePath is set to true in default stanza' do
+  context 'when _noGenerateTstatsHomePath is set to true or remotePath is set in default stanza' do
     let(:index_config) do
       {
         'config' => {
           'default' => {
-            '_noGenerateTstatsHomePath' => true
+            '_noGenerateTstatsHomePath' => true,
+            'remotePath' => 'volume:remote_store/$_index_name'
           },
           'volume:test' => {
             'path' => '/test/path'
@@ -199,7 +201,7 @@ describe 'cerner_splunk::_configure_indexes' do
     it 'writes the indexes.conf file without tstats paths for all indexes' do
       expected_attributes = {
         stanzas: {
-          'default' => {},
+          'default' => {"remotePath" => "volume:remote_store/$_index_name"},
           'volume:test' => index_config['config']['volume:test'],
           'index_a' => {
             'coldPath' => 'volume:bar/index_a/colddb',
@@ -223,12 +225,12 @@ describe 'cerner_splunk::_configure_indexes' do
     end
   end
 
-  context 'when _is_s2Index is set to true in default stanza' do
+  context 'when remotePath is set in default stanza' do
     let(:index_config) do
       {
         'config' => {
           'default' => {
-            '_is_s2Index' => true,
+            'remotePath' => 'volume:remote_store/$_index_name',
             '_maxDailyDataSizeMB' => 100
           },
           'index_a' => {
@@ -249,7 +251,8 @@ describe 'cerner_splunk::_configure_indexes' do
       expected_attributes = {
         stanzas: {
           'default' => {
-            'maxGlobalDataSizeMB' => 240_240
+            'maxGlobalDataSizeMB' => 240_240,
+            'remotePath' => 'volume:remote_store/$_index_name'
           },
           'index_a' => {
             'maxGlobalDataSizeMB' => 240_240
@@ -264,7 +267,7 @@ describe 'cerner_splunk::_configure_indexes' do
     end
   end
 
-  context 'when _is_s2Index is set to true in specific stanza' do
+  context 'when remotePath is set to true in specific stanza' do
     let(:index_config) do
       {
         'config' => {
@@ -272,7 +275,7 @@ describe 'cerner_splunk::_configure_indexes' do
             '_maxDailyDataSizeMB' => 100
           },
           'index_a' => {
-            '_is_s2Index' => true,
+            'remotePath' => 'volume:remote_store/$_index_name',
             '_maxDailyDataSizeMB' => 100
           },
           'index_b' => {
@@ -293,7 +296,8 @@ describe 'cerner_splunk::_configure_indexes' do
             'maxTotalDataSizeMB' => 160_160
           },
           'index_a' => {
-            'maxGlobalDataSizeMB' => 240_240
+            'maxGlobalDataSizeMB' => 240_240,
+            "remotePath" => "volume:remote_store/$_index_name"
           },
           'index_b' => {
             'maxTotalDataSizeMB' => 40_040
