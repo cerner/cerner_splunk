@@ -180,12 +180,56 @@ describe 'cerner_splunk::_configure_indexes' do
     end
   end
 
-  context 'when _noGenerateTstatsHomePath is set to true or remotePath is set in default stanza' do
+  context 'when _noGenerateTstatsHomePath is set to true in default stanza' do
     let(:index_config) do
       {
         'config' => {
           'default' => {
             '_noGenerateTstatsHomePath' => true,
+            'remotePath' => 'volume:remote_store/$_index_name'
+          },
+          'volume:test' => {
+            'path' => '/test/path'
+          },
+          'index_a' => { '_volume' => 'bar' },
+          'index_b' => { '_volume' => 'test' },
+          'index_c' => { '_volume' => 'test' }
+        }
+      }
+    end
+
+    it 'writes the indexes.conf file without tstats paths for all indexes' do
+      expected_attributes = {
+        stanzas: {
+          'default' => {"remotePath" => "volume:remote_store/$_index_name"},
+          'volume:test' => index_config['config']['volume:test'],
+          'index_a' => {
+            'coldPath' => 'volume:bar/index_a/colddb',
+            'homePath' => 'volume:bar/index_a/db',
+            'thawedPath' => '$SPLUNK_DB/index_a/thaweddb'
+          },
+          'index_b' => {
+            'coldPath' => 'volume:test/index_b/colddb',
+            'homePath' => 'volume:test/index_b/db',
+            'thawedPath' => '$SPLUNK_DB/index_b/thaweddb'
+          },
+          'index_c' => {
+            'coldPath' => 'volume:test/index_c/colddb',
+            'homePath' => 'volume:test/index_c/db',
+            'thawedPath' => '$SPLUNK_DB/index_c/thaweddb'
+          }
+        }
+      }
+
+      expect(subject).to create_splunk_template('system/indexes.conf').with(expected_attributes)
+    end
+  end
+
+  context 'when remotePath is set in default stanza' do
+    let(:index_config) do
+      {
+        'config' => {
+          'default' => {
             'remotePath' => 'volume:remote_store/$_index_name'
           },
           'volume:test' => {
@@ -267,7 +311,7 @@ describe 'cerner_splunk::_configure_indexes' do
     end
   end
 
-  context 'when remotePath is set to true in specific stanza' do
+  context 'when remotePath is set in specific stanza' do
     let(:index_config) do
       {
         'config' => {

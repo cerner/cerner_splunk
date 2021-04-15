@@ -1,0 +1,20 @@
+{
+  "domain": "local",
+  "fqdn": "chefspec.local",
+  "hostname": "chefspec",
+  "ipaddress": "127.0.0.1",
+  "kernel": {
+    "machine": "i386"
+  },
+  "languages": {
+    "ruby": {
+      "bin_dir": "/usr/local/bin",
+      "gem_bin": "/usr/local/bin/gem",
+      "gems_dir": "/usr/local/gems",
+      "ruby_bin": "/usr/local/bin/ruby"
+    }
+  },
+  "os": "chefspec",
+  "os_version": "0.6.1",
+  "platform_family": "chefspec"
+}

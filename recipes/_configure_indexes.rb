@@ -40,7 +40,7 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
   padding = hash.delete('_dataSizePaddingPercent')
   default_config = config.fetch('default', {})
 
-  s2_enabled_index =  hash.key?('remotePath') || !default_config['remotePath'].nil?
+  s2_enabled_index = hash.key?('remotePath') || default_config.key?('remotePath')
   # _noGenerateTstatsHomePath is false  by default.
   no_gentstat = hash.delete('_noGenerateTstatsHomePath') || default_config['_noGenerateTstatsHomePath'] || s2_enabled_index
   if %i[index default].include?(stanza_type) && daily_mb && ((!s2_enabled_index && !hash.key?('maxTotalDataSizeMB')) || (s2_enabled_index && !hash.key?('maxGlobalDataSizeMB')))
@@ -54,7 +54,7 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
     padding ||= default_config['_dataSizePaddingPercent']
     padding = padding.nil? ? 1.1 : 1 + (padding / 100.0)
     # For smartstore enabled indexes only .
-    if s2_enabled_index == true
+    if s2_enabled_index
       hash['maxGlobalDataSizeMB'] = (daily_mb * padding * frozen_time_in_days).to_i
     else
       hash['maxTotalDataSizeMB'] = (daily_mb * padding * frozen_time_in_days * replication_factor).to_i / indexer_count
@@ -69,7 +69,7 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
       hash['coldPath'] = "#{base_path}/#{dir_name}/colddb" unless hash['coldPath']
       hash['homePath'] = "#{base_path}/#{dir_name}/db" unless hash['homePath']
       hash['thawedPath'] = "$SPLUNK_DB/#{dir_name}/thaweddb" unless hash['thawedPath']
-      hash['tstatsHomePath'] = "#{base_path}/#{dir_name}/datamodel_summary" if volume && !hash['tstatsHomePath'] && !no_gentstat && !s2_enabled_index
+      hash['tstatsHomePath'] = "#{base_path}/#{dir_name}/datamodel_summary" if volume && !hash['tstatsHomePath'] && !no_gentstat
     end
     if is_master && !index_flags['noRepFactor']
       hash['repFactor'] = 'auto' unless hash['repFactor']

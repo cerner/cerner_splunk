@@ -1,0 +1,14 @@
+
+= CREDITS.txt
+
+
+== Contributors
+
+- Gleb Kuzmenko - https://github.com/bayclosed - squeeze! and more
+- Baldur Gudbjornsson - https://github.com/baldur
+
+
+== Feedback
+
+- many people
+
