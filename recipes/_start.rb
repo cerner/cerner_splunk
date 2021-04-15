@@ -10,8 +10,10 @@ init_file_path = '/etc/init.d/splunk'
 restart_flag = !(File.exist?(init_file_path) && File.readlines(init_file_path).grep(/#{ulimit_command}/).any?)
 
 # We want to always ensure that the boot-start script is in place on non-windows platforms
-command = "#{node['splunk']['cmd']} enable boot-start -user #{node['splunk']['user']} -group #{node['splunk']['group']}"
-command += node['splunk']['boot_start_args'] if Gem::Version.new(node['splunk']['package']['version']) >= Gem::Version.new('7.2.2')
+package_version = Gem::Version.new(node['splunk']['package']['version'])
+command = "#{node['splunk']['cmd']} enable boot-start -user #{node['splunk']['user']}"
+command += " -group #{node['splunk']['group']}" if package_version >= Gem::Version.new('7.3.0')
+command += " #{node['splunk']['boot_start_args']}" if package_version >= Gem::Version.new('7.2.2')
 
 execute command do
   not_if { platform_family?('windows') }
@@ -48,7 +50,7 @@ filter_lines 'update-systemd-file' do
             { stanza: ['Service', { KillMode: 'mixed', KillSignal: 'SIGINT', TimeoutStopSec: '10min' }] }
           ])
   sensitive false
-  only_if { File.exist?(node['splunk']['systemd_file_location']) && Gem::Version.new(node['splunk']['package']['version']) < Gem::Version.new('8.0.0') }
+  only_if { File.exist?(node['splunk']['systemd_file_location']) && package_version < Gem::Version.new('8.0.0') }
   notifies :run, 'execute[reload-systemctl]', :immediately
 end
 
