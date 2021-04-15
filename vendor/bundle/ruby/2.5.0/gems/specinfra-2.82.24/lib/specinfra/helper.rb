@@ -1,6 +1,0 @@
-require 'specinfra/helper/os'
-require 'specinfra/helper/docker'
-require 'specinfra/helper/lxc'
-require 'specinfra/helper/configuration'
-require 'specinfra/helper/properties'
-require 'specinfra/helper/host_inventory'
