@@ -39,9 +39,11 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
   daily_mb = hash.delete('_maxDailyDataSizeMB')
   padding = hash.delete('_dataSizePaddingPercent')
   default_config = config.fetch('default', {})
+
+  s2_enabled_index = hash.key?('remotePath') || default_config.key?('remotePath')
   # _noGenerateTstatsHomePath is false  by default.
-  no_gentstat = hash.delete('_noGenerateTstatsHomePath') || default_config['_noGenerateTstatsHomePath']
-  if %i[index default].include?(stanza_type) && daily_mb && !hash.key?('maxTotalDataSizeMB')
+  no_gentstat = hash.delete('_noGenerateTstatsHomePath') || default_config['_noGenerateTstatsHomePath'] || s2_enabled_index
+  if %i[index default].include?(stanza_type) && daily_mb && ((!s2_enabled_index && !hash.key?('maxTotalDataSizeMB')) || (s2_enabled_index && !hash.key?('maxGlobalDataSizeMB')))
     settings = CernerSplunk.my_cluster_data(node).fetch('settings', {})
     replication_factor = settings['replication_factor'] || 1
     indexer_count = settings['_cerner_splunk_indexer_count'] || 1
@@ -51,8 +53,12 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
 
     padding ||= default_config['_dataSizePaddingPercent']
     padding = padding.nil? ? 1.1 : 1 + (padding / 100.0)
-
-    hash['maxTotalDataSizeMB'] = (daily_mb * padding * frozen_time_in_days * replication_factor).to_i / indexer_count
+    # For smartstore enabled indexes only .
+    if s2_enabled_index
+      hash['maxGlobalDataSizeMB'] = (daily_mb * padding * frozen_time_in_days).to_i
+    else
+      hash['maxTotalDataSizeMB'] = (daily_mb * padding * frozen_time_in_days * replication_factor).to_i / indexer_count
+    end
   end
 
   if stanza_type == :index

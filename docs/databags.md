@@ -78,9 +78,10 @@ An Indexes Hash is part of a plaintext data bag item that defines the set of ind
 * `['config']` - These define the [indexes.conf] stanzas (in fairly raw form). However there are a few special keys:
     * `_volume` - The base volume for the coldPath, homePath and tstatsHomePath. Defaults to nil, so the index will be located in $SPLUNK_DB.
     * `_directory_name` - The on-disk name of the directory to store the index. Defaults to the index name.
-    * `_maxDailyDataSizeMB` - The amount of daily usage this index is expected to consume.  Used to calculate the maxTotalDataSizeMB if maxTotalDataSizeMB has not already been specified for the index.
+    * `_maxDailyDataSizeMB` - The amount of daily usage this index is expected to consume. Used to calculate the maxTotalDataSizeMB or maxGlobalDataSizeMB
+    if maxTotalDataSizeMB or maxGlobalDataSizeMB has not already been specified for the index.
     * `_dataSizePaddingPercent` - The percentage of padding to apply to the amount of space this index is expected to consume.  Used to calculate the maxTotalDataSizeMB if maxTotalDataSizeMB has not already been specified for the index. Defaults to 10 if no value is specified.
-    * `_noGenerateTstatsHomePath` - Do not generate tstatsHomePath for this index when set to true. Used to disable datamodel acceleration in case of the smartstore enabled indexes. 
+    * `_noGenerateTstatsHomePath` - Do not generate tstatsHomePath for this index when set to true. Used to disable datamodel acceleration in case of the smartstore enabled indexes.This is deprecated, instead of this please set the remotePath in smartstore enabled clusters.
 * `['flags']` - These define boolean processing flags per index. All flags are default 'false' but can be set to true. Current flags include:
     * `noGeneratePaths` - Do not generate the homePath,coldPath,thawedPath to this index when not present in the config above
     * `noRepFactor` - Do not add 'repFactor = auto' to this index when not present in the config on a cluster master.
