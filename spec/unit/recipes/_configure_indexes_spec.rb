@@ -201,7 +201,7 @@ describe 'cerner_splunk::_configure_indexes' do
     it 'writes the indexes.conf file without tstats paths for all indexes' do
       expected_attributes = {
         stanzas: {
-          'default' => {"remotePath" => "volume:remote_store/$_index_name"},
+          'default' => { 'remotePath' => 'volume:remote_store/$_index_name' },
           'volume:test' => index_config['config']['volume:test'],
           'index_a' => {
             'coldPath' => 'volume:bar/index_a/colddb',
@@ -245,7 +245,7 @@ describe 'cerner_splunk::_configure_indexes' do
     it 'writes the indexes.conf file without tstats paths for all indexes' do
       expected_attributes = {
         stanzas: {
-          'default' => {"remotePath" => "volume:remote_store/$_index_name"},
+          'default' => { 'remotePath' => 'volume:remote_store/$_index_name' },
           'volume:test' => index_config['config']['volume:test'],
           'index_a' => {
             'coldPath' => 'volume:bar/index_a/colddb',
@@ -341,7 +341,7 @@ describe 'cerner_splunk::_configure_indexes' do
           },
           'index_a' => {
             'maxGlobalDataSizeMB' => 240_240,
-            "remotePath" => "volume:remote_store/$_index_name"
+            'remotePath' => 'volume:remote_store/$_index_name'
           },
           'index_b' => {
             'maxTotalDataSizeMB' => 40_040
