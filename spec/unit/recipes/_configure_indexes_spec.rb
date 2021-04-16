@@ -269,7 +269,7 @@ describe 'cerner_splunk::_configure_indexes' do
     end
   end
 
-  context 'when remotePath is set in default stanza' do
+  context 'when remotePath is set in default stanza and _maxDailyDataSizeMB is given' do
     let(:index_config) do
       {
         'config' => {
@@ -311,7 +311,7 @@ describe 'cerner_splunk::_configure_indexes' do
     end
   end
 
-  context 'when remotePath is set in specific stanza' do
+  context 'when remotePath is set in specific stanza and _maxDailyDataSizeMB is given' do
     let(:index_config) do
       {
         'config' => {
