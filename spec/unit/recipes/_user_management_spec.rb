@@ -46,6 +46,10 @@ describe 'cerner_splunk::_user_management' do
         }
         expect(subject).to create_user('splunk').with(expected_attrs)
       end
+
+      it 'does not ensure the home directory exists' do
+        expect(subject).not_to create_directory('/home/splunk')
+      end
     end
 
     context 'when the user_home is set' do
@@ -64,7 +68,7 @@ describe 'cerner_splunk::_user_management' do
           group: 'splunk',
           mode: '0700'
         }
-        expect(subject).to create_directory(user_home).with(expected_attrs)
+        expect(subject).to create_directory('/home/splunk').with(expected_attrs)
       end
     end
   end
