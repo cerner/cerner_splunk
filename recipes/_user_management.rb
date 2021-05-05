@@ -8,10 +8,20 @@
 # User management currently not supported on windows
 return if platform_family?('windows')
 
+home_directory = node['splunk']['user_home']
 # user should be created by the package install
 user node['splunk']['user'] do
-  manage_home true
+  manage_home false
+  home home_directory if home_directory
   action %i[create lock]
+end
+
+if home_directory
+  directory home_directory do
+    user node['splunk']['user']
+    group node['splunk']['group']
+    mode '0700'
+  end
 end
 
 conflicts = node['splunk']['groups'].find_all do |group_to_add|

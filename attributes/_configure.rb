@@ -42,7 +42,7 @@ default['splunk']['boot_start_args'] =
     case node['platform_version'].to_i
     when 6
       '-systemd-managed 0'
-    when 7
+    when 7, 8
       '-systemd-managed 1 -systemd-unit-file-name splunk'
     else
       '-systemd-managed 0'

@@ -10,6 +10,7 @@ Configurable (with defaults)
 -----------------------------
 * `node['splunk']['exclude_groups']` - Array of local groups to which the splunk user should not belong. Checking existing memberships and removing the splunk user from these groups during the chef run only works on Chef 11.10+, users of prior versions should remove the splunk user from these groups manually. (`['root','wheel','admin']`)
 * `node['splunk']['groups']` - Array of local groups to which splunk user should be a member in addition to `node['splunk']['group']`. ([] - no additional groups)
+* `node['splunk']['user_home']` - The home directory to set for the splunk user. If unset the home directory will be the one created by the splunk package install in node['splunk']['home'] (nil - no default)
 * `node['splunk']['main_project_index']` - Index to send all configured monitors to by default (nil - no default)
 * `node['splunk']['monitors']` - Array of Hashes, to setup Monitoring stanzas (empty - no monitors)
   * `node['splunk']['monitors'][]['path']` - Path to monitor !!Required!!
