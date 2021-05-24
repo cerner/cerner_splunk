@@ -7,9 +7,6 @@ AllCops:
     - 'vendor/**/*'
     - '.git/**/*'
 
-Metrics/BlockLength:
-  Enabled: false
-
 Layout/LineLength:
   Enabled: false
 
@@ -22,10 +19,19 @@ Lint/RaiseException:
 Lint/StructNewOverride:
   Enabled: true
 
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
 Metrics/MethodLength:
   Max: 40
 
-Metrics/AbcSize:
+Metrics/PerceivedComplexity:
+  Max: 9
+
+Naming/VariableNumber:
   Enabled: false
 
 Style/EachWithObject:
@@ -40,14 +46,11 @@ Style/HashTransformKeys:
 Style/HashTransformValues:
   Enabled: true
 
-Style/SignalException:
-  EnforcedStyle: semantic
-
 Style/NumericPredicate:
   EnforcedStyle: comparison
 
-Style/TernaryParentheses:
-  Enabled: false
+Style/SignalException:
+  EnforcedStyle: semantic
 
-Naming/VariableNumber:
+Style/TernaryParentheses:
   Enabled: false

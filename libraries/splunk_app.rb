@@ -229,7 +229,7 @@ class Chef
         fail "Downloaded tarball for '#{new_resource.app}' has local entries" unless Dir[::File.join(temp_app_dir, 'local', '**', '*')].count { |file| ::File.file?(file) } == 0
       end
 
-      def should_install?(expected_version, installed_version, tar_version) # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+      def should_install?(expected_version, installed_version, tar_version) # rubocop:disable Metrics/CyclomaticComplexity
         fail "Downloaded tarball for #{new_resource.app} does not contain a version in app.conf!" unless tar_version.version
 
         # If we specify an expected version (see warning in should download), the tar version must match exactly OR the expected version is the base version of the (prerelease) tar version
@@ -283,12 +283,18 @@ class Chef
       end
 
       def manage_lookups
-        lookups = new_resource.lookups
-        lookups.each do |file_name, url|
-          if url && !url.empty?
+        new_resource.lookups.each do |file_name, value|
+          if value && !value.empty?
             fail "Unsupported lookup file format for #{file_name} in the app #{new_resource.app}" unless file_name =~ /\.(?:csv\.gz|csv|kmz)$/i
 
-            download_file ::File.join(new_resource.lookup_dir, file_name), url
+            if value.is_a? Hash
+              url = value['url']
+              auth = CernerSplunk::DataBag.load(value['authorization'], secret: node['splunk']['data_bag_secret']) if value['authorization']
+            else
+              url = value
+            end
+
+            download_file ::File.join(new_resource.lookup_dir, file_name), url, auth
           else
             delete_file ::File.join(new_resource.lookup_dir, file_name)
           end
@@ -305,10 +311,11 @@ class Chef
         manage_file(new_resource.perms_file, permissions)
       end
 
-      def download_file(file_path, url)
+      def download_file(file_path, url, auth = nil)
         download = Chef::Resource::RemoteFile.new(file_path, run_context)
         download.source(url)
         download.backup(false)
+        download.headers('Authorization' => auth) if auth
         download.run_action(:create)
       end
 
@@ -352,7 +359,7 @@ class Chef
       # function for dropping either a splunk template generated from a hash
       # or a simple file if the contents are a string. If the content of the file
       # is empty, then the file will be removed
-      def manage_file(path, contents) # rubocop:disable Metrics/PerceivedComplexity
+      def manage_file(path, contents)
         if contents.is_a?(Hash) && !contents.empty?
           file = Chef::Resource::Template.new(path, run_context)
           file.cookbook('cerner_splunk')

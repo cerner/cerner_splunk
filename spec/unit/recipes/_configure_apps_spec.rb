@@ -4,7 +4,7 @@ require_relative '../spec_helper'
 
 describe 'cerner_splunk::_configure_apps' do
   subject do
-    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '6.10') do |node|
+    runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '8') do |node|
       node.override['splunk']['apps'] = apps
     end
     runner.converge('cerner_splunk::_restart_marker', described_recipe)
@@ -22,7 +22,11 @@ describe 'cerner_splunk::_configure_apps' do
           }
         },
         'lookups' => {
-          'index-owners.csv' => 'http://33.33.33.33:5000/lookups/index-owners.csv'
+          'index-owners.csv' => 'http://33.33.33.33:5000/lookups/index-owners.csv',
+          'test.csv' => {
+            'url' => 'http://33.33.33.33:5000/lookups/test.csv',
+            'authorization' => 'test_bag/test_item:test_attribute'
+          }
         }
       }
     }
@@ -33,7 +37,11 @@ describe 'cerner_splunk::_configure_apps' do
   it 'installs the app with the expected attributes' do
     expected_attributes = {
       lookups: {
-        'index-owners.csv' => 'http://33.33.33.33:5000/lookups/index-owners.csv'
+        'index-owners.csv' => 'http://33.33.33.33:5000/lookups/index-owners.csv',
+        'test.csv' => {
+          'url' => 'http://33.33.33.33:5000/lookups/test.csv',
+          'authorization' => 'test_bag/test_item:test_attribute'
+        }
       },
       files: {
         'app.conf' => {
