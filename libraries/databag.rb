@@ -53,7 +53,7 @@ module CernerSplunk #:nodoc:
     # Converts an array of the form [data_bag,bag_item,key] to a string of the form "(data_bag/)bag_item(:key)"
     # If provided nil, will return nil
     # Inverse of to_a
-    def self.to_value(array, _options = {}) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def self.to_value(array, _options = {}) # rubocop:disable Metrics/CyclomaticComplexity
       case array
       when nil
         nil
