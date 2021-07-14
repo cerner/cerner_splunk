@@ -117,15 +117,10 @@ unless platform_family?('windows')
   end
 end
 
-r_b = ruby_block 'read splunk.secret' do
+ruby_block 'read splunk.secret' do
   block do
     node.run_state['cerner_splunk']['splunk.secret'] = ::File.open(::File.join(node['splunk']['home'], 'etc/auth/splunk.secret'), 'r') { |file| file.readline.chomp }
   end
-end
-
-# Hack to not always notify with a ruby_block
-def r_b.updated_by_last_action?
-  false
 end
 
 directory node['splunk']['external_config_directory'] do
