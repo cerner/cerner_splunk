@@ -1,7 +1,11 @@
 source 'https://rubygems.org'
 
 # Going forward, these should be updated to the latest versions immediately post release
-chefspec_version = '= 9.3.1'
+chefspec_version = if Bundler.current_ruby.on_25?
+                 '= 9.2.1'
+               else
+                 '= 9.3.1'
+               end
 
 foodcritic_version = '= 16.3.0'
 rubocop_version = '= 1.25.0'
