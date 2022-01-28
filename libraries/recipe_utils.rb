@@ -14,9 +14,7 @@ module CernerSplunk # rubocop:disable Metrics/ModuleLength
   NODE_TYPE ||= lambda do |symbol|
     throw 'Symbol should not be nil' unless symbol
     throw "Cannot set type '#{symbol}', already set '#{node.default['splunk']['node_type']}'" if node.default['splunk']['node_type']
-    if node['splunk']['free_license']
-      throw "Cannot use the Splunk #{symbol} recipe with the free license" unless %i[forwarder server].include? symbol
-    end
+    throw "Cannot use the Splunk #{symbol} recipe with the free license" if node['splunk']['free_license'] && !(%i[forwarder server].include? symbol)
     node.default['splunk']['node_type'] = symbol.to_sym
   end
 
@@ -126,7 +124,7 @@ module CernerSplunk # rubocop:disable Metrics/ModuleLength
 
   # Determine if we need to use the splunk start command instead of systemctl
   # https://docs.splunk.com/Documentation/Splunk/8.1.3/Admin/RunSplunkassystemdservice#Upgrade_considerations_for_systemd
-  def self.use_splunk_start_command?(node, previous_splunk_version) # rubocop:disable Metrics/CyclomaticComplexity
+  def self.use_splunk_start_command?(node, previous_splunk_version)
     return false unless ::File.exist?(node['splunk']['systemd_file_location'])
     return false if previous_splunk_version.nil?
 

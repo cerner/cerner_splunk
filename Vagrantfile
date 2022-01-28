@@ -80,7 +80,7 @@ Vagrant.configure('2') do |config|
   config.vm.provider :virtualbox do |vb|
     vb.customize ['modifyvm', :id, '--natdnsproxy1', 'off']
     vb.customize ['modifyvm', :id, '--natdnshostresolver1', 'off']
-    vb.customize ['modifyvm', :id, '--memory', 256]
+    vb.customize ['modifyvm', :id, '--memory', 384]
   end
 
   config.vm.define :chef do |cfg|

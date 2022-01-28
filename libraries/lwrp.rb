@@ -16,7 +16,7 @@ module CernerSplunk
   module LWRP
     # Change a list of monitors to a hash of stanzas for writing to a config file
     def self.convert_monitors(monitors, default_index = nil, base = {})
-      all_stanzas = monitors.inject(base) do |stanzas, element|
+      monitors.inject(base) do |stanzas, element|
         type = element['type'] || element[:type] || 'monitor'
         path = element['path'] || element[:path]
 
@@ -32,14 +32,13 @@ module CernerSplunk
         end
         stanzas
       end
-      all_stanzas
     end
 
     # RESOURCE: extend CernerSplunk::LWRP::DelayableAttribute unless defined? delayable_attribute
     #
     # Extension of the Resource DSL, defines an attribute that can be set upfront or can be calculated at convergence time.
     module DelayableAttribute
-      def delayable_attribute(attr_name, validation = {}) # rubocop:disable Metrics/CyclomaticComplexity
+      def delayable_attribute(attr_name, validation = {})
         class_eval(<<-SHIM, __FILE__, __LINE__ + 1)
           def #{attr_name}(arg=nil,&block)
             _set_or_return_#{attr_name}(arg,block)

@@ -13,7 +13,7 @@ require 'mixlib/archive'
 module CernerSplunk
   # Utilities to use with the splunk_app resource/provider
   class SplunkApp
-    def self.merge_hashes(*hashes)
+    def self.merge_hashes(*hashes) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       hashes.collect(&:keys).flatten.uniq.each_with_object({}) do |app_name, result|
         app_hash = {}
 
@@ -233,8 +233,8 @@ class Chef
         fail "Downloaded tarball for #{new_resource.app} does not contain a version in app.conf!" unless tar_version.version
 
         # If we specify an expected version (see warning in should download), the tar version must match exactly OR the expected version is the base version of the (prerelease) tar version
-        if expected_version.version && tar_version != expected_version
-          fail "Expected version #{expected_version} does not match tar version #{tar_version} for #{new_resource.app}" unless expected_version.type == :base && tar_version.base == expected_version.base
+        if expected_version.version && tar_version != expected_version && !(expected_version.type == :base && tar_version.base == expected_version.base) # rubocop:disable Style/IfUnlessModifier
+          fail "Expected version #{expected_version} does not match tar version #{tar_version} for #{new_resource.app}"
         end
         # If the exact version is already installed, NOOP
         return false if tar_version == installed_version
