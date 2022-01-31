@@ -10,7 +10,7 @@ module CernerSplunk
   # Encrypts the password before writing into config files. As of now all the passwords
   # needs to be XORed except for the sslPassword. The boolean
   # parameter xor controls the XOR logic.
-  def self.splunk_encrypt_password(plain_text, splunk_secret, xor = true)
+  def self.splunk_encrypt_password(plain_text, splunk_secret, xor)
     # Prevent double encrypting values
     return plain_text if plain_text.start_with? '$1$', '$7$'
 
@@ -23,13 +23,13 @@ module CernerSplunk
         pwd.zip(xorkey).map { |c1, c2| c1 ^ c2 }.pack('c*')
       end || plain_text
 
-    '$1$' + Base64.encode64(CernerSplunk::RC4.new(rc4key).encrypt("#{password}\0")).strip!
+    "$1$#{Base64.encode64(CernerSplunk::RC4.new(rc4key).encrypt("#{password}\0")).strip!}"
   end
 
   # Decrypts the splunk passwords. As of now the encrypted passwords needs to be XORed
   # to retrieve the plain_text for every password except the sslPassword.
   # The boolean parameter xor controls the XOR logic.
-  def self.splunk_decrypt_password(encryp_password, splunk_secret, xor = true)
+  def self.splunk_decrypt_password(encryp_password, splunk_secret, xor)
     rc4key = splunk_secret.strip[0..15]
     pwd = CernerSplunk::RC4.new(rc4key).decrypt(Base64.decode64(encryp_password.sub('$1$', ''))).chomp("\0")
 

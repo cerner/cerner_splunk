@@ -25,8 +25,8 @@ ruby_block 'update-initd-file' do
     file = Chef::Util::FileEdit.new(init_file_path)
     file.insert_line_after_match(/^RETVAL=\d$/, ulimit_command)
     file.insert_line_after_match(/^#{ulimit_command}$/, "USER=#{node['splunk']['user']}")
-    file.search_file_replace(%r{"[$\w\/]+\/bin\/splunk" start --no-prompt --answer-yes}, "su - ${USER} -c '\\0'")
-    file.search_file_replace(%r{"[$\w\/]+\/bin\/splunk" (stop|restart|status)}, "su - ${USER} -c '\\0'")
+    file.search_file_replace(%r{"[$\w/]+/bin/splunk" start --no-prompt --answer-yes}, "su - ${USER} -c '\\0'")
+    file.search_file_replace(%r{"[$\w/]+/bin/splunk" (stop|restart|status)}, "su - ${USER} -c '\\0'")
     file.write_file
   end
   only_if { File.exist?(init_file_path) }

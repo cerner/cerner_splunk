@@ -71,9 +71,8 @@ index_stanzas = config.inject({}) do |result, (stanza, index_config)|
       hash['thawedPath'] = "$SPLUNK_DB/#{dir_name}/thaweddb" unless hash['thawedPath']
       hash['tstatsHomePath'] = "#{base_path}/#{dir_name}/datamodel_summary" if volume && !hash['tstatsHomePath'] && !no_gentstat
     end
-    if is_master && !index_flags['noRepFactor']
-      hash['repFactor'] = 'auto' unless hash['repFactor']
-    end
+
+    hash['repFactor'] = 'auto' if is_master && !index_flags['noRepFactor'] && !hash['repFactor']
   end
 
   result[stanza] = hash

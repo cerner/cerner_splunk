@@ -6,7 +6,7 @@
 require 'chef/dsl/data_query'
 require 'chef-vault'
 
-module CernerSplunk #:nodoc:
+module CernerSplunk # :nodoc:
   # This module has methods and classes dealing with databags
   module DataBag
     extend Chef::DSL::DataQuery
