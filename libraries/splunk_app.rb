@@ -302,7 +302,7 @@ class Chef
       end
 
       def manage_metaconf
-        permissions = new_resource.permissions
+        permissions = new_resource.permissions.dup
         permissions.each do |stanza, hash|
           hash.each do |key, values|
             permissions[stanza][key] = values.map { |right, role| "#{right} : [ #{[*role].join(', ')} ]" }.join(', ') if values.is_a?(Hash)

@@ -4,7 +4,21 @@
   "default_attributes": {
     "splunk": {
       "apps": {
-        "bag": "cerner_splunk/cluster-apps-vagrant:search_head"
+        "bag": "cerner_splunk/cluster-apps-vagrant:search_head",
+        "another_awesome_app": {
+          "files": {
+            "app.conf": {
+              "ui": {
+                "is_visible": "1",
+                "label": "Another Awesome Splunk App"
+              }
+            }
+          },
+          "permissions": {
+            "": { "access": { "read": "*", "write": "*" } },
+            "viewstates": { "access": { "read": "*", "write": "*" } }
+          }
+        }
       },
       "logs": {
         "splunkd": {
