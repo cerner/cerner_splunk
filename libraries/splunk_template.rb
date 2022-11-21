@@ -17,9 +17,7 @@ class Chef
       include Chef::Mixin::Securable
       extend CernerSplunk::LWRP::DelayableAttribute unless defined? delayable_attribute
 
-      use_provider_resolver = defined?(Chef::ProviderResolver) == 'constant' && Class.instance_of?(Chef::ProviderResolver.class)
-
-      provides :splunk_template, (use_provider_resolver ? {} : { on_platforms: :all })
+      provides :splunk_template
 
       def initialize(name, run_context = nil)
         super

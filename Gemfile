@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 chefspec_version = if Bundler.current_ruby.on_25?
                  '= 9.2.1'
                else
-                 '= 9.3.1'
+                 '= 9.3.3'
                end
 
 foodcritic_version = '= 16.3.0'
@@ -16,8 +16,10 @@ chef_version = if Bundler.current_ruby.on_25?
                  '= 14.13.11'
                elsif Bundler.current_ruby.on_26?
                  '= 15.8.23'
-               else
+               elsif Bundler.current_ruby.on_26?
                  '= 16.17.18'
+               else
+                  '= 17.10.0'
                end
 
 gem 'berkshelf'
