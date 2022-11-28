@@ -20,7 +20,7 @@ Configurable (with defaults)
   * `node['splunk']['monitors'][][???]` - Other attributes for an inputs.conf stanza. See [inputs.conf][]
 * `node['splunk']['cleanup']` - Determines whether the recipe should attempt to clean up the old forwarder install (`true`)
 * `node['splunk']['package']['version']` - Major version to install (`9.0.2`)
-* `node['splunk']['package']['build']` - Corresponding build number (`17e00c557dc2`)
+* `node['splunk']['package']['build']` - Corresponding build number (`17e00c557dc1`)
 * `node['splunk']['package']['base_url']` - Base download path (`https://download.splunk.com/products`)
 * `node['splunk']['package']['base_name']` - Name of the package to install (`splunkforwarder`/`splunk`)
 * `node['splunk']['package']['name']` - Name of the package being installed (`"#{node['splunk']['package']['base_name']}-#{node['splunk']['package']['version']}-#{node['splunk']['package']['build']}"`)
