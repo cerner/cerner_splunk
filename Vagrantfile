@@ -55,7 +55,7 @@ def network(config, name, splunk_password = true)
 end
 
 def chef_defaults(chef, name, environment = 'splunk_server')
-  chef.version = '16'
+  chef.version = '17'
   chef.arguments = "--chef-license accept"
   chef.environment = environment
   chef.chef_server_url = "http://#{@chefip}:4000/"
@@ -80,7 +80,7 @@ Vagrant.configure('2') do |config|
   config.vm.provider :virtualbox do |vb|
     vb.customize ['modifyvm', :id, '--natdnsproxy1', 'off']
     vb.customize ['modifyvm', :id, '--natdnshostresolver1', 'off']
-    vb.customize ['modifyvm', :id, '--memory', 384]
+    vb.customize ['modifyvm', :id, '--memory', 1152]
   end
 
   config.vm.define :chef do |cfg|
