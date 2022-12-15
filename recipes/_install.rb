@@ -74,6 +74,16 @@ remote_file splunk_file do
   only_if(&manifest_missing)
 end
 
+# If this is an upgrade, we should stop splunk before installing the new package
+# The vagrant tests timeout trying to stop splunk on the windows box though, so skip windows
+# https://docs.splunk.com/Documentation/Forwarder/9.0.2/Forwarder/Upgradetheuniversalforwarder
+# https://docs.splunk.com/Documentation/Splunk/9.0.2/Installation/UpgradeonUNIX#Upgrade_Splunk_Enterprise
+ruby_block 'upgrade-splunk-stop' do
+  block { true }
+  notifies :stop, 'service[splunk]', :immediately
+  only_if { CernerSplunk.splunk_installed?(node) && node['splunk']['package']['version'] != previous_splunk_version && !platform_family?('windows') }
+end
+
 if platform_family? 'rhel', 'fedora', 'amazon'
   rpm_package node['splunk']['package']['base_name'] do
     source splunk_file
