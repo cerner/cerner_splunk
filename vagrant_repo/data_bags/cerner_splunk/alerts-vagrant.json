@@ -4,13 +4,13 @@
     "search.splunk.cerner.local": {
       "bag": ":base",
       "email": {
-        "hostname":"http://33.33.33.10:8000"
+        "hostname":"http://192.168.56.10:8000"
       }
     },
     "s_standalone": {
       "bag": ":base",
       "email": {
-        "hostname":"http://33.33.33.20:8000"
+        "hostname":"http://192.168.56.20:8000"
       }
     },
     "search_head": {

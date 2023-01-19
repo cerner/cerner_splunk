@@ -1,7 +1,7 @@
 {
   "id": "cluster-vagrant",
-  "master_uri": "https://33.33.33.11:8089",
-  "deployer_uri" : "https://33.33.33.28:8089",
+  "master_uri": "https://192.168.56.11:8089",
+  "deployer_uri" : "https://192.168.56.28:8089",
   "settings": {
     "replication_factor" : 2,
     "search_factor" : 2,
@@ -12,9 +12,9 @@
   },
   "license_uri": null,
   "receivers": [
-    "33.33.33.12",
-    "33.33.33.13",
-    "33.33.33.14"
+    "192.168.56.12",
+    "192.168.56.13",
+    "192.168.56.14"
   ],
   "tcpout_settings":{
     "useACK": false
@@ -25,9 +25,9 @@
     }
   },
   "shc_members": [
-    "https://33.33.33.15:8089",
-    "https://33.33.33.16:8089",
-    "https://33.33.33.17:8089"
+    "https://192.168.56.15:8089",
+    "https://192.168.56.16:8089",
+    "https://192.168.56.17:8089"
   ],
   "shc_settings":{
     "replication_factor" : 2,

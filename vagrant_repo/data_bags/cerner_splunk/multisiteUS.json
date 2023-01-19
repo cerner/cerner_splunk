@@ -1,7 +1,7 @@
 {
   "id": "multisiteUS",
   "sites" : ["cerner_splunk/cluster-vagrant-site1", "cerner_splunk/cluster-vagrant-site2"],
-  "master_uri": "https://33.33.33.35:8089",
+  "master_uri": "https://192.168.56.35:8089",
   "license_uri": null,
   "cluster_label": "Multisite-1",
   "multisite_settings": {
