@@ -1,7 +1,7 @@
 {
   "id": "cluster-standalone",
   "receivers": [
-    "33.33.33.20"
+    "192.168.56.20"
   ],
   "license_uri": null,
   "receiver_settings": {

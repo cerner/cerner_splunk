@@ -39,13 +39,13 @@
   "search_head": {
     "my_app": {
       "download": {
-        "url" : "http://33.33.33.33:5000/my_app.tgz",
+        "url" : "http://192.168.56.33:5000/my_app.tgz",
         "version" : "1.0"
       }
     },
     "test_app": {
       "download": {
-        "url" : "http://33.33.33.33:5000/test_app.tgz",
+        "url" : "http://192.168.56.33:5000/test_app.tgz",
         "version" : "1.0"
       }
     },
@@ -73,8 +73,8 @@
         "data/ui/nav/default.xml": "<nav search_view=\"search\" color=\"#72231F\"><view name=\"search\" default='true' /><view name=\"data_models\" /><view name=\"reports\" /><view name=\"alerts\" /><view name=\"dashboards\" /></nav>"
       },
       "lookups": {
-        "index-owners.csv": "http://33.33.33.33:5000/lookups/index-owners.csv",
-        "test.csv": "http://33.33.33.33:5000/lookups/test.txt"
+        "index-owners.csv": "http://192.168.56.33:5000/lookups/index-owners.csv",
+        "test.csv": "http://192.168.56.33:5000/lookups/test.txt"
       },
       "permissions": {
         "": {
