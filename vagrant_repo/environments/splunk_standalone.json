@@ -44,7 +44,8 @@
         }
       },
       "data_bag_secret": "/vagrant/vagrant_repo/alternative_encrypted_data_bag_secret",
-      "mgmt_interface": "eth1"
+      "mgmt_interface": "eth1",
+      "ignore_already_installed_instance" : true
     }
   }
 }
