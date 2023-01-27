@@ -7,7 +7,7 @@ sudo: false
 rvm:
 - 2.7.5
 - 3.0.3
-- 3.1.2
+- 3.1.0
 addons:
   apt:
     packages:

@@ -57,9 +57,9 @@ end
 def chef_defaults(chef, name, environment = 'splunk_server')
   chef.version = '18'
   if ENV['CHEF_DEBUG'] # if you want chef-client debug output
-    chef.arguments = "--chef-license accept -l debug" 
+    chef.arguments = "--chef-license accept --config-option cookbook_sync_threads=1 -l debug" 
   else
-    chef.arguments = "--chef-license accept"
+    chef.arguments = "--chef-license accept --config-option cookbook_sync_threads=1"
   end
   chef.environment = environment
   chef.chef_server_url = "http://#{@chefip}:4000/"
