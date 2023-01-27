@@ -11,7 +11,7 @@ chef_version = if Bundler.current_ruby.on_27?
                  '= 16.17.18'
                elsif Bundler.current_ruby.on_30?
                  '= 17.10.0'
-               elsif Bundler.current_ruby.on_31?
+               else
                  '= 18.1.0'
                end
 
