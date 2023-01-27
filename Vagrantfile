@@ -56,10 +56,9 @@ end
 
 def chef_defaults(chef, name, environment = 'splunk_server')
   chef.version = '18'
+  chef.arguments = "--chef-license accept"
   if ENV['CHEF_DEBUG'] # if you want chef-client debug output
-    chef.arguments = "--chef-license accept --config-option cookbook_sync_threads=1 -l debug" 
-  else
-    chef.arguments = "--chef-license accept --config-option cookbook_sync_threads=1"
+    chef.arguments += " -l debug"
   end
   chef.environment = environment
   chef.chef_server_url = "http://#{@chefip}:4000/"
@@ -88,7 +87,7 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define :chef do |cfg|
-    # update VERSION to take newer packages (current version is the lastest that still has chef-client 16) https://docs.chef.io/release_notes_workstation/
+    # update VERSION to take newer packages (current version is the latest that still has chef-client 16) https://docs.chef.io/release_notes_workstation/
     cfg.vm.provision :shell, inline: 'VERSION="21.4.365" && yum install -y https://packages.chef.io/files/stable/chef-workstation/${VERSION}/el/8/chef-workstation-${VERSION}-1.el7.x86_64.rpm'
 
     if ENV['KNIFE_ONLY']
@@ -316,6 +315,8 @@ Vagrant.configure('2') do |config|
     end
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :f_win2012r2, 'splunk_standalone'
+      # workaround for defect in chef 18 on windows: https://github.com/chef/chef/issues/13380
+      chef.arguments += " --config-option cookbook_sync_threads=1"
       chef.add_role 'splunk_monitors_windows'
       chef.add_recipe 'cerner_splunk_test::install_libarchive'
       chef.add_recipe 'cerner_splunk'

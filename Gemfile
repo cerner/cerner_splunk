@@ -7,11 +7,11 @@ rubocop_version = '= 1.25.0'
 
 chef_vault_version = '~> 4.0'
 
-chef_version = if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.7.0') && Gem::Version.new(RUBY_VERSION) < Gem::Version.new('3.0.0')
+chef_version = if Bundler.current_ruby.on_27?
                  '= 16.17.18'
-               elsif Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.0.0') && Gem::Version.new(RUBY_VERSION) < Gem::Version.new('3.1.0')
+               elsif Bundler.current_ruby.on_30?
                  '= 17.10.0'
-               elsif Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.1.0')
+               elsif Bundler.current_ruby.on_31?
                  '= 18.1.0'
                end
 
