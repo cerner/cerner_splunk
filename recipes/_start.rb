@@ -57,10 +57,22 @@ end
 
 # We then start splunk. In the future, the other resource should be here instead of this clumsy notification
 # but we'd need to refactor the determination of the service name away from the _install recipe.
-ruby_block 'start-splunk' do
-  block { true }
-  notifies :start, 'service[splunk]', :immediately
+
+ruby_block 'start-splunk-service' do
+  if node['splunk']['ignore_already_installed_instance'] == true
+    block { true }
+    notifies :start, 'service[splunkforwarder]', :immediately
+  else
+    block { true }
+    notifies :start, 'service[splunk]', :immediately
+  end
 end
+
+
+# ruby_block 'start-splunk' do
+#   block { true }
+#   notifies :start, 'service[splunk]', :immediately
+# end
 
 # The first time splunk is started on linux using chef the .pid file is owned by root which causes issues.
 pid_file = "#{node['splunk']['home']}/var/run/splunk/splunkd.pid"

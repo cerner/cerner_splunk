@@ -8,6 +8,8 @@
 
 return if node['splunk']['free_license'] && node['splunk']['node_type'] != :forwarder
 
+return if node['splunk']['ignore_already_installed_instance'] == true
+
 require 'securerandom'
 
 password_file = File.join node['splunk']['external_config_directory'], 'password'
