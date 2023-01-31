@@ -16,7 +16,7 @@
             },
             "deploymentclient.conf": {
               "target-broker:deploymentServer": {
-                "targetUri": "CERNCSECSPLNKDS00.northamerica.cerner.net:8089"
+                "targetUri": "test.net:8089"
               }
             }
           }
