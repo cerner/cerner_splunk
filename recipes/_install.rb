@@ -18,7 +18,7 @@ node.default['splunk']['package']['url'] =
 node.default['splunk']['home'] = CernerSplunk.splunk_home(node['platform_family'], node['kernel']['machine'], nsp['base_name'])
 node.default['splunk']['cmd'] = CernerSplunk.splunk_command(node)
 
-service = CernerSplunk.splunk_service_name(node['platform_family'], nsp['base_name'])
+service = CernerSplunk.splunk_service_name(node['platform_family'], nsp['base_name'], node['splunk']['systemd_unit_file_name'])
 
 manifest_missing = proc { ::Dir.glob("#{node['splunk']['home']}/#{node['splunk']['package']['name']}-*").empty? }
 

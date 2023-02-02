@@ -11,8 +11,10 @@ restart_flag = !(File.exist?(init_file_path) && File.readlines(init_file_path).g
 
 # We want to always ensure that the boot-start script is in place on non-windows platforms
 package_version = Gem::Version.new(node['splunk']['package']['version'])
-command = "#{node['splunk']['cmd']} enable boot-start -user #{node['splunk']['user']}"
+command = "#{node['splunk']['cmd']} enable boot-start -user #{node['splunk']['user']} -systemd-unit-file-name #{node['splunk']['systemd_unit_file_name']}"
 command += " -group #{node['splunk']['group']}" if package_version >= Gem::Version.new('7.3.0')
+#####
+#command += 
 command += " #{node['splunk']['boot_start_args']}" if package_version >= Gem::Version.new('7.2.2')
 
 execute command do
@@ -57,22 +59,10 @@ end
 
 # We then start splunk. In the future, the other resource should be here instead of this clumsy notification
 # but we'd need to refactor the determination of the service name away from the _install recipe.
-
-ruby_block 'start-splunk-service' do
-  if node['splunk']['ignore_already_installed_instance'] == true
-    block { true }
-    notifies :start, 'service[splunkforwarder]', :immediately
-  else
-    block { true }
-    notifies :start, 'service[splunk]', :immediately
-  end
+ruby_block 'start-splunk' do
+  block { true }
+  notifies :start, 'service[splunk]', :immediately
 end
-
-
-# ruby_block 'start-splunk' do
-#   block { true }
-#   notifies :start, 'service[splunk]', :immediately
-# end
 
 # The first time splunk is started on linux using chef the .pid file is owned by root which causes issues.
 pid_file = "#{node['splunk']['home']}/var/run/splunk/splunkd.pid"

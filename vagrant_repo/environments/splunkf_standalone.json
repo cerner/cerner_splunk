@@ -3,8 +3,8 @@
   "description": "Environment for the Splunk Standalone server and a separate universal forwarder.",
   "default_attributes": {
     "splunk": {
-      "boot_start_args": "-systemd-managed 1 -systemd-unit-file-name splunkforwarder",
-      "systemd_file_location": "etc/systemd/system/splunkforwarder.service",
+      "systemd_file_location": "/etc/systemd/system/splunkforwarder.service",
+      "systemd_unit_file_name": "splunkforwarder",
       "ignore_already_installed_instance" : true,
       "apps": {
         "CONFIG-CSSP_splunk": {

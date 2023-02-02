@@ -102,8 +102,8 @@ module CernerSplunk # rubocop:disable Metrics/ModuleLength
 
   # Returns the installed package name based on platform and package base name.
   # Written because Windows is dumb
-  def self.installed_package_name(platform_family, package_base_name)
-    return package_base_name unless platform_family == 'windows'
+  def self.installed_package_name(platform_family, package_base_name, systemd_unit_file_name)
+    return package_base_name unless systemd_unit_file_name != '' unless platform_family == 'windows'
 
     # Windows package names
     return 'Splunk Enterprise' if package_base_name == 'splunk'
@@ -139,13 +139,14 @@ module CernerSplunk # rubocop:disable Metrics/ModuleLength
   end
 
   # Returns the Splunk service name based on platform and package name
-  def self.splunk_service_name(platform_family, package_base_name)
+  def self.splunk_service_name(platform_family, package_base_name, systemd_unit_file_name)
     if platform_family == 'windows'
       return 'SplunkForwarder' if package_base_name == 'splunkforwarder'
       return 'Splunkd' if package_base_name == 'splunk'
     end
-
-    'splunk'
+      return systemd_unit_file_name
+    #return 'splunkforwarder' if package_base_name == 'splunkforwarder'
+    #'splunk'
   end
 
   # Validates that the splunk.secret file either does not exist or has the same value that's currently configured.

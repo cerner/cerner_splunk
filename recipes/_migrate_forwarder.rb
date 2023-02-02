@@ -10,7 +10,7 @@ require 'fileutils'
 opposite_package_name = CernerSplunk.opposite_package_name(node['splunk']['package']['base_name'])
 
 service 'splunk' do
-  service_name CernerSplunk.splunk_service_name(node['platform_family'], opposite_package_name)
+  service_name CernerSplunk.splunk_service_name(node['platform_family'], opposite_package_name, node['splunk']['systemd_unit_file_name'])
   action :stop
 end
 
