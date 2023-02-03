@@ -24,7 +24,6 @@ Vagrant.require_version '>= 2.2.5'
   s2_search:    { ip: '192.168.56.36', hostname: 's2.search.splunk', ports: { 8017 => 8000, 8107 => 8089 } },
   s2_slave1:    { ip: '192.168.56.37', hostname: 's2.slave01.splunk', ports: { 8018 => 8000, 8108 => 8089 } },
   s2_slave2:    { ip: '192.168.56.38', hostname: 's2.slave02.splunk', ports: { 8019 => 8000, 8109 => 8089 } },
-  sf_standalone:{ ip: '192.168.56.39', hostname: 'splunk3', ports: { 8020 => 8000, 8110 => 8089 } },
   f_default:    { ip: '192.168.56.50', hostname: 'default.forward', ports: { 9090 => 8089 } },
   f_debian:     { ip: '192.168.56.51', hostname: 'debian.forward', ports: { 9091 => 8089 } },
   f_heavy:      { ip: '192.168.56.52', hostname: 'heavy.forward', ports: { 9092 => 8089 } },
