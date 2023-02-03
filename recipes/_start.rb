@@ -13,8 +13,6 @@ restart_flag = !(File.exist?(init_file_path) && File.readlines(init_file_path).g
 package_version = Gem::Version.new(node['splunk']['package']['version'])
 command = "#{node['splunk']['cmd']} enable boot-start -user #{node['splunk']['user']}"
 command += " -group #{node['splunk']['group']}" if package_version >= Gem::Version.new('7.3.0')
-#####
-#command += 
 command += " #{node['splunk']['boot_start_args']} -systemd-unit-file-name #{node['splunk']['systemd_unit_file_name']}" if package_version >= Gem::Version.new('7.2.2')
 
 execute command do
