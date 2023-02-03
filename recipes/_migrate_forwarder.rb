@@ -24,7 +24,7 @@ ruby_block 'backup-splunk-artifacts' do
 end
 
 package opposite_package_name do
-  package_name CernerSplunk.installed_package_name(node['platform_family'], opposite_package_name)
+  package_name CernerSplunk.installed_package_name(node['platform_family'], opposite_package_name, systemd_unit_file_name)
   action :remove
 end
 
