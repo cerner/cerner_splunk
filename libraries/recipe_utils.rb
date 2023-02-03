@@ -144,9 +144,7 @@ module CernerSplunk # rubocop:disable Metrics/ModuleLength
       return 'SplunkForwarder' if package_base_name == 'splunkforwarder'
       return 'Splunkd' if package_base_name == 'splunk'
     end
-      return systemd_unit_file_name
-    #return 'splunkforwarder' if package_base_name == 'splunkforwarder'
-    #'splunk'
+    return systemd_unit_file_name
   end
 
   # Validates that the splunk.secret file either does not exist or has the same value that's currently configured.
