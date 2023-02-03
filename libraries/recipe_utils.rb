@@ -102,7 +102,7 @@ module CernerSplunk # rubocop:disable Metrics/ModuleLength
 
   # Returns the installed package name based on platform and package base name.
   # Written because Windows is dumb
-  def self.installed_package_name(platform_family, package_base_name, _systemd_unit_file_name)
+  def self.installed_package_name(platform_family, package_base_name)
     return package_base_name unless platform_family == 'windows'
 
     # Windows package names
