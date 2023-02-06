@@ -8,11 +8,14 @@
 
 return if node['splunk']['free_license'] && node['splunk']['node_type'] != :forwarder
 
-return if node['splunk']['ignore_already_installed_instance'] == true
-
 require 'securerandom'
 
-password_file = File.join node['splunk']['external_config_directory'], 'password'
+# For a node that has multiple splunk instances, create a separate password file.
+password_file = if node['splunk']['ignore_already_installed_instance'] == true
+                  File.join node['splunk']['external_config_directory'], 'password_forwarder'
+                else
+                  File.join node['splunk']['external_config_directory'], 'password'
+                end
 
 old_password = File.exist?(password_file) ? File.read(password_file) : 'changeme'
 
