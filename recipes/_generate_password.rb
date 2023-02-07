@@ -11,7 +11,7 @@ return if node['splunk']['free_license'] && node['splunk']['node_type'] != :forw
 require 'securerandom'
 
 # For a node that has multiple splunk instances, create a separate password file.
-password_file = if node['splunk']['ignore_already_installed_instance'] == true
+password_file = if node['splunk']['ignore_already_installed_instance']
                   File.join node['splunk']['external_config_directory'], 'password_forwarder'
                 else
                   File.join node['splunk']['external_config_directory'], 'password'
