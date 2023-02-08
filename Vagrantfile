@@ -55,8 +55,11 @@ def network(config, name, splunk_password = true)
 end
 
 def chef_defaults(chef, name, environment = 'splunk_server')
-  chef.version = '17'
+  chef.version = '18'
   chef.arguments = "--chef-license accept"
+  if ENV['CHEF_DEBUG'] # if you want chef-client debug output
+    chef.arguments += " -l debug"
+  end
   chef.environment = environment
   chef.chef_server_url = "http://#{@chefip}:4000/"
   chef.validation_key_path = 'vagrant_repo/fake-key.pem'
@@ -80,11 +83,12 @@ Vagrant.configure('2') do |config|
   config.vm.provider :virtualbox do |vb|
     vb.customize ['modifyvm', :id, '--natdnsproxy1', 'off']
     vb.customize ['modifyvm', :id, '--natdnshostresolver1', 'off']
-    vb.customize ['modifyvm', :id, '--memory', 1152]
+    vb.customize ['modifyvm', :id, '--memory', 1536]
   end
 
   config.vm.define :chef do |cfg|
-    cfg.vm.provision :shell, inline: 'rpm -q chefdk || curl -L https://omnitruck.chef.io/install.sh | bash -s -- -P chefdk -v 4.13.3'
+    # update VERSION to take newer packages (current version is the latest that still has chef-client 16) https://docs.chef.io/release_notes_workstation/
+    cfg.vm.provision :shell, inline: 'VERSION="21.4.365" && yum install -y https://packages.chef.io/files/stable/chef-workstation/${VERSION}/el/8/chef-workstation-${VERSION}-1.el7.x86_64.rpm'
 
     if ENV['KNIFE_ONLY']
       cfg.vm.provision :shell, inline: 'cd /vagrant/vagrant_repo; mv nodes .nodes.bak', privileged: false
@@ -95,7 +99,7 @@ Vagrant.configure('2') do |config|
     # We then need to run through any ruby files as well
     # We use berks to upload everything here as well, as we could be on VPN :)
     cfg.vm.provision :shell, inline: <<-'SCRIPT'.gsub(/^\s+/, ''), privileged: false
-      export PATH=$PATH:/opt/chefdk/bin:/opt/chefdk/embedded/bin
+      export PATH=$PATH:/opt/chef-workstation/bin:/opt/chef-workstation/embedded/bin
       nohup chef-zero -H 0.0.0.0 -p 4000 2>&1 > /dev/null &
       cd /vagrant/vagrant_repo
       gem install bundler
@@ -127,7 +131,7 @@ Vagrant.configure('2') do |config|
         fi
       done
       cd "$HOME"
-      netstat -nl | grep -q :5000 || nohup /opt/chefdk/embedded/bin/ruby -run -e httpd "$HOME/app_service" -p5000 2>&1 > /dev/null &
+      netstat -nl | grep -q :5000 || nohup /opt/chef-workstation/embedded/bin/ruby -run -e httpd "$HOME/app_service" -p5000 2>&1 > /dev/null &
       sleep 10
     SCRIPT
 
@@ -284,6 +288,7 @@ Vagrant.configure('2') do |config|
 
   config.vm.define :f_debian do |cfg|
     cfg.vm.box = 'bento/ubuntu-16.04'
+    cfg.vm.boot_timeout = 600 # was timing out for WSL
 
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :f_debian, 'splunk_standalone'
@@ -310,6 +315,8 @@ Vagrant.configure('2') do |config|
     end
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :f_win2012r2, 'splunk_standalone'
+      # workaround for defect in chef 18 on windows: https://github.com/chef/chef/issues/13380
+      chef.arguments += " --config-option cookbook_sync_threads=1"
       chef.add_role 'splunk_monitors_windows'
       chef.add_recipe 'cerner_splunk_test::install_libarchive'
       chef.add_recipe 'cerner_splunk'

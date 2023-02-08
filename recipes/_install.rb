@@ -33,8 +33,8 @@ include_recipe 'cerner_splunk::_restart_marker'
 # Under systemd, starting or restarting the service allows the chef run to continue
 # before Splunk is finished initializing.  Need to wait a bit to let it fully start
 # before we run any other commands.
-execute 'sleep-15' do
-  command 'sleep 15'
+chef_sleep 'sleep-45' do
+  seconds 45
   action :nothing
   only_if { ::File.exist? node['splunk']['systemd_file_location'] }
 end
@@ -48,7 +48,7 @@ service 'splunk' do
   supports status: true, start: true, stop: true
   start_command splunk_start_command if CernerSplunk.use_splunk_start_command? node, previous_splunk_version
   notifies :delete, 'file[splunk-marker]', :immediately
-  notifies :run, 'execute[sleep-15]', :immediately
+  notifies :sleep, 'chef_sleep[sleep-45]', :immediately
 end
 
 # This service definition is used for restarting splunk when the run is over
@@ -58,7 +58,7 @@ service 'splunk-restart' do
   supports status: true, restart: true
   only_if { ::File.exist? CernerSplunk.restart_marker_file }
   notifies :delete, 'file[splunk-marker]', :immediately
-  notifies :run, 'execute[sleep-15]', :immediately
+  notifies :sleep, 'chef_sleep[sleep-45]', :immediately
 end
 
 ruby_block 'splunk-delayed-restart' do

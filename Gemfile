@@ -7,12 +7,12 @@ rubocop_version = '= 1.25.0'
 
 chef_vault_version = '~> 4.0'
 
-chef_version = if Bundler.current_ruby.on_26?
-                 '= 15.8.23'
-               elsif Bundler.current_ruby.on_27?
+chef_version = if Bundler.current_ruby.on_27?
                  '= 16.17.18'
-               else
+               elsif Bundler.current_ruby.on_30?
                  '= 17.10.0'
+               else
+                 '= 18.1.0'
                end
 
 gem 'berkshelf'

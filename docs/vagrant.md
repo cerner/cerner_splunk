@@ -9,11 +9,12 @@ Running with Vagrant
   * `vagrant provision chef` - Will only package splunk apps if they're not already packaged.
   * `REGEN_APPS=1 vagrant provision chef` - Will repackage all apps.
 * You can speed up repeated provisioning attempts by mirroring the Splunk package downloads locally:
-  1. Download the needed splunk packages locally, in a directory structure mirroring that of download.splunk.com
+  * Download the needed splunk packages locally, in a directory structure mirroring that of download.splunk.com
     * You can find URLs for Splunk packages at the [Splunk download page](http://splunk.com/download)
   * Host the root of your mirrored structure on port 8080 using a lightweight HTTP server such as the node package [http-server](https://npmjs.org/package/http-server)
   * Un-comment the `splunk-mirrors` role in the Vagrant file. (Do not check in this modification of your Vagrantfile)
 * `vagrant-omnibus` installer currently requires internet access to function.
+* To debug the output of `chef-client`, run `CHEF_DEBUG=1 vagrant up <vm_name>` for a given VM, or `CHEF_DEBUG=1 vagrant up /c1_.*/` for all the nodes in a cluster.
 
 **Note**:
 If you want to set up the vagrant cluster to use the license pools defined in the [license pool hash](databags.md#license-pool-hash) databag, add the `configure_guids` recipe to the run_list on the cluster slave (to update the GUIDs on these slaves to predefined values) and update the `license_uri` attribute in the cluster-vagrant databag item to point to the license master (_https://192.168.56.30:8089_).
