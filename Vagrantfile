@@ -270,8 +270,12 @@ Vagrant.configure('2') do |config|
   config.vm.define :s_standalone do |cfg|
     cfg.vm.provision :chef_client do |chef|
       chef_defaults chef, :s_standalone, 'splunk_standalone'
+# This is used to test installing the forwarder ontop of a node that already has splunk installed. Only have 1 chef_defaults line active.
+#      chef_defaults chef, :s_standalone, 'splunkf_standalone'
       chef.add_recipe 'cerner_splunk_test::install_libarchive'
       chef.add_recipe 'cerner_splunk::server'
+# This is used to test installing the forwarder ontop of a node that already has splunk installed. Only have splunk_server OR forwarder active.
+#      chef.add_recipe 'cerner_splunk::forwarder'
     end
     network cfg, :s_standalone
   end

@@ -1,0 +1,27 @@
+{
+  "name": "splunkf_standalone",
+  "description": "Environment for the Splunk Standalone server and a separate universal forwarder.",
+  "default_attributes": {
+    "splunk": {
+      "systemd_file_location": "/etc/systemd/system/splunkforwarder.service",
+      "systemd_unit_file_name": "splunkforwarder",
+      "ignore_already_installed_instance" : true,
+      "apps": {
+        "CONFIG-CSSP_splunk": {
+          "files": {
+            "web.conf": {
+              "settings": {
+                "mgmtHostPort": 8088
+              }
+            },
+            "deploymentclient.conf": {
+              "target-broker:deploymentServer": {
+                "targetUri": "test.net:8089"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

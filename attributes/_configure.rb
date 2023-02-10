@@ -43,7 +43,7 @@ default['splunk']['boot_start_args'] =
     when 6
       '-systemd-managed 0'
     when 7, 8
-      '-systemd-managed 1 -systemd-unit-file-name splunk'
+      '-systemd-managed 1'
     else
       '-systemd-managed 0'
     end
@@ -53,5 +53,5 @@ default['splunk']['boot_start_args'] =
 
 # Default systemd file location based on default systemd unit file name
 default['splunk']['systemd_file_location'] = '/etc/systemd/system/splunk.service'
-
+default['splunk']['systemd_unit_file_name'] = 'splunk'
 default['splunk']['config']['sslPassword'] = 'password'

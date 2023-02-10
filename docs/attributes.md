@@ -50,6 +50,8 @@ Configurable (with defaults)
 * `node['splunk']['is_cloud']` - Set this attribute to `true` on cloud instances for Search Head Cluster (SHC). (`false`)
 * `node['splunk']['boot_start_args']` - Set splunk enabled boot-start arguments here. (` -systemd-managed 0`)
 * `node['splunk']['logs']` - Specify the contents of log-local.cfg, to override the default settings of Splunk's internal logging.
+* `node['splunk']['ignore_already_installed_instance']` - Set this attribute to `true` to allow the installation of a universal fowarder along side a full splunk installation. This will need to be a completely separate chef run.
+* `node['splunk']['systemd_unit_file_name']` - Allows the changing of the systemd unit file name.
 
 Non-configurable (defaults)
 ----------------------------

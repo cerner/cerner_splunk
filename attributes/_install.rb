@@ -39,3 +39,6 @@ default['splunk']['package']['file_suffix'] =
       '-x86-release.msi'
     end
   end
+
+# Ignore another splunk artifact installed on a node. This is for when you want to install the universal forwarder alongisde an instance of Splunk Enterprise.
+default['splunk']['ignore_already_installed_instance'] = false

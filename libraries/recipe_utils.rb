@@ -139,13 +139,12 @@ module CernerSplunk # rubocop:disable Metrics/ModuleLength
   end
 
   # Returns the Splunk service name based on platform and package name
-  def self.splunk_service_name(platform_family, package_base_name)
+  def self.splunk_service_name(platform_family, package_base_name, systemd_unit_file_name)
     if platform_family == 'windows'
       return 'SplunkForwarder' if package_base_name == 'splunkforwarder'
       return 'Splunkd' if package_base_name == 'splunk'
     end
-
-    'splunk'
+    systemd_unit_file_name
   end
 
   # Validates that the splunk.secret file either does not exist or has the same value that's currently configured.

@@ -19,6 +19,7 @@ Running with Vagrant
 **Note**:
 If you want to set up the vagrant cluster to use the license pools defined in the [license pool hash](databags.md#license-pool-hash) databag, add the `configure_guids` recipe to the run_list on the cluster slave (to update the GUIDs on these slaves to predefined values) and update the `license_uri` attribute in the cluster-vagrant databag item to point to the license master (_https://192.168.56.30:8089_).
 After you spin up the cluster slaves you will have to restart the cluster master to bring the cluster to a stable state. While spinning up the cluster slaves, they are re-assigned with different GUIDS by the `configure_guids` recipe which requires a restart (this restart can take a while to complete). Cluster master is restarted so that it can identify the new GUIDS.
+To test installing a Universal Forwarder along side a Splunk Enterprise installation, use the s_standalone vagrant instance. There are 2 comments in the Vagrantfile that replace the environment and recipe that is ran against the box. Run the default config first and then comment out the two lines mentioned and run `vagrant provsion chef s_standalone` to install the universal forwarder. 
 
 # Spinning up a Search Head Cluster in Vagrant
 
