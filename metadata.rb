@@ -6,7 +6,7 @@ maintainer_email 'splunk@cerner.com'
 license          'Apache-2.0'
 description      'Installs/Configures Splunk Servers and Forwarders'
 
-version          '2.57.0'
+version          '2.57.1'
 
 source_url       'https://github.com/cerner/cerner_splunk'
 issues_url       'https://github.com/cerner/cerner_splunk/issues'
