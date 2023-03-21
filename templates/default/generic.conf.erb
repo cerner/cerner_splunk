@@ -1,7 +1,5 @@
-<% stanzas = CernerSplunk::ConfTemplate.convert_stanzas @stanzas -%># Auto Generated and Managed with Chef!
-# EVERY TIME YOU MANUALLY EDIT THIS FILE,
-# APES GO BANANNAS MONKEYPATCHING UR RUBIES
-# SO DON'T DO IT CHIMP!!!!! BORK BORK BORK!!!!!
+<% stanzas = CernerSplunk::ConfTemplate.convert_stanzas @stanzas -%># This file is auto-generated and managed by the cerner_splunk Chef cookbook.
+# Manual changes to this file may be lost or modified during future Chef executions.
 
 <% stanzas['default'].each do |key,value| -%>
 <%=key%> = <%=value%>
