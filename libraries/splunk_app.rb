@@ -99,6 +99,10 @@ class Chef
         set_or_return(:version, arg, kind_of: String)
       end
 
+      def authorization(arg = nil)
+        set_or_return(:authorization, arg, kind_of: String)
+      end
+
       # Calculated attributes
       def required_directories
         %w[local default metadata lookups].collect { |d| "#{root_dir}/#{d}" }.unshift(root_dir)
@@ -216,8 +220,9 @@ class Chef
         return unless should_download? expected_version, installed_version
 
         filename = "#{Chef::Config[:file_cache_path]}/#{new_resource.app}.tgz"
+        authorization = CernerSplunk::DataBag.load(new_resource.authorization, secret: node['splunk']['data_bag_secret']) if new_resource.authorization
 
-        download = download_file filename, new_resource.url
+        download = download_file filename, new_resource.url, authorization
 
         install_from_tar filename, expected_version, installed_version
       ensure

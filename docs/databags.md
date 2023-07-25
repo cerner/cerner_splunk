@@ -142,6 +142,7 @@ An apps hash is a contextual (see above) Hash, part of a plaintext data bag item
 * `[app]['download']` - Information for downloading an app
 * `[app]['download']['url']` - URL of where to download the app .tar.gz or .spl file. Archive is expected to contain a top-level directory with name matching 'app' attribute above.
 * `[app]['download']['version']` - Expected [version number][app.conf] (if any) used to determine if a new app should be downloaded.
+* `[app]['download']['authorization']` - A contextual Hash of coordinate strings pointing to a key within a data bag item containing the Authorization header value for downloading the splunk app.
 * `[app]['files']` - Hash of files to manage under the "default" or "local" directory.
 * `[app]['files'][filename]` - Contents of a particular file to manage. It can take 3 values, a hash of stanzas -> key-value pairs (then written with the splunk template), a string (written as is), or nil / false (deleted). If the hash or string is empty, the file is also deleted.
 * `[app]['files'][filename][stanza][attribute]` - A particular attribute in a configuration file. Can be either a discrete value or a hash (parts described below)

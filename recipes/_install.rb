@@ -67,10 +67,12 @@ ruby_block 'splunk-delayed-restart' do
 end
 
 splunk_file = "#{Chef::Config[:file_cache_path]}/#{node['splunk']['package']['file_name']}"
-
+package_auth = node['splunk']['package']['authorization']
+auth_header = CernerSplunk::DataBag.load(package_auth, secret: node['splunk']['data_bag_secret']) if package_auth
 remote_file splunk_file do
   source node['splunk']['package']['url']
   action :create
+  headers('Authorization' => auth_header) if auth_header
   only_if(&manifest_missing)
 end
 
