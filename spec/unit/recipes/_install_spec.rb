@@ -10,6 +10,7 @@ describe 'cerner_splunk::_install' do
       node.override['splunk']['package']['base_name'] = 'splunkforwarder'
       node.override['splunk']['package']['download_group'] = 'universalforwarder'
       node.override['splunk']['package']['file_suffix'] = '.txt'
+      node.override['splunk']['package']['authorization'] = package_authorization
       node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
     end
     runner.converge(described_recipe)
@@ -31,6 +32,7 @@ describe 'cerner_splunk::_install' do
 
   let(:platform) { 'centos' }
   let(:platform_version) { '6.10' }
+  let(:package_authorization) { nil }
 
   let(:initd_exists) { nil }
   let(:ui_login_exists) { nil }
@@ -92,6 +94,21 @@ describe 'cerner_splunk::_install' do
       expect(subject).to create_remote_file(splunk_filepath)
     end
 
+    context 'when authorization is provided' do
+      let(:package_authorization) { 'cerner_splunk/test_item:auth' }
+      
+      before do
+        stub_data_bag_item('cerner_splunk', 'test_item').and_return('auth' => 'Basic user:pass')
+      end
+
+      it 'downloads the remote file' do
+        expected_attrs = {
+          headers: {'Authorization' => 'Basic user:pass'}
+        }
+        expect(subject).to create_remote_file(splunk_filepath).with(expected_attrs)
+      end
+    end
+
     it 'does not delete the downloaded splunk package' do
       expect(subject).to_not delete_file(splunk_filepath)
     end
@@ -100,12 +117,9 @@ describe 'cerner_splunk::_install' do
       let(:platform) { 'windows' }
       let(:platform_version) { '2012R2' }
       let(:windows) { true }
-      let(:password_databag) { 'cerner_splunk/passwords:winpass' }
 
       before do
         ENV['PROGRAMW6432'] = 'test'
-        allow(ChefVault::Item).to receive(:data_bag_item_type).and_return(:normal)
-        stub_data_bag_item('cerner_splunk', 'passwords').and_return('winpass' => 'foobar')
       end
 
       it 'installs downloaded splunk package' do

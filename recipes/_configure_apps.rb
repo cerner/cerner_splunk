@@ -26,6 +26,7 @@ apps.each do |app_name, app_data|
     action app_data['remove'] ? :remove : :create
     url download_data['url']
     version download_data['version']
+    authorization download_data['authorization']
     local app_data['local']
     files app_data['files']
     lookups app_data['lookups']
