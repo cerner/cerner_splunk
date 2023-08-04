@@ -13,8 +13,8 @@ default['splunk']['external_config_directory'] =
     '/etc/splunk'
   end
 
-default['splunk']['package']['version'] = '9.0.2'
-default['splunk']['package']['build'] = '17e00c557dc1'
+default['splunk']['package']['version'] = '9.0.5'
+default['splunk']['package']['build'] = 'e9494146ae5c'
 default['splunk']['is_cloud'] = false
 default['splunk']['package']['base_url'] = 'https://download.splunk.com/products'
 default['splunk']['package']['platform'] = node['os']
@@ -22,7 +22,12 @@ default['splunk']['package']['file_suffix'] =
   case node['platform_family']
   when 'rhel', 'fedora'
     if node['kernel']['machine'] == 'x86_64'
+      # linux rpms of splunk/UF before 9.0.5 are a differently named package.
+      if default['splunk']['package']['version'] >= '9.0.5'
+        '.x86_64.rpm'
+      else
       '-linux-2.6-x86_64.rpm'
+      end
     else
       '.i386.rpm'
     end
