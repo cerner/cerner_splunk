@@ -23,7 +23,8 @@ default['splunk']['package']['file_suffix'] =
   when 'rhel', 'fedora'
     if node['kernel']['machine'] == 'x86_64'
       # linux rpms of splunk/UF before 9.0.5 are a differently named package.
-      if default['splunk']['package']['version'] >= '9.0.5'
+      package_version = Gem::Version.new(node['splunk']['package']['version'])
+      if package_version >= Gem::Version.new('9.0.5')
         '.x86_64.rpm'
       else
       '-linux-2.6-x86_64.rpm'
