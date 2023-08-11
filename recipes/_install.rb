@@ -12,6 +12,33 @@ end
 
 # Attributes
 node.default['splunk']['package']['name'] = "#{nsp['base_name']}-#{nsp['version']}-#{nsp['build']}"
+node.default['splunk']['package']['file_suffix'] =
+  case node['platform_family']
+  when 'rhel', 'fedora'
+    if node['kernel']['machine'] == 'x86_64'
+      # linux rpms of splunk/UF before 9.0.5 are a differently named package.
+      package_version = Gem::Version.new(node['splunk']['package']['version'])
+      if package_version >= Gem::Version.new('9.0.5')
+        '.x86_64.rpm'
+      else
+      '-linux-2.6-x86_64.rpm'
+      end
+    else
+      '.i386.rpm'
+    end
+  when 'debian'
+    if node['kernel']['machine'] == 'x86_64'
+      '-linux-2.6-amd64.deb'
+    else
+      '-linux-2.6-intel.deb'
+    end
+  when 'windows'
+    if node['kernel']['machine'] == 'x86_64'
+      '-x64-release.msi'
+    else
+      '-x86-release.msi'
+    end
+  end
 node.default['splunk']['package']['file_name'] = "#{nsp['name']}#{nsp['file_suffix']}"
 node.default['splunk']['package']['url'] =
   "#{nsp['base_url']}/#{nsp['download_group']}/releases/#{nsp['version']}/#{nsp['platform']}/#{nsp['file_name']}"
